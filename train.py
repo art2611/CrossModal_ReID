@@ -29,7 +29,7 @@ def multi_process() :
     num_of_same_id_in_batch = 4 # Number of same identity in a batch
     workers = 4
     lr = 0.001
-    checkpoint_path = 'save_model/'
+    checkpoint_path = '../save_model/'
     suffix = f'RegDB_person({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
     # Data info  :
     data_path = '../Datasets/RegDB/'
@@ -155,7 +155,7 @@ def multi_process() :
             # measure elapsed time
             batch_time.update(time.time() - end)
             end = time.time()
-            if batch_idx % 2 == 0:
+            if batch_idx % 30 == 0:
                 print(f'Epoch: [{epoch}][{batch_idx}/{len(trainloader)}] '
                       f'Time: {batch_time.val:.3f} ({batch_time.avg:.3f}) '
                       f'lr:{current_lr:.3f} '
