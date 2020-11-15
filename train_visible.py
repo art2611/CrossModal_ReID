@@ -182,11 +182,12 @@ def multi_process() :
                       f'iLoss: {id_loss.val:.4f} ({id_loss.avg:.4f}) '
                       f'TLoss: {tri_loss.val:.4f} ({tri_loss.avg:.4f}) '
                       f'Accu: {100. * correct / total:.2f}')
-        # For all batch, write in tensorBoard
-        writer.add_scalar('total_loss', train_loss.avg, epoch)
-        writer.add_scalar('id_loss', id_loss.avg, epoch)
-        writer.add_scalar('tri_loss', tri_loss.avg, epoch)
-        writer.add_scalar('lr', current_lr, epoch)
+            # For all batch, write in tensorBoard
+            writer.add_scalar('total_loss', train_loss.avg, epoch)
+            writer.add_scalar('id_loss', id_loss.avg, epoch)
+            writer.add_scalar('tri_loss', tri_loss.avg, epoch)
+            writer.add_scalar('lr', current_lr, epoch)
+            writer.add_scalar('acc_train', acc, epoch)
 
 
     # Training part
@@ -264,12 +265,12 @@ def multi_process() :
                     _, predicted = out0.max(1)
                     correct += (predicted.eq(visible_label).sum().item() / 2)
                     loss = loss_ce + loss_tri
+                    total += visible_label.size(0)
+                    acc = 100. * correct / total
 
                     valid_loss.update(loss.item(), 2 * visible_input.size(0))
                     valid_id_loss.update(loss_ce.item(), 2 * visible_input.size(0))
                     valid_tri_loss.update(loss_tri.item(), 2 * visible_input.size(0))
-                    total += visible_label.size(0)
-                    acc = 100. * correct / total
 
                     print(f'Loss: {loss:.4f}'
                           f'iLoss: {loss_ce:.4f}  '
@@ -291,6 +292,7 @@ def multi_process() :
             writer.add_scalar('Valid_total_loss', valid_loss.avg, epoch)
             writer.add_scalar('Valid_loss', valid_id_loss.avg, epoch)
             writer.add_scalar('Valid_tri_loss', valid_tri_loss.avg, epoch)
+            writer.add_scalar('acc_test', acc, epoch)
 
 if __name__ == '__main__':
     freeze_support()
