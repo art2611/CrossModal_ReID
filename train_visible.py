@@ -265,17 +265,17 @@ def multi_process() :
                     correct += (predicted.eq(visible_label).sum().item() / 2)
                     loss = loss_ce + loss_tri
 
+                    valid_loss.update(loss.item(), 2 * visible_input.size(0))
+                    valid_id_loss.update(loss_ce.item(), 2 * visible_input.size(0))
+                    valid_tri_loss.update(loss_tri.item(), 2 * visible_input.size(0))
+                    total += visible_label.size(0)
+                    acc = 100. * correct / total
 
                     print(f'Loss: {loss:.4f}'
                           f'iLoss: {loss_ce:.4f}  '
                           f'TLoss: {loss_tri:.4f}  '
                           f'Accurac= {acc}'
                           )
-                    valid_loss.update(loss.item(), 2 * visible_input.size(0))
-                    valid_id_loss.update(loss_ce.item(), 2 * visible_input.size(0))
-                    valid_tri_loss.update(loss_tri.item(), 2 * visible_input.size(0))
-                    total += visible_label.size(0)
-                    acc = 100. * correct / total
             # save model
             if acc > best_acc:
                 best_acc = acc
