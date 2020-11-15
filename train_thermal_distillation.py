@@ -197,8 +197,8 @@ def multi_process() :
 
             loss_MSE = criterion_MSE(out1, out2)
 
-            _, predicted = out0.max(1)
-            correct += (predicted.eq(visible_label).sum().item())
+            _, predicted = out2.max(1)
+            correct += (predicted.eq(thermal_label).sum().item())
 
             optimizer.zero_grad()
             loss_MSE.backward()
