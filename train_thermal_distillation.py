@@ -174,7 +174,7 @@ def multi_process() :
         net_thermal.train()
 
         end = time.time()
-        for batch_idx, (visible_input, visible_label, thermal_input, thermal_label) in enumerate(trainloader):
+        for batch_idx, (visible_input, thermal_input, visible_label, thermal_label) in enumerate(trainloader):
             # visible_input = Variable(visible_input.cuda())
             # thermal_input = Variable(visible_input.cuda())
             # visible_label = Variable(visible_label.cuda())
