@@ -136,9 +136,10 @@ def multi_process() :
     # Freeze visible model
     net_visible.eval()
     # Freeze some in thermal model
-    for param in net_thermal.parameters():
+    for layer in net_thermal.shared_resnet.base:
         # param.requires_grad = False
-        print(param)
+        layer.requires_grad = False
+        print(layer)
     sys.exit()
 
     ######################################### TRAINING
