@@ -19,7 +19,7 @@ from evaluation import eval_regdb
 import sys
 from data_augmentation import data_aug
 
-
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 def multi_process() :
     # device = 'cpu'
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -181,7 +181,9 @@ def multi_process() :
             thermal_label = Variable(visible_label.cuda())
 
             # visible_input = Variable(visible_input)
+            # thermal_input = Variable(visible_input)
             # visible_label = Variable(visible_label)
+            # thermal_label = Variable(visible_label)
 
             data_time.update(time.time() - end)
 
@@ -189,7 +191,7 @@ def multi_process() :
             # Out is the last output
             feat1, out1, = net_visible(visible_input)  # Call the visible branch only
 
-            feat2, out2, = net_visible(visible_input)
+            feat2, out2, = net_thermal(thermal_input)
             sys.exit()
 
             loss_MSE = criterion_MSE(out1, out2)
