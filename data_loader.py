@@ -318,7 +318,7 @@ def process_test_regdb(img_dir, trial=1, modal='visible', split = False):
             #     w = ((k+1)%4 < 4)
             # elif trial == 4 :
             #     w = ((k+1)%6 <6)
-            if w :
+            if ((k+1)%5 < 5) :
             # if (k+1)%10 < 5 :
                 first_image_slice.append(file_image[k])
                 first_label_slice.append(file_label[k])
