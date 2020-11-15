@@ -188,7 +188,7 @@ def multi_process() :
             # feat is the feature vector out of
             # Out is the last output
             feat1, out1, = net_visible(visible_input)  # Call the visible branch only
-            feat2, out2, = net_thermal(thermal_input)
+            feat2, out2, = net_visible(thermal_input)
 
 
             loss_MSE = criterion_MSE(out1, out2)
