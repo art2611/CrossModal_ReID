@@ -160,7 +160,7 @@ def multi_process() :
         weight_decay=5e-4, momentum=0.9, nesterov=True)
 
     ################FUNCTIONs :
-    sys.exit()
+
 
     def train_thermal(epoch):
         current_lr = adjust_learning_rate(optimizer, epoch, lr=lr)
@@ -172,6 +172,7 @@ def multi_process() :
 
         # switch to train mode
         net_thermal.train()
+
         end = time.time()
         for batch_idx, (visible_input, visible_label, thermal_input, thermal_label) in enumerate(trainloader):
             visible_input = Variable(visible_input.cuda())
@@ -191,6 +192,7 @@ def multi_process() :
 
 
             loss_MSE = criterion_MSE(out1, out2)
+            sys.exit()
             _, predicted = out0.max(1)
             correct += (predicted.eq(visible_label).sum().item())
 
