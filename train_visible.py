@@ -11,7 +11,7 @@ import numpy as np
 from utils import *
 from loss import BatchHardTripLoss
 from tensorboardX import SummaryWriter
-from model import Network
+from model import Network, Network_fuse
 from multiprocessing import freeze_support
 from test import extract_gall_feat, extract_query_feat
 from evaluation import eval_regdb
@@ -109,7 +109,8 @@ def multi_process() :
     print('==> Building model..')
     ######################################### MODEL
 
-    net = Network(206).to(device)
+    # net = Network(206).to(device)
+    net = Network_fuse(206).to(device)
 
     ######################################### TRAINING
     print('==> Start Training...')
@@ -152,7 +153,8 @@ def multi_process() :
 
             # feat is the feature vector out of
             # Out is the last output
-            feat, out0, = net(visible_input)  # Call the visible branch only
+            # feat, out0, = net(visible_input)  # Call the visible branch only
+            feat, out0, = net(visible_input, visible_input, modal=1)  # Call the visible branch only
 
             loss_ce = criterion_id(out0, visible_label)
             loss_tri, batch_acc = criterion_tri(feat, visible_label)
@@ -257,7 +259,8 @@ def multi_process() :
                     # visible_label = Variable(visible_label.cuda())
                     visible_input = Variable(visible_input)
                     visible_label = Variable(visible_label)
-                    feat, out0, = net(visible_input)  # Call the visible branch only
+                    # feat, out0, = net(visible_input)  # Call the visible branch only
+                    feat, out0, = net(visible_input, visible_input, modal=1) # Call the visible branch only
 
                     loss_ce = criterion_id(out0, visible_label)
                     loss_tri, batch_acc = criterion_tri(feat, visible_label)
