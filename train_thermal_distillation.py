@@ -160,7 +160,7 @@ def multi_process() :
         weight_decay=5e-4, momentum=0.9, nesterov=True)
 
     ################FUNCTIONs :
-
+    sys.exit()
 
     def train_thermal(epoch):
         current_lr = adjust_learning_rate(optimizer, epoch, lr=lr)
