@@ -24,7 +24,7 @@ def multi_process() :
     # device = 'cpu'
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    writer = SummaryWriter("runs/CrossModal2")
+    writer = SummaryWriter("runs/CrossModal4")
 
     # Init variables :
     img_w = 144
