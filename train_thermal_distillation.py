@@ -21,15 +21,15 @@ from data_augmentation import data_aug
 
 
 def multi_process() :
-    device = 'cpu'
-    # device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    # device = 'cpu'
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     writer = SummaryWriter("runs/CrossModal3")
 
     # Init variables :
     img_w = 144
     img_h = 288
     test_batch_size = 64
-    batch_num_identities = 8 # 8 different identities in a batch
+    batch_num_identities = 16 # 8 different identities in a batch
     trainV_batch_num_identities = 16 # 16 different identities in a batch
     num_of_same_id_in_batch = 4 # Number of same identity in a batch
     workers = 4
@@ -135,6 +135,7 @@ def multi_process() :
 
     # Freeze visible model
     net_visible.eval()
+    net_thermal.train()
     # Freeze some in thermal model
     net_thermal.Resnet_module.res.layer2.requires_grad = False
     net_thermal.Resnet_module.res.layer3.requires_grad = False
@@ -174,10 +175,10 @@ def multi_process() :
         net_thermal.train()
         end = time.time()
         for batch_idx, (visible_input, visible_label) in enumerate(trainloader):
-            # visible_input = Variable(visible_input.cuda())
-            # visible_label = Variable(visible_label.cuda())
-            visible_input = Variable(visible_input)
-            visible_label = Variable(visible_label)
+            visible_input = Variable(visible_input.cuda())
+            visible_label = Variable(visible_label.cuda())
+            # visible_input = Variable(visible_input)
+            # visible_label = Variable(visible_label)
 
             data_time.update(time.time() - end)
 
@@ -284,10 +285,10 @@ def multi_process() :
             total = 0
             with torch.no_grad():
                 for batch_idx, (visible_input, visible_label) in enumerate(validloader):
-                    # visible_input = Variable(visible_input.cuda())
-                    # visible_label = Variable(visible_label.cuda())
-                    visible_input = Variable(visible_input)
-                    visible_label = Variable(visible_label)
+                    visible_input = Variable(visible_input.cuda())
+                    visible_label = Variable(visible_label.cuda())
+                    # visible_input = Variable(visible_input)
+                    # visible_label = Variable(visible_label)
                     feat, out0, = net_thermal(visible_input, visible_input, modal=1)  # Call the visible branch only
 
                     loss_ce = criterion_id(out0, visible_label)
