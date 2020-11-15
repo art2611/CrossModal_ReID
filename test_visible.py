@@ -96,7 +96,7 @@ def multi_process() :
                 checkpoint = torch.load(model_path)
                 net = Network(class_num=nclass)
                 net = net.load_state_dict(checkpoint['net'])
-                # net = net.to(device)
+                net = net.to(device)
             else :
                 print("Saved model not loaded, care")
                 net = Network(class_num = nclass).to(device)
