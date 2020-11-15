@@ -80,8 +80,13 @@ class RegDBData_split(data.Dataset):
         thermal_lab = []
         #Get real and thermal images with good shape in a list
         # Training => return 50%
-        if split == "training" :
-            first50percent = int(len(color_img_file)*50/100)
+        # On s'assure d'avoir 50% mais surtout un multiple de 10 pour coller avec le nb d'images
+        first50percent = int(len(color_img_file) * 50 / 100)
+        first50percent -= int(len(color_img_file) * 50 / 100) % 10
+        first80percent = int(len(color_img_file) * 80 / 100)
+        first80percent -= int(len(color_img_file) * 80 / 100)%10
+
+        if split == "training":
             for i in range(first50percent):
                 img = Image.open(data_dir + color_img_file[i])
                 img = img.resize((144, 288), Image.ANTIALIAS)
@@ -105,16 +110,14 @@ class RegDBData_split(data.Dataset):
             self.train_thermal_image = thermal_image
             self.train_thermal_label = thermal_lab
         if split == "validation" :
-            first50percent = int(len(color_img_file) * 50 / 100)
-            first80percent = int(len(color_img_file) * 80 / 100)
-            for i in range(first50percent , first80percent):
+            for i in range(first50percent, first80percent):
                 img = Image.open(data_dir + color_img_file[i])
                 img = img.resize((144, 288), Image.ANTIALIAS)
                 pix_array = np.array(img)
                 color_image.append(pix_array)
                 color_lab.append(color_target[i])
 
-            for i in range(first50percent , first80percent):
+            for i in range(first50percent, first80percent):
                 img = Image.open(data_dir + thermal_img_file[i])
                 img = img.resize((144, 288), Image.ANTIALIAS)
                 pix_array = np.array(img)
@@ -130,8 +133,6 @@ class RegDBData_split(data.Dataset):
             self.valid_thermal_image = thermal_image
             self.valid_thermal_label = thermal_lab
         if split == "testing" :
-            first80percent = int(len(color_img_file)*80/100)
-            print(f' last 20% {len(color_img_file) - (first80percent +1)}')
             for i in range(first80percent, len(color_img_file)):
                 img = Image.open(data_dir + color_img_file[i])
                 img = img.resize((144, 288), Image.ANTIALIAS)
@@ -194,8 +195,11 @@ class RegDBVisibleData_split(data.Dataset):
 
         #Get real and thermal images with good shape in a list
         # Training => return 50%
+        first50percent = int(len(color_img_file) * 50 / 100)
+        first50percent -= int(len(color_img_file) * 50 / 100) % 10
+        first80percent = int(len(color_img_file) * 80 / 100)
+        first80percent -= int(len(color_img_file) * 80 / 100)%10
         if split == "training" :
-            first50percent = int(len(color_img_file)*50/100)
             for i in range(first50percent):
                 img = Image.open(data_dir + color_img_file[i])
                 img = img.resize((144, 288), Image.ANTIALIAS)
@@ -209,8 +213,6 @@ class RegDBVisibleData_split(data.Dataset):
             self.train_color_label = color_lab
 
         if split == "validation" :
-            first50percent = int(len(color_img_file) * 50 / 100)
-            first80percent = int(len(color_img_file) * 80 / 100)
             for i in range(first50percent , first80percent):
                 img = Image.open(data_dir + color_img_file[i])
                 img = img.resize((144, 288), Image.ANTIALIAS)
@@ -225,8 +227,6 @@ class RegDBVisibleData_split(data.Dataset):
             self.valid_color_label = color_lab
 
         if split == "testing" :
-            first80percent = int(len(color_img_file)*80/100)
-            print(f' last 20% {len(color_img_file) - (first80percent +1)}')
             for i in range(first80percent, len(color_img_file)):
                 img = Image.open(data_dir + color_img_file[i])
                 img = img.resize((144, 288), Image.ANTIALIAS)
@@ -235,12 +235,9 @@ class RegDBVisibleData_split(data.Dataset):
                 color_lab.append(color_target[i])
 
             color_image = np.array(color_image)
-
             # Init color images / labels
             self.test_color_image = color_image
             self.test_color_label = color_lab
-
-
         self.transform = transform
         # Prepare index
         self.cIndex = colorIndex
@@ -308,6 +305,7 @@ def process_test_regdb(img_dir, trial=1, modal='visible', split = False):
         sec_image_slice = []
         sec_label_slice = []
         first80percent = int(len(file_image) * 80 / 100)
+        first80percent -= int(len(file_image) * 80 / 100) % 10
         #Récupération des 20 dernier % d'images pour la phase de test
         for k in range(first80percent, len(file_image)):
             w = ((k + 1) % 10 <= trial)
