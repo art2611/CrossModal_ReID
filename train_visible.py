@@ -22,7 +22,7 @@ from data_augmentation import data_aug
 def multi_process() :
     device = 'cpu'
     # device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    writer = SummaryWriter("runs/CrossModal1")
+    writer = SummaryWriter("runs/CrossModal2")
 
     # Init variables :
     img_w = 144
@@ -183,11 +183,11 @@ def multi_process() :
                       f'TLoss: {tri_loss.val:.4f} ({tri_loss.avg:.4f}) '
                       f'Accu: {100. * correct / total:.2f}')
             # For all batch, write in tensorBoard
-            writer.add_scalar('total_loss', train_loss.avg, epoch)
-            writer.add_scalar('id_loss', id_loss.avg, epoch)
-            writer.add_scalar('tri_loss', tri_loss.avg, epoch)
-            writer.add_scalar('lr', current_lr, epoch)
-            writer.add_scalar('acc_train', 100. * correct / total, epoch)
+        writer.add_scalar('total_loss', train_loss.avg, epoch)
+        writer.add_scalar('id_loss', id_loss.avg, epoch)
+        writer.add_scalar('tri_loss', tri_loss.avg, epoch)
+        writer.add_scalar('lr', current_lr, epoch)
+        writer.add_scalar('acc_train', 100. * correct / total, epoch)
 
 
     # Training part
