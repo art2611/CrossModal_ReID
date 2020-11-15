@@ -92,6 +92,7 @@ def multi_process() :
     loaded_img = len(trainset.train_color_image) + len(validset.valid_color_label) + \
             len(validset.valid_color_image) + len(validset.valid_thermal_image)
 
+
     print(f'Loaded images : {loaded_img}')
     print(' ')
     ######################################### Image GENERATION
@@ -102,7 +103,9 @@ def multi_process() :
     loaded_img = len(trainset.train_color_image) + len(validset.valid_color_image) + \
                  len(trainset.train_thermal_image) + len(validset.valid_thermal_image)
     print(f'New image number : {loaded_img}')
-    train_color_pos, thermal_color_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
+    train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
+    valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
+
     print(f'Identities number : {len(train_color_pos)}')
     print(' ')
     print('New dataset statistics:')
@@ -141,8 +144,6 @@ def multi_process() :
     net_thermal.Resnet_module.res.layer3.requires_grad = False
     net_thermal.Resnet_module.res.layer4.requires_grad = False
 
-    sys.exit()
-
     ######################################### TRAINING
     print('==> Start Training...')
 
@@ -161,11 +162,9 @@ def multi_process() :
     ################FUNCTIONs :
 
 
-    def train_visible(epoch):
+    def train_thermal(epoch):
         current_lr = adjust_learning_rate(optimizer, epoch, lr=lr)
         train_loss = AverageMeter()
-        id_loss = AverageMeter()
-        tri_loss = AverageMeter()
         data_time = AverageMeter()
         batch_time = AverageMeter()
         correct = 0
@@ -174,9 +173,12 @@ def multi_process() :
         # switch to train mode
         net_thermal.train()
         end = time.time()
-        for batch_idx, (visible_input, visible_label) in enumerate(trainloader):
+        for batch_idx, (visible_input, visible_label, thermal_input, thermal_label) in enumerate(trainloader):
             visible_input = Variable(visible_input.cuda())
+            thermal_input = Variable(visible_input.cuda())
             visible_label = Variable(visible_label.cuda())
+            thermal_label = Variable(visible_label.cuda())
+
             # visible_input = Variable(visible_input)
             # visible_label = Variable(visible_label)
 
@@ -184,23 +186,20 @@ def multi_process() :
 
             # feat is the feature vector out of
             # Out is the last output
-            feat, out0, = net_thermal(visible_input, visible_input, modal=1)  # Call the visible branch only
+            feat1, out1, = net_visible(visible_input)  # Call the visible branch only
+            feat2, out2, = net_thermal(thermal_input)
 
-            loss_ce = criterion_id(out0, visible_label)
-            loss_tri, batch_acc = criterion_tri(feat, visible_label)
-            correct += (batch_acc / 2)
+
+            loss_MSE = criterion_MSE(out1, out2)
             _, predicted = out0.max(1)
-            correct += (predicted.eq(visible_label).sum().item() / 2)
+            correct += (predicted.eq(visible_label).sum().item())
 
-            loss = loss_ce + loss_tri
             optimizer.zero_grad()
-            loss.backward()
+            loss_MSE.backward()
             optimizer.step()
 
             # update P
-            train_loss.update(loss.item(), 2 * visible_input.size(0))
-            id_loss.update(loss_ce.item(), 2 * visible_input.size(0))
-            tri_loss.update(loss_tri.item(), 2 * visible_input.size(0))
+            train_loss.update(loss_MSE.item(), 2 * visible_input.size(0))
             total += visible_label.size(0)
 
             # measure elapsed time
@@ -211,13 +210,9 @@ def multi_process() :
                       f'Time: {batch_time.val:.3f} ({batch_time.avg:.3f}) '
                       f'lr:{current_lr:.4f} '
                       f'Loss: {train_loss.val:.4f} ({train_loss.avg:.4f}) '
-                      f'iLoss: {id_loss.val:.4f} ({id_loss.avg:.4f}) '
-                      f'TLoss: {tri_loss.val:.4f} ({tri_loss.avg:.4f}) '
                       f'Accu: {100. * correct / total:.2f}')
             # For all batch, write in tensorBoard
         writer.add_scalar('total_loss', train_loss.avg, epoch)
-        writer.add_scalar('id_loss', id_loss.avg, epoch)
-        writer.add_scalar('tri_loss', tri_loss.avg, epoch)
         writer.add_scalar('lr', current_lr, epoch)
         writer.add_scalar('acc_train', 100. * correct / total, epoch)
 
@@ -226,53 +221,37 @@ def multi_process() :
     # start_epoch = 0
     loader_batch = batch_num_identities * num_of_same_id_in_batch
     # define loss function
-    criterion_id = nn.CrossEntropyLoss().to(device)
-    criterion_tri = BatchHardTripLoss(batch_size=loader_batch, margin= 0.3).to(device)
+    criterion_MSE = nn.MSELoss().to(device)
 
 
-    #Prepare valid loader
-    sampler_valid = UniModalIdentitySampler(validset.valid_color_label, valid_color_pos, \
-                                           num_of_same_id_in_batch, trainV_batch_num_identities)
-
-    # print(f'trainset.train_color_label {len(validset.valid_color_label)}')
-    # print(f'trainset.train_color_label {len(np.unique(validset.valid_color_label))}')
-    # print(f'len train_color_pos {len(valid_color_pos)}')
+    # Prepare valid loader
+    sampler_valid = IdentitySampler(validset.valid_color_label, validset.valid_thermal_label,\
+                                    valid_color_pos, valid_thermal_pos, \
+                                num_of_same_id_in_batch, batch_num_identities)
 
     validset.cIndex = sampler_valid.index1
+    validset.tIndex = sampler_valid.index2
+
     validloader = torch.utils.data.DataLoader(validset, batch_size=loader_batch, \
                             sampler=sampler_valid, num_workers=workers, drop_last=True)
-
-    # print(f'trainset.train_color_label {len(trainset.train_color_label)}')
-    # print(f'trainset.train_color_label {len(np.unique(trainset.train_color_label))}')
-    # print(f'len train_color_pos {len(train_color_pos)}')
-
-
-    sampler_train = UniModalIdentitySampler(trainset.train_color_label, train_color_pos, \
-                                            num_of_same_id_in_batch, trainV_batch_num_identities)
-
-    trainset.cIndex = sampler_train.index1  # color index
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=loader_batch, \
-                                              sampler=sampler_train, num_workers=workers, drop_last=True)
-
 
     best_acc = 0
     for epoch in range(81):
 
         print('==> Preparing Data Loader...')
-        # identity sampler - Give iteratively index from a randomized list of color index and thermal index
-        sampler_train  = UniModalIdentitySampler(trainset.train_color_label, \
-                                train_color_pos, \
-                                num_of_same_id_in_batch, trainV_batch_num_identities)
-
+        # Prepare training loader :
+        sampler_train = IdentitySampler(trainset.train_color_label, trainset.train_thermal_label, \
+                                        train_color_pos, train_thermal_pos, \
+                                        num_of_same_id_in_batch, batch_num_identities)
         trainset.cIndex = sampler_train.index1  # color index
+        trainset.tIndex = sampler_train.index2
+
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=loader_batch, \
-                                sampler=sampler_train, num_workers=workers, drop_last=True)
-
-
+                                                  sampler=sampler_train, num_workers=workers, drop_last=True)
         print(f'len trainloader : {len(trainloader)}')
 
         # training
-        train_visible(epoch)
+        train_thermal(epoch)
         # validation
         if epoch > 0 and epoch % 1 == 0:
             valid_loss = AverageMeter()
@@ -291,22 +270,16 @@ def multi_process() :
                     # visible_label = Variable(visible_label)
                     feat, out0, = net_thermal(visible_input, visible_input, modal=1)  # Call the visible branch only
 
-                    loss_ce = criterion_id(out0, visible_label)
-                    loss_tri, batch_acc = criterion_tri(feat, visible_label)
-                    correct += (batch_acc / 2)
+                    loss_MSE = criterion_MSE(out0, visible_label)
                     _, predicted = out0.max(1)
-                    correct += (predicted.eq(visible_label).sum().item() / 2)
-                    loss = loss_ce + loss_tri
+                    correct += (predicted.eq(visible_label).sum().item())
+
                     total += visible_label.size(0)
                     acc = 100. * correct / total
 
-                    valid_loss.update(loss.item(), 2 * visible_input.size(0))
-                    valid_id_loss.update(loss_ce.item(), 2 * visible_input.size(0))
-                    valid_tri_loss.update(loss_tri.item(), 2 * visible_input.size(0))
+                    valid_loss.update(loss_MSE.item(), 2 * visible_input.size(0))
 
-                    print(f'Loss: {loss:.4f}'
-                          f'iLoss: {loss_ce:.4f}  '
-                          f'TLoss: {loss_tri:.4f}  '
+                    print(f'iLoss: {loss_MSE:.4f}  '
                           f'Accurac= {acc}'
                           )
             # save model
@@ -315,16 +288,14 @@ def multi_process() :
                 best_epoch = epoch
                 state = {
                     'net_thermal': net_thermal.state_dict(),
-                    'loss': loss,
+                    'loss': loss_MSE,
                     'acc': acc,
                     'epoch': epoch,
                 }
                 torch.save(state, checkpoint_path + suffix + '_best.t')
 
             writer.add_scalar('Valid_total_loss', valid_loss.avg, epoch)
-            writer.add_scalar('Valid_loss', valid_id_loss.avg, epoch)
-            writer.add_scalar('Valid_tri_loss', valid_tri_loss.avg, epoch)
-            writer.add_scalar('acc_test', acc, epoch)
+            writer.add_scalar('acc_valid', acc, epoch)
 
 if __name__ == '__main__':
     freeze_support()

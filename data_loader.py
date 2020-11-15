@@ -73,7 +73,6 @@ class RegDBData_split(data.Dataset):
         #Load color and thermal images + labels
         color_img_file, color_target = load_data(train_color_list)
         thermal_img_file, thermal_target= load_data(train_thermal_list)
-
         color_image = []
         color_lab = []
         thermal_image = []
