@@ -54,7 +54,7 @@ def extract_gall_feat(gall_loader, ngall, net, visible_train = False):
             input = Variable(input)
             # input = Variable(input.cuda())
             if visible_train :
-                feat_pool, feat_fc = net(input, input, 1)
+                feat_pool, feat_fc = net(input)
             else :
                 feat_pool, feat_fc = net(input, input, test_mode[0])
             gall_feat_pool[ptr:ptr + batch_num, :] = feat_pool.detach().cpu().numpy()
@@ -77,7 +77,7 @@ def extract_query_feat(query_loader, nquery, net, visible_train = False):
             # input = Variable(input.cuda())
             input = Variable(input)
             if visible_train :
-                feat_pool, feat_fc = net(input, input, 1)
+                feat_pool, feat_fc = net(input)
             else :
                 feat_pool, feat_fc = net(input, input, test_mode[1])
             query_feat_pool[ptr:ptr + batch_num, :] = feat_pool.detach().cpu().numpy()

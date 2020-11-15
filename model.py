@@ -71,9 +71,9 @@ class shared_resnet(nn.Module):
         x = self.base.layer4(x)
         return x
 
-class Network(nn.Module):
+class Network_fuse(nn.Module):
     def __init__(self,  class_num, arch='resnet50'):
-        super(Network, self).__init__()
+        super(Network_fuse, self).__init__()
 
         self.thermal_module = thermal_module(arch=arch)
         self.visible_module = visible_module(arch=arch)
@@ -114,6 +114,55 @@ class Network(nn.Module):
         else:
             return self.l2norm(x_pool), self.l2norm(feat)
 
-# print(Network(250, arch='resnet50'))
-#print(resneut50(pretrained= True))
-# print(thermal_module())
+class Resnet_module(nn.Module):
+    def __init__(self, arch='resnet50'):
+        super(Resnet_module, self).__init__()
+
+        model_base = resnet50(pretrained=True)
+        model_base.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        model_base.fc = Identity()
+        # avg pooling to global pooling
+        self.res = model_base
+
+
+    def forward(self, x):
+        x = self.res.conv1(x)
+        x = self.res.bn1(x)
+        x = self.res.relu(x)
+        x = self.res.maxpool(x)
+        x = self.res.layer1(x)
+        x = self.res.layer2(x)
+        x = self.res.layer3(x)
+        x = self.res.layer4(x)
+        return x
+
+class Network(nn.Module):
+    def __init__(self,  class_num, arch='resnet50'):
+        super(Network, self).__init__()
+        model_base = resnet50(pretrained=True)
+
+        self.Resnet_module = Resnet_module(arch=arch)
+        pool_dim = 2048
+
+        # self.bottleneck.apply(weights_init_kaiming)
+        # self.classifier.apply(weights_init_classifier)
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.bottleneck = nn.BatchNorm1d(pool_dim)
+        self.bottleneck.bias.requires_grad_(False)  # no shift
+        self.fc = nn.Linear(pool_dim, class_num, bias=False)
+        self.l2norm = Normalize(2)
+
+    def forward(self, x):
+
+        x = self.Resnet_module(x)    #torch.Size([64, 2048, 18, 9])
+
+        x_pool = self.avgpool(x)
+        x_pool = x_pool.view(x_pool.size(0), x_pool.size(1))
+
+        feat = self.bottleneck(x_pool) #torch.Size([64, 2048])
+
+        if self.training:
+            return x_pool, self.fc(feat)
+        else:
+            return self.l2norm(x_pool), self.l2norm(feat)
+
