@@ -89,7 +89,7 @@ def extract_query_feat(query_loader, nquery, net, visible_train = False):
 def multi_process() :
 
         end = time.time()
-        trial_nb = 2
+        trial_nb = 4
         for trial in range(1, trial_nb+1) :
             #model_path = checkpoint_path +  args.resume
             model_path = '../save_model/' + suffix + '_best.t'
