@@ -187,7 +187,7 @@ def multi_process() :
             writer.add_scalar('id_loss', id_loss.avg, epoch)
             writer.add_scalar('tri_loss', tri_loss.avg, epoch)
             writer.add_scalar('lr', current_lr, epoch)
-            writer.add_scalar('acc_train', acc, epoch)
+            writer.add_scalar('acc_train', 100. * correct / total, epoch)
 
 
     # Training part
