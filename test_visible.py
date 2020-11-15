@@ -139,7 +139,7 @@ def multi_process() :
                 cmc, mAP, mINP = eval_regdb(-distmat, query_label, gall_label)
 
 
-            if trial == 0:
+            if trial == 1:
                 all_cmc = cmc
                 all_mAP = mAP
                 all_mINP = mINP
