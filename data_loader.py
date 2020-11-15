@@ -310,14 +310,15 @@ def process_test_regdb(img_dir, trial=1, modal='visible', split = False):
         first80percent = int(len(file_image) * 80 / 100)
         #Récupération des 20 dernier % d'images pour la phase de test
         for k in range(first80percent, len(file_image)):
-            if trial == 1 :
-                w = ((k+1)%2 == 0)
-            elif trial == 2 :
-                w = ((k+1)%10 < 5)
-            elif trial == 3 :
-                w = ((k+1)%10 < 4)
-            elif trial == 4 :
-                w = ((k+1)%10 <6 )
+            w = ((k + 1) % 10 <= trial)
+            # if trial == 1 :
+            #     w = ((k+1)%2 == 0)
+            # elif trial == 2 :
+            #     w = ((k+1)%10 < 5)
+            # elif trial == 3 :
+            #     w = ((k+1)%10 < 4)
+            # elif trial == 4 :
+            #     w = ((k+1)%10 <6 )
             if w :
             # if (k+1)%10 < 5 :
                 first_image_slice.append(file_image[k])
