@@ -1,7 +1,6 @@
 from __future__ import print_function, absolute_import
 import numpy as np
 
-
 """Cross-Modality ReID"""
 
 def eval_regdb(distmat, query_labels, gallery_labels, max_rank=20):
