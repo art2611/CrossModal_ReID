@@ -291,7 +291,6 @@ def multi_process() :
             writer.add_scalar('Valid_total_loss', valid_loss.avg, epoch)
             writer.add_scalar('Valid_loss', valid_id_loss.avg, epoch)
             writer.add_scalar('Valid_tri_loss', valid_tri_loss.avg, epoch)
-            sys.exit()
 
 if __name__ == '__main__':
     freeze_support()
