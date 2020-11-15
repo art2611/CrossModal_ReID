@@ -81,9 +81,6 @@ class Network(nn.Module):
 
         pool_dim = 2048
 
-
-
-
         # self.bottleneck.apply(weights_init_kaiming)
         # self.classifier.apply(weights_init_classifier)
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))

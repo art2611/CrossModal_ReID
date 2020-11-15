@@ -21,6 +21,7 @@ def multi_process() :
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     writer = SummaryWriter("runs/CrossModal1")
 
+
     # Init variables :
     img_w = 144
     img_h = 288
@@ -208,8 +209,7 @@ def multi_process() :
         print('==> Preparing Data Loader...')
         # identity sampler - Give iteratively index from a randomized list of color index and thermal index
         sampler = IdentitySampler(trainset.train_color_label, \
-                                  trainset.train_thermal_label, color_pos, thermal_pos, num_of_same_id_in_batch, batch_num_identities,
-                                  epoch)
+                                  trainset.train_thermal_label, color_pos, thermal_pos, num_of_same_id_in_batch, batch_num_identities)
 
         trainset.cIndex = sampler.index1  # color index
         trainset.tIndex = sampler.index2  # thermal index

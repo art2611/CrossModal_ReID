@@ -9,10 +9,21 @@ import numpy as np
 #
 # print(np.argsort(-gall_feat_pool, axis = 1))
 
-List = [0,0,0,0,1,2,3]
-nw = [6,6,4,4,4,4,4]
+# List = [0,0,0,0,1,2,3]
+# nw = [6,6,4,4,4,4,4]
+#
+#
+# List = np.array(List)
+# nw = np.array(nw)
+# print(List[nw])
 
+class test():
+    def __init__(self):
+        super(test, self).__init__()
+        self.t = 0
 
-List = np.array(List)
-nw = np.array(nw)
-print(List[nw])
+a = test()
+b = new(a)
+b.t = 2
+print(b.t)
+print(a.t)
