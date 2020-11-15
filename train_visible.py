@@ -34,7 +34,7 @@ def multi_process() :
     workers = 4
     lr = 0.001
     checkpoint_path = '../save_model/'
-    suffix = f'RegDB_person_Visible({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+    suffix = f'RegDB_person_Visible({num_of_same_id_in_batch})_same_id({trainV_batch_num_identities})_lr_{lr}'
     # Data info  :
     data_path = '../Datasets/RegDB/'
     #log_path = args.log_path + 'regdb_log/'
@@ -194,7 +194,7 @@ def multi_process() :
 
     # Training part
     # start_epoch = 0
-    loader_batch = batch_num_identities * num_of_same_id_in_batch
+    loader_batch = trainV_batch_num_identities * num_of_same_id_in_batch
     # define loss function
     criterion_id = nn.CrossEntropyLoss().to(device)
     criterion_tri = BatchHardTripLoss(batch_size=loader_batch, margin= 0.3).to(device)
