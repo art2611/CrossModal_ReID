@@ -292,9 +292,9 @@ def GenIdx(train_color_label, train_thermal_label):
 
 def process_test_regdb(img_dir, trial=1, modal='visible', split = False):
     if modal == 'visible':
-        input_data_path = img_dir + 'idx/test_visible_{}'.format(trial) + '.txt'
+        input_data_path = img_dir + 'idx/train_visible_1.txt'
     elif modal == 'thermal':
-        input_data_path = img_dir + 'idx/test_thermal_{}'.format(trial) + '.txt'
+        input_data_path = img_dir + 'idx/train_thermal_1.txt'
 
     with open(input_data_path) as f:
         data_file_list = open(input_data_path, 'rt').read().splitlines()
@@ -307,7 +307,9 @@ def process_test_regdb(img_dir, trial=1, modal='visible', split = False):
         first_label_slice = []
         sec_image_slice = []
         sec_label_slice = []
-        for k in range(len(file_image)):
+        first80percent = int(len(file_image) * 80 / 100)
+        #Récupération des 20 dernier % d'images pour la phase de test
+        for k in range(first80percent, len(file_image)):
             if (k+1)%10 < 5 :
                 first_image_slice.append(file_image[k])
                 first_label_slice.append(file_label[k])
