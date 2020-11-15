@@ -103,7 +103,7 @@ def multi_process() :
                 print("Saved model not loaded, care")
                 net = Network(class_num = nclass).to(device)
             # testing set
-            query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, trial=test_trial, modal='visible', split=True)
+            query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, trial=trial, modal='visible', split=True)
             # gall_img, gall_label = process_test_regdb(data_path, trial=test_trial, modal='thermal')
 
             gallset = TestData(gall_img, gall_label, transform=transform_test, img_size=(img_w, img_h))
