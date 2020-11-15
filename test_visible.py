@@ -89,8 +89,7 @@ def extract_query_feat(query_loader, nquery, net, visible_train = False):
 def multi_process() :
 
         end = time.time()
-        for trial in range(10):
-            test_trial = trial +1
+        for trial in range(1, 5) :
             #model_path = checkpoint_path +  args.resume
             model_path = '../save_model/' + suffix + '_best.t'
             # model_path = checkpoint_path + 'regdb_awg_p4_n8_lr_0.1_seed_0_trial_{}_best.t'.format(test_trial)
