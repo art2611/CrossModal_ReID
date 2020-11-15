@@ -192,7 +192,6 @@ def multi_process() :
             feat1, out1, = net_visible(visible_input)  # Call the visible branch only
 
             feat2, out2, = net_thermal(thermal_input)
-            sys.exit()
 
             loss_MSE = criterion_MSE(out1, out2)
 
