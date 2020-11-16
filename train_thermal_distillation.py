@@ -137,9 +137,9 @@ def multi_process() :
     else:
         print("Saved model not loaded, care")
         sys.exit()
-    #Keep both in testing to get same output size and compare raw vectors
-    net_visible.test()
-    net_thermal.test()
+    #Keep both in eval mode to get same output size and compare raw vectors
+    net_visible.eval()
+    net_thermal.eval()
     # Freeze some in thermal model
     # net_thermal.Resnet_module.res.layer2.requires_grad = False
     # net_thermal.Resnet_module.res.layer3.requires_grad = False
