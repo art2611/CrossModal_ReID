@@ -18,6 +18,7 @@ class IdentitySampler(Sampler):
             batch_idx = np.random.choice(uni_label, batchSize, replace=False)
             for i in range(batchSize):
                 #On choisit un nombre num pos au hasard de même personne d'identité batchidx[i]
+                #On soustraint le nombre de label car l'identité est décalée quand on a par exemple20% de la bdd
                 sample_color = np.random.choice(color_pos[batch_idx[i]-train_color_label[0]], num_pos)
                 sample_thermal = np.random.choice(thermal_pos[batch_idx[i]- train_thermal_label[0]], num_pos)
 
