@@ -82,12 +82,18 @@ def multi_process() :
     print('==> Loading images..')
 
     #Get Train set and test set
-    trainset = RegDBVisibleData_split(data_path, transform=transform_train, split="training")
+    trainset = RegDBVisibleData_split_VALID(data_path, transform=transform_train, split="training")
 
     ######################################### VALIDATION SET
-    validset = RegDBVisibleData_split(data_path, transform=transform_train, split="validation")
-    # print(validset.valid_color_label)
+    validset = RegDBVisibleData_split_VALID(data_path, transform=transform_train, split="validation")
+    # print(f'len(trainset.train_color_label) : {len(trainset.train_color_label)}')
+    # print(f'len(validset.valid_color_label) : {len(validset.valid_color_label)}')
     valid_color_pos, _ = GenIdx(validset.valid_color_label, validset.valid_color_label)
+    train_color_pos, _ = GenIdx(trainset.train_color_label, trainset.train_color_label)
+    # print(len(valid_color_pos[0]))
+    # print(len(train_color_pos[0]))
+    # print(f' nbre d ids train : {len(np.unique(trainset.train_color_label)):5d}')
+    # print(f' nbre d ids valid : {len(np.unique(validset.valid_color_label)):5d}')
 
     print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
     print(' ')
@@ -96,7 +102,7 @@ def multi_process() :
     # trainset.train_color_image, trainset.train_color_label, _, _ =\
     #     data_aug(visible_images = trainset.train_color_image, Visible_labels = trainset.train_color_label)
     print(f'New image number : {len(trainset.train_color_image)+ len(validset.valid_color_image)}')
-    train_color_pos, _ = GenIdx(trainset.train_color_label, trainset.train_color_label)
+
     print(f'Identities number : {len(train_color_pos)}')
     print(' ')
     print('New dataset statistics:')
@@ -108,9 +114,9 @@ def multi_process() :
     print(f'Data Loading Time:\t {time.time() - Timer1:.3f}')
     print(' ')
     print('==> Building model..')
-    ######################################### MODEL
-
-    net = Network(206).to(device)
+    ######################################### MODEL TRAIN
+    class_number = len(np.unique(trainset.train_color_label))
+    net = Network(class_number).to(device)
     # net = Network_fuse(206).to(device)
 
     ######################################### TRAINING
@@ -190,7 +196,7 @@ def multi_process() :
         writer.add_scalar('id_loss', id_loss.avg, epoch)
         writer.add_scalar('tri_loss', tri_loss.avg, epoch)
         writer.add_scalar('lr', current_lr, epoch)
-        writer.add_scalar('acc_train', 100. * correct / total, epoch)
+        writer.add_scalar('Training accuracy', 100. * correct / total, epoch)
 
 
     # Training part
@@ -201,30 +207,15 @@ def multi_process() :
     criterion_tri = BatchHardTripLoss(batch_size=loader_batch, margin= 0.3).to(device)
 
 
-    #Prepare valid loader
-    sampler_valid = UniModalIdentitySampler(validset.valid_color_label, valid_color_pos, \
-                                           num_of_same_id_in_batch, trainV_batch_num_identities)
 
     # print(f'trainset.train_color_label {len(validset.valid_color_label)}')
     # print(f'trainset.train_color_label {len(np.unique(validset.valid_color_label))}')
     # print(f'len train_color_pos {len(valid_color_pos)}')
 
-    validset.cIndex = sampler_valid.index1
-    validloader = torch.utils.data.DataLoader(validset, batch_size=loader_batch, \
-                            sampler=sampler_valid, num_workers=workers, drop_last=True)
 
     # print(f'trainset.train_color_label {len(trainset.train_color_label)}')
     # print(f'trainset.train_color_label {len(np.unique(trainset.train_color_label))}')
     # print(f'len train_color_pos {len(train_color_pos)}')
-
-
-    sampler_train = UniModalIdentitySampler(trainset.train_color_label, train_color_pos, \
-                                            num_of_same_id_in_batch, trainV_batch_num_identities)
-
-    trainset.cIndex = sampler_train.index1  # color index
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=loader_batch, \
-                                              sampler=sampler_train, num_workers=workers, drop_last=True)
-
 
     best_acc = 0
     for epoch in range(81):
@@ -245,12 +236,20 @@ def multi_process() :
         # training
         train_visible(epoch)
         # validation
-        if epoch > 0 and epoch % 1 == 0:
+        if epoch > 0 and epoch % 2 == 0:
             valid_loss = AverageMeter()
             valid_id_loss = AverageMeter()
             valid_tri_loss = AverageMeter()
             data_time = AverageMeter()
             batch_time = AverageMeter()
+            # Prepare valid loader
+            sampler_valid = UniModalIdentitySampler(validset.valid_color_label, valid_color_pos, \
+                                                    num_of_same_id_in_batch, trainV_batch_num_identities)
+
+            validset.cIndex = sampler_valid.index1
+            validloader = torch.utils.data.DataLoader(validset, batch_size=loader_batch, \
+                                                      sampler=sampler_valid, num_workers=workers, drop_last=True)
+
             print(f'Validation epoch: {epoch}')
             correct = 0
             total = 0
@@ -296,7 +295,7 @@ def multi_process() :
             writer.add_scalar('Valid_total_loss', valid_loss.avg, epoch)
             writer.add_scalar('Valid_loss', valid_id_loss.avg, epoch)
             writer.add_scalar('Valid_tri_loss', valid_tri_loss.avg, epoch)
-            writer.add_scalar('acc_test', acc, epoch)
+            writer.add_scalar('Validation accuracy', acc, epoch)
 
 if __name__ == '__main__':
     freeze_support()

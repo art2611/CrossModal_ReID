@@ -141,9 +141,10 @@ def multi_process() :
     net_visible.train()
     net_thermal.train()
     # Freeze some in thermal model
-    net_thermal.Resnet_module.res.layer2.requires_grad = False
     net_thermal.Resnet_module.res.layer3.requires_grad = False
     net_thermal.Resnet_module.res.layer4.requires_grad = False
+    net_thermal.Resnet_module.res.layer5.requires_grad = False
+
 
     ######################################### TRAINING
     print('==> Start Training...')

@@ -261,6 +261,87 @@ class RegDBVisibleData_split(data.Dataset):
         elif hasattr(self, "test_color_image"):
             return len(self.test_color_label)
 
+class RegDBVisibleData_split_VALID(data.Dataset):
+    def __init__(self, data_dir, transform=None, colorIndex=None, split="training" ):
+        # Load training images (path) and labels
+        data_dir = '../Datasets/RegDB/'
+        train_color_list = data_dir + 'idx/train_visible_1.txt'
+        #Load color and thermal images + labels
+        color_img_file, color_target = load_data(train_color_list)
+        color_image = []
+        color_lab = []
+
+        #Get real and thermal images with good shape in a list
+        # Training => return 50%
+        first50percent = int(len(color_img_file) * 50 / 100)
+        first50percent -= int(len(color_img_file) * 50 / 100) % 10
+        first80percent = int(len(color_img_file) * 80 / 100)
+        first80percent -= int(len(color_img_file) * 80 / 100)%10
+        if split == "training" :
+            for i in range(first80percent):
+                if i%10 < 6 :
+                    img = Image.open(data_dir + color_img_file[i])
+                    img = img.resize((144, 288), Image.ANTIALIAS)
+                    pix_array = np.array(img)
+                    color_image.append(pix_array)
+                    color_lab.append(color_target[i])
+
+            color_image = np.array(color_image)
+            # Init color images / labels
+            self.train_color_image = color_image
+            self.train_color_label = color_lab
+
+        if split == "validation" :
+            for i in range(first80percent):
+                if i%10 >= 6 :
+                    img = Image.open(data_dir + color_img_file[i])
+                    img = img.resize((144, 288), Image.ANTIALIAS)
+                    pix_array = np.array(img)
+                    color_image.append(pix_array)
+                    color_lab.append(color_target[i])
+
+            color_image = np.array(color_image)
+
+            # Init color images / labels
+            self.valid_color_image = color_image
+            self.valid_color_label = color_lab
+
+        if split == "testing" :
+            for i in range(first80percent, len(color_img_file)):
+                img = Image.open(data_dir + color_img_file[i])
+                img = img.resize((144, 288), Image.ANTIALIAS)
+                pix_array = np.array(img)
+                color_image.append(pix_array)
+                color_lab.append(color_target[i])
+
+            color_image = np.array(color_image)
+            # Init color images / labels
+            self.test_color_image = color_image
+            self.test_color_label = color_lab
+        self.transform = transform
+        # Prepare index
+        self.cIndex = colorIndex
+
+    def __getitem__(self, index):
+        #Dataset[i] return images from both modal and the corresponding label
+        if hasattr(self, "train_color_image"):
+            img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
+        elif hasattr(self, "valid_color_image") :
+            img1, target1 = self.valid_color_image[self.cIndex[index]], self.valid_color_label[self.cIndex[index]]
+        elif hasattr(self, "test_color_image") :
+            img1, target1 = self.test_color_image[self.cIndex[index]], self.test_color_label[self.cIndex[index]]
+
+        img1 = self.transform(img1)
+
+        return img1, target1
+    def __len__(self):
+        if hasattr(self, "train_color_image"):
+            return len(self.train_color_label)
+        elif hasattr(self, "valid_color_image"):
+            return len(self.valid_color_label)
+        elif hasattr(self, "test_color_image"):
+            return len(self.test_color_label)
+
 def load_data(input_data_path):
     with open(input_data_path) as f:
         data_file_list = open(input_data_path, 'rt').read().splitlines()
