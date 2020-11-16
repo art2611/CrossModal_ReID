@@ -141,9 +141,9 @@ def multi_process() :
     net_visible.train()
     net_thermal.train()
     # Freeze some in thermal model
-    # net_thermal.Resnet_module.res.layer2.requires_grad = False
-    # net_thermal.Resnet_module.res.layer3.requires_grad = False
-    # net_thermal.Resnet_module.res.layer4.requires_grad = False
+    net_thermal.Resnet_module.res.layer2.requires_grad = False
+    net_thermal.Resnet_module.res.layer3.requires_grad = False
+    net_thermal.Resnet_module.res.layer4.requires_grad = False
 
     ######################################### TRAINING
     print('==> Start Training...')
@@ -207,13 +207,13 @@ def multi_process() :
             feat1, out1, = net_visible(visible_input)  # Call the visible branch only
 
             feat2, out2, = net_thermal(thermal_input)
-
-            print(f'Visible output shape : {out1.shape}')
-            print(f'Thermal output shape : {out2.shape}')
+            #
+            # print(f'Visible output shape : {out1.shape}')
+            # print(f'Thermal output shape : {out2.shape}')
 
             loss_MSE = criterion_MSE(out1, out2)
 
-            print(f'Loss : {loss_MSE}')
+            # print(f'Loss : {loss_MSE}')
             _, predicted = out2.max(1)
             correct += (predicted.eq(thermal_label).sum().item())
 
