@@ -141,9 +141,9 @@ def multi_process() :
     net_visible.train()
     net_thermal.train()
     # Freeze some in thermal model
-    # net_thermal.Resnet_module.res.layer2.requires_grad = False
-    # net_thermal.Resnet_module.res.layer3.requires_grad = False
-    # net_thermal.Resnet_module.res.layer4.requires_grad = False
+    net_thermal.Resnet_module.res.layer2.requires_grad = False
+    net_thermal.Resnet_module.res.layer3.requires_grad = False
+    net_thermal.Resnet_module.res.layer4.requires_grad = False
 
     ######################################### TRAINING
     print('==> Start Training...')
@@ -187,16 +187,16 @@ def multi_process() :
         net_thermal.train()
 
         end = time.time()
-        for batch_idx, (visible_input, thermal_input, visible_label, thermal_label) in enumerate(trainloader):
+        for batch_idx, (visible_input, thermal_input, visible_label, thermal_input) in enumerate(trainloader):
             # visible_input = Variable(visible_input.cuda())
-            # thermal_input = Variable(visible_input.cuda())
+            # thermal_input = Variable(thermal_input.cuda())
             # visible_label = Variable(visible_label.cuda())
-            # thermal_label = Variable(visible_label.cuda())
+            # thermal_label = Variable(thermal_input.cuda())
 
             visible_input = Variable(visible_input)
-            thermal_input = Variable(visible_input)
+            thermal_input = Variable(thermal_input)
             visible_label = Variable(visible_label)
-            thermal_label = Variable(visible_label)
+            thermal_label = Variable(thermal_input)
 
             data_time.update(time.time() - end)
 
