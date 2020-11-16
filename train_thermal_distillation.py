@@ -21,8 +21,8 @@ from data_augmentation import data_aug
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 def multi_process() :
-    # device = 'cpu'
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = 'cpu'
+    # device = 'cuda' if torch.cuda.is_available() else 'cpu'
     writer = SummaryWriter("runs/CrossModal3")
 
     # Init variables :
@@ -188,15 +188,15 @@ def multi_process() :
 
         end = time.time()
         for batch_idx, (visible_input, thermal_input, visible_label, thermal_label) in enumerate(trainloader):
-            visible_input = Variable(visible_input.cuda())
-            thermal_input = Variable(thermal_input.cuda())
-            visible_label = Variable(visible_label.cuda())
-            thermal_label = Variable(thermal_label.cuda())
-
-            # visible_input = Variable(visible_input)
-            # thermal_input = Variable(thermal_input)
-            # visible_label = Variable(visible_label)
-            # thermal_label = Variable(thermal_label)
+            # visible_input = Variable(visible_input.cuda())
+            # thermal_input = Variable(thermal_input.cuda())
+            # visible_label = Variable(visible_label.cuda())
+            # thermal_label = Variable(thermal_label.cuda())
+            #
+            visible_input = Variable(visible_input)
+            thermal_input = Variable(thermal_input)
+            visible_label = Variable(visible_label)
+            thermal_label = Variable(thermal_label)
 
             data_time.update(time.time() - end)
 
