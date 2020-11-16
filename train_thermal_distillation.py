@@ -205,11 +205,14 @@ def multi_process() :
             with torch.no_grad():
                 # net_visible.train()
                 feat1, out1, = net_visible(visible_input)  # Call the visible branch only
-            print(f'thermal input shape : {thermal_input.shape}')
-            print(f'thermal input shape : {visible_input.shape}')
+
             feat2, out2, = net_thermal(thermal_input)
 
+            print(f'Visible output shape : {out1.shape}')
+            print(f'thermal output shape : {out2.shape}')
+
             loss_MSE = criterion_MSE(out1, out2)
+
             print(f'Loss : {loss_MSE}')
             _, predicted = out2.max(1)
             correct += (predicted.eq(thermal_label).sum().item())
