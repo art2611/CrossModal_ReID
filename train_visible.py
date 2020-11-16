@@ -20,8 +20,8 @@ from data_augmentation import data_aug
 
 
 def multi_process() :
-    device = 'cpu'
-    # device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    # device = 'cpu'
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     writer = SummaryWriter("runs/CrossModal2")
 
     # Init variables :
@@ -144,10 +144,10 @@ def multi_process() :
         net.train()
         end = time.time()
         for batch_idx, (visible_input, visible_label) in enumerate(trainloader):
-            # visible_input = Variable(visible_input.cuda())
-            # visible_label = Variable(visible_label.cuda())
-            visible_input = Variable(visible_input)
-            visible_label = Variable(visible_label)
+            visible_input = Variable(visible_input.cuda())
+            visible_label = Variable(visible_label.cuda())
+            # visible_input = Variable(visible_input)
+            # visible_label = Variable(visible_label)
 
             data_time.update(time.time() - end)
 
@@ -255,10 +255,10 @@ def multi_process() :
             total = 0
             with torch.no_grad():
                 for batch_idx, (visible_input, visible_label) in enumerate(validloader):
-                    # visible_input = Variable(visible_input.cuda())
-                    # visible_label = Variable(visible_label.cuda())
-                    visible_input = Variable(visible_input)
-                    visible_label = Variable(visible_label)
+                    visible_input = Variable(visible_input.cuda())
+                    visible_label = Variable(visible_label.cuda())
+                    # visible_input = Variable(visible_input)
+                    # visible_label = Variable(visible_label)
                     feat, out0, = net(visible_input)  # Call the visible branch only
                     # feat, out0, = net(visible_input, visible_input, modal=1) # Call the visible branch only
 
