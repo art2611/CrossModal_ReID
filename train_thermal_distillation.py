@@ -155,7 +155,7 @@ def multi_process() :
     base_params = filter(lambda p: id(p) not in ignored_params, net_thermal.parameters())
     base_params_v = filter(lambda p: id(p) not in ignored_params, net_visible.parameters())
 
-    optimizer = optim.SGD([
+    optimizer_thermal = optim.SGD([
         {'params': base_params, 'lr': 0.1 * lr},
         {'params': net_thermal.bottleneck.parameters(), 'lr': lr},
         {'params': net_thermal.fc.parameters(), 'lr': lr}],
@@ -202,14 +202,14 @@ def multi_process() :
 
             # feat is the feature vector out of
             # Out is the last output
-            with torch.no_grad():
+            # with torch.no_grad():
                 # net_visible.train()
-                feat1, out1, = net_visible(visible_input)  # Call the visible branch only
+            feat1, out1, = net_visible(visible_input)  # Call the visible branch only
 
             feat2, out2, = net_thermal(thermal_input)
 
             print(f'Visible output shape : {out1.shape}')
-            print(f'thermal output shape : {out2.shape}')
+            print(f'Thermal output shape : {out2.shape}')
 
             loss_MSE = criterion_MSE(out1, out2)
 
@@ -217,9 +217,9 @@ def multi_process() :
             _, predicted = out2.max(1)
             correct += (predicted.eq(thermal_label).sum().item())
 
-            optimizer.zero_grad()
+            optimizer_thermal.zero_grad()
             loss_MSE.backward()
-            optimizer.step()
+            optimizer_thermal.step()
 
             # update P
             train_loss.update(loss_MSE.item(), 2 * visible_input.size(0))
