@@ -196,7 +196,7 @@ def multi_process() :
             visible_input = Variable(visible_input)
             thermal_input = Variable(thermal_input)
             visible_label = Variable(visible_label)
-            thermal_label = Variable(thermal_input)
+            thermal_label = Variable(thermal_label)
 
             data_time.update(time.time() - end)
 
