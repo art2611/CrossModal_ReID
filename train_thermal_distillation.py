@@ -137,9 +137,9 @@ def multi_process() :
     else:
         print("Saved model not loaded, care")
         sys.exit()
-    #Keep both in training to get same output size
-    net_visible.train()
-    net_thermal.train()
+    #Keep both in testing to get same output size and compare raw vectors
+    net_visible.test()
+    net_thermal.test()
     # Freeze some in thermal model
     net_thermal.Resnet_module.res.layer2.requires_grad = False
     net_thermal.Resnet_module.res.layer3.requires_grad = False
@@ -203,7 +203,7 @@ def multi_process() :
             # feat is the feature vector out of
             # Out is the last output
             with torch.no_grad():
-                net_visible.train()
+                # net_visible.train()
                 feat1, out1, = net_visible(visible_input)  # Call the visible branch only
             print(f'thermal input shape : {thermal_input.shape}')
             feat2, out2, = net_thermal(thermal_input)
