@@ -90,7 +90,7 @@ def multi_process() :
     # print(validset.valid_color_label)
     valid_Vcolor_pos, validTcolor_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
     loaded_img = len(trainset.train_color_image) + len(validset.valid_color_label) + \
-            len(validset.valid_color_image) + len(validset.valid_thermal_image)
+            len(trainset.train_thermal_image) + len(validset.valid_thermal_image)
 
 
     print(f'Loaded images : {loaded_img}')
@@ -103,6 +103,8 @@ def multi_process() :
     loaded_img = len(trainset.train_color_image) + len(validset.valid_color_image) + \
                  len(trainset.train_thermal_image) + len(validset.valid_thermal_image)
     print(f'New image number : {loaded_img}')
+
+    # Get position list
     train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
     valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
 
@@ -135,14 +137,13 @@ def multi_process() :
     else:
         print("Saved model not loaded, care")
         sys.exit()
-
-    # Freeze visible model
-    net_visible.eval()
+    #Keep both in training to get same output size
+    net_visible.train()
     net_thermal.train()
     # Freeze some in thermal model
-    net_thermal.Resnet_module.res.layer2.requires_grad = False
-    net_thermal.Resnet_module.res.layer3.requires_grad = False
-    net_thermal.Resnet_module.res.layer4.requires_grad = False
+    # net_thermal.Resnet_module.res.layer2.requires_grad = False
+    # net_thermal.Resnet_module.res.layer3.requires_grad = False
+    # net_thermal.Resnet_module.res.layer4.requires_grad = False
 
     ######################################### TRAINING
     print('==> Start Training...')
@@ -152,11 +153,23 @@ def multi_process() :
                      + list(map(id, net_thermal.fc.parameters()))
 
     base_params = filter(lambda p: id(p) not in ignored_params, net_thermal.parameters())
+    base_params_v = filter(lambda p: id(p) not in ignored_params, net_visible.parameters())
 
     optimizer = optim.SGD([
         {'params': base_params, 'lr': 0.1 * lr},
         {'params': net_thermal.bottleneck.parameters(), 'lr': lr},
         {'params': net_thermal.fc.parameters(), 'lr': lr}],
+        weight_decay=5e-4, momentum=0.9, nesterov=True)
+    #Train function
+    ignored_params = list(map(id, net_visible.bottleneck.parameters())) \
+                     + list(map(id, net_visible.fc.parameters()))
+
+    base_params = filter(lambda p: id(p) not in ignored_params, net_visible.parameters())
+
+    optimizer = optim.SGD([
+        {'params': base_params_v, 'lr': 0.1 * lr},
+        {'params': net_visible.bottleneck.parameters(), 'lr': lr},
+        {'params': net_visible.fc.parameters(), 'lr': lr}],
         weight_decay=5e-4, momentum=0.9, nesterov=True)
 
     ################FUNCTIONs :
@@ -196,7 +209,7 @@ def multi_process() :
             feat2, out2, = net_thermal(thermal_input)
 
             loss_MSE = criterion_MSE(out1, out2)
-
+            print(f'Loss : {loss_MSE}')
             _, predicted = out2.max(1)
             correct += (predicted.eq(thermal_label).sum().item())
 
@@ -259,7 +272,7 @@ def multi_process() :
         # training
         train_thermal(epoch)
         # validation
-        if epoch > 0 and epoch % 1 == 0:
+        if epoch > 0 and epoch % 20 == 0:
             valid_loss = AverageMeter()
             valid_id_loss = AverageMeter()
             valid_tri_loss = AverageMeter()

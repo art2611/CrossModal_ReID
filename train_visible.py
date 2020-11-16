@@ -17,8 +17,9 @@ from test import extract_gall_feat, extract_query_feat
 from evaluation import eval_regdb
 import sys
 from data_augmentation import data_aug
+import os
 
-
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 def multi_process() :
     # device = 'cpu'
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
