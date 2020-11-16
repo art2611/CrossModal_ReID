@@ -95,7 +95,7 @@ def multi_process() :
     trainset.train_color_image, trainset.train_color_label, _, _ =\
         data_aug(visible_images = trainset.train_color_image, Visible_labels = trainset.train_color_label)
     validset.valid_color_image, validset.valid_color_label, _, _ =\
-        data_aug(visible_images = trainset.train_color_image, Visible_labels = trainset.train_color_label)
+        data_aug(visible_images = validset.valid_color_image, Visible_labels = validset.valid_color_label)
 
     valid_color_pos, _ = GenIdx(validset.valid_color_label, validset.valid_color_label)
     train_color_pos, _ = GenIdx(trainset.train_color_label, trainset.train_color_label)
@@ -104,7 +104,6 @@ def multi_process() :
     print(len(train_color_pos[0]))
     print(f' nbre d ids train : {len(np.unique(trainset.train_color_label)):5d}')
     print(f' nbre d ids valid : {len(np.unique(validset.valid_color_label)):5d}')
-    sys.exit()
 
     print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
     print(' ')
