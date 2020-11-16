@@ -13,10 +13,12 @@ def data_aug(visible_images = None, Thermal_images = None, Visible_labels = None
         visible_img_number = visible_images.shape[0]
         for k in range(visible_img_number):
             final_visible_data.append(visible_images[k])
-            final_visible_data.append(np.fliplr(visible_images[k]))
-            final_visible_data.append(random_noise(visible_images[k], var=0.01))
-            final_visible_data.append(random_noise(visible_images[k], var=0.05))
-            final_visible_data.append(random_noise(visible_images[k], var=0.015))
+            final_visible_data.append(visible_images[k])
+            final_visible_data.append(visible_images[k])
+            # final_visible_data.append(np.fliplr(visible_images[k]))
+            # final_visible_data.append(random_noise(visible_images[k], var=0.01))
+            # final_visible_data.append(random_noise(visible_images[k], var=0.05))
+            # final_visible_data.append(random_noise(visible_images[k], var=0.015))
             for j in range(nbr_of_images_per_image):
                 final_visible_target.append(Visible_labels[k])
     if Thermal_images is not None :
