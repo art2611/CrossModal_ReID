@@ -202,9 +202,9 @@ def multi_process() :
 
             # feat is the feature vector out of
             # Out is the last output
-            # with torch.no_grad():
-            #     # net_visible.train()
-            feat1, out1, = net_visible(visible_input)  # Call the visible branch only
+            with torch.no_grad():
+                # net_visible.train()
+                feat1, out1, = net_visible(visible_input)  # Call the visible branch only
             print(f'thermal input shape : {thermal_input.shape}')
             print(f'thermal input shape : {visible_input.shape}')
             feat2, out2, = net_thermal(thermal_input)
