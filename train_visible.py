@@ -98,9 +98,6 @@ def multi_process() :
 
     valid_color_pos, _ = GenIdx(validset.valid_color_label, validset.valid_color_label)
     train_color_pos, _ = GenIdx(trainset.train_color_label, trainset.train_color_label)
-    print( trainset.train_color_image[1])
-    print(trainset.train_color_image[2])
-    sys.exit()
 
     print(len(valid_color_pos[0]))
     print(len(train_color_pos[0]))
