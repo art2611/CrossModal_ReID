@@ -88,19 +88,27 @@ def multi_process() :
     validset = RegDBVisibleData_split_VALID(data_path, transform=transform_train, split="validation")
     # print(f'len(trainset.train_color_label) : {len(trainset.train_color_label)}')
     # print(f'len(validset.valid_color_label) : {len(validset.valid_color_label)}')
+
+    ######################################### Image GENERATION
+    print('==> Image generation..')
+
+    trainset.train_color_image, trainset.train_color_label, _, _ =\
+        data_aug(visible_images = trainset.train_color_image, Visible_labels = trainset.train_color_label)
+    validset.valid_color_image, validset.valid_color_label, _, _ =\
+        data_aug(visible_images = trainset.train_color_image, Visible_labels = trainset.train_color_label)
+
     valid_color_pos, _ = GenIdx(validset.valid_color_label, validset.valid_color_label)
     train_color_pos, _ = GenIdx(trainset.train_color_label, trainset.train_color_label)
-    # print(len(valid_color_pos[0]))
-    # print(len(train_color_pos[0]))
-    # print(f' nbre d ids train : {len(np.unique(trainset.train_color_label)):5d}')
-    # print(f' nbre d ids valid : {len(np.unique(validset.valid_color_label)):5d}')
+
+    print(len(valid_color_pos[0]))
+    print(len(train_color_pos[0]))
+    print(f' nbre d ids train : {len(np.unique(trainset.train_color_label)):5d}')
+    print(f' nbre d ids valid : {len(np.unique(validset.valid_color_label)):5d}')
+    sys.exit()
 
     print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
     print(' ')
-    ######################################### Image GENERATION
-    print('==> Image generation..')
-    # trainset.train_color_image, trainset.train_color_label, _, _ =\
-    #     data_aug(visible_images = trainset.train_color_image, Visible_labels = trainset.train_color_label)
+
     print(f'New image number : {len(trainset.train_color_image)+ len(validset.valid_color_image)}')
 
     print(f'Identities number : {len(train_color_pos)}')
