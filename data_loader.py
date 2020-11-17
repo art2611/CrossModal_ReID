@@ -330,7 +330,6 @@ class RegDBVisibleData_split_VALID(data.Dataset):
             img1, target1 = self.valid_color_image[self.cIndex[index]], self.valid_color_label[self.cIndex[index]]
         elif hasattr(self, "test_color_image") :
             img1, target1 = self.test_color_image[self.cIndex[index]], self.test_color_label[self.cIndex[index]]
-        print("COUCOU TRANSFORM")
         img1 = self.transform(img1)
 
         return img1, target1
