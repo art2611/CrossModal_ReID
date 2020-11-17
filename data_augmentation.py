@@ -7,16 +7,14 @@ def data_aug(visible_images = None, Thermal_images = None, Visible_labels = None
     final_visible_target = []
     final_thermal_data = []
     final_thermal_target = []
-    nbr_of_images_per_image = 3
+    nbr_of_images_per_image = 2
     # print(trainset.train_color_label)
     if visible_images is not None :
         visible_img_number = visible_images.shape[0]
         for k in range(visible_img_number):
             final_visible_data.append(visible_images[k])
             final_visible_data.append(np.fliplr(visible_images[k]))
-            final_visible_data.append(np.array(random_noise(visible_images[k])))
-            print(type(np.array(random_noise(visible_images[k]))[0]))
-            # final_visible_data.append(np.fliplr(visible_images[k]))
+            # final_visible_data.append(np.array(random_noise(visible_images[k])))
             # final_visible_data.append(random_noise(visible_images[k], var=0.01))
             # final_visible_data.append(random_noise(visible_images[k], var=0.05))
             # final_visible_data.append(random_noise(visible_images[k], var=0.015))
