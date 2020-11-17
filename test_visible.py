@@ -12,9 +12,9 @@ import torch.utils.data
 from multiprocessing import freeze_support
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-# device = 'cuda' if torch.cuda.is_available() else 'cpu'
-device = 'cpu'
-nclass = 206
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+# device = 'cpu'
+nclass = 164
 # net = Network(class_num=nclass).to(device)
 
 pool_dim = 2048
@@ -51,8 +51,8 @@ def extract_gall_feat(gall_loader, ngall, net, visible_train = False):
     with torch.no_grad():
         for batch_idx, (input, label) in enumerate(gall_loader):
             batch_num = input.size(0)
-            input = Variable(input)
-            # input = Variable(input.cuda())
+            # input = Variable(input)
+            input = Variable(input.cuda())
             if visible_train :
                 feat_pool, feat_fc = net(input)
             else :
@@ -74,8 +74,8 @@ def extract_query_feat(query_loader, nquery, net, visible_train = False):
     with torch.no_grad():
         for batch_idx, (input, label) in enumerate(query_loader):
             batch_num = input.size(0)
-            # input = Variable(input.cuda())
-            input = Variable(input)
+            input = Variable(input.cuda())
+            # input = Variable(input)
             if visible_train :
                 feat_pool, feat_fc = net(input)
             else :
