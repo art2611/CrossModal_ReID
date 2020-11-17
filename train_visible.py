@@ -95,7 +95,7 @@ def multi_process() :
         data_aug(visible_images = trainset.train_color_image, Visible_labels = trainset.train_color_label)
     validset.valid_color_image, validset.valid_color_label, _, _ =\
         data_aug(visible_images = validset.valid_color_image, Visible_labels = validset.valid_color_label)
-
+    sys.exit()
     valid_color_pos, _ = GenIdx(validset.valid_color_label, validset.valid_color_label)
     train_color_pos, _ = GenIdx(trainset.train_color_label, trainset.train_color_label)
 

@@ -15,6 +15,7 @@ def data_aug(visible_images = None, Thermal_images = None, Visible_labels = None
             final_visible_data.append(visible_images[k])
             final_visible_data.append(np.fliplr(visible_images[k]))
             final_visible_data.append(np.array(random_noise(visible_images[k])))
+            print(type(np.array(random_noise(visible_images[k]))))
             # final_visible_data.append(np.fliplr(visible_images[k]))
             # final_visible_data.append(random_noise(visible_images[k], var=0.01))
             # final_visible_data.append(random_noise(visible_images[k], var=0.05))
