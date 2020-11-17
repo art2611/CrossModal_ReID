@@ -366,7 +366,7 @@ def GenIdx(train_color_label, train_thermal_label):
 
     return color_pos, thermal_pos
 
-def process_test_regdb(img_dir, trial=1, modal='visible', split = False):
+def process_test_regdb(img_dir, modal='visible', split = False):
     if modal == 'visible':
         input_data_path = img_dir + 'idx/train_visible_1.txt'
     elif modal == 'thermal':
@@ -387,17 +387,8 @@ def process_test_regdb(img_dir, trial=1, modal='visible', split = False):
         first80percent -= int(len(file_image) * 80 / 100) % 10
         #Récupération des 20 dernier % d'images pour la phase de test
         for k in range(first80percent, len(file_image)):
-            w = ((k + 1) % 10 <= trial)
-            # if trial == 1 :
-            #     w = ((k+1)%2 == 0)
-            # elif trial == 2 :
-            #     w = ((k+1)%10 < 5)
-            # elif trial == 3 :
-            #     w = ((k+1)%10 < 4)
-            # elif trial == 4 :
-            #     w = ((k+1)%10 <6 )
-            if w :
-            # if (k+1)%10 < 5 :
+            # On chosiit deux personnes en query, le reste dans la gallery
+            if (k + 1) % 10 < 2 :
                 first_image_slice.append(file_image[k])
                 first_label_slice.append(file_label[k])
             else :
