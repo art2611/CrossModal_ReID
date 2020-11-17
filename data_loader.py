@@ -279,7 +279,7 @@ class RegDBVisibleData_split_VALID(data.Dataset):
         first80percent -= int(len(color_img_file) * 80 / 100)%10
         if split == "training" :
             for i in range(first80percent):
-                if i%10 < 6 :
+                if i%10 < 7 :
                     img = Image.open(data_dir + color_img_file[i])
                     img = img.resize((144, 288), Image.ANTIALIAS)
                     pix_array = np.array(img)
@@ -293,7 +293,7 @@ class RegDBVisibleData_split_VALID(data.Dataset):
 
         if split == "validation" :
             for i in range(first80percent):
-                if i%10 >= 6 :
+                if i%10 >= 7 :
                     img = Image.open(data_dir + color_img_file[i])
                     img = img.resize((144, 288), Image.ANTIALIAS)
                     pix_array = np.array(img)
