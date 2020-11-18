@@ -74,23 +74,22 @@ def multi_process() :
     # train_color_pos, thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
 
 
-    ######################################### TRAIN SET
+    ######################################### TRAIN & VALIDATION SETs
     Timer1 = time.time()
     print('==> Loading images..')
 
-    #Get Train set and test set
-    trainset = RegDBVisibleData_split_VALID(data_path, transform=transform_train, split="training")
-
-    ######################################### VALIDATION SET
-    validset = RegDBVisibleData_split_VALID(data_path, transform=transform_train, split="validation")
-
+    if args.train == "visible ":
+        trainset = RegDBVisibleData(data_path, transform=transform_train, split="training")
+        validset = RegDBVisibleData(data_path, transform=transform_train, split="validation")
+        print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
+    elif args.train == "thermal" :
+        trainset = RegDBThermalData(data_path, transform=transform_train, split="training")
+        validset = RegDBVisibleData(data_path, transform=transform_train, split="validation")
+        print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
 
     # print(f'len(trainset.train_color_label) : {len(trainset.train_color_label)}')
     # print(f'len(validset.valid_color_label) : {len(validset.valid_color_label)}')
-    if args.train == "visible":
-        print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
-    elif args.train == "thermal":
-        print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
+
     print(' ')
     ######################################### Image GENERATION
     print('==> Image generation..')

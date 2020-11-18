@@ -6,64 +6,6 @@ from torchvision import transforms
 import matplotlib.pyplot as plt
 
 
-class RegDBData(data.Dataset):
-    def __init__(self, data_dir, trial, transform=None, colorIndex=None, thermalIndex=None):
-        # Load training images (path) and labels
-        data_dir = '../Datasets/RegDB/'
-        train_color_list = data_dir + 'idx/train_visible_{}'.format(trial) + '.txt'
-        train_thermal_list = data_dir + 'idx/train_thermal_{}'.format(trial) + '.txt'
-        #Load color and thermal images + labels
-        color_img_file, train_color_label = load_data(train_color_list)
-        thermal_img_file, train_thermal_label = load_data(train_thermal_list)
-
-        #Get real and thermal images with good shape in a list
-        train_color_image = []
-        for i in range(len(color_img_file)):
-            img = Image.open(data_dir + color_img_file[i])
-            img = img.resize((144, 288), Image.ANTIALIAS)
-            pix_array = np.array(img)
-            train_color_image.append(pix_array)
-
-        train_thermal_image = []
-        for i in range(len(thermal_img_file)):
-            img = Image.open(data_dir + thermal_img_file[i])
-            img = img.resize((144, 288), Image.ANTIALIAS)
-            pix_array = np.array(img)
-            train_thermal_image.append(pix_array)
-
-        train_color_image = np.array(train_color_image)
-        train_thermal_image = np.array(train_thermal_image)
-
-        # Init color images / labels
-        self.train_color_image = train_color_image
-        self.train_color_label = train_color_label
-
-        # Init themal images / labels
-        self.train_thermal_image = train_thermal_image
-        self.train_thermal_label = train_thermal_label
-
-        self.transform = transform
-
-        # Prepare index
-        self.cIndex = colorIndex
-        self.tIndex = thermalIndex
-
-
-    def __getitem__(self, index):
-        #Dataset[i] return images from both modal and the corresponding label
-        img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
-        img2, target2 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
-
-        img1 = self.transform(img1)
-        img2 = self.transform(img2)
-
-        return img1, img2, target1, target2
-
-    def __len__(self):
-        return len(self.train_color_label)
-
-
-
 class RegDBData_split(data.Dataset):
     def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, split="training" ):
         # Load training images (path) and labels
@@ -160,7 +102,7 @@ class RegDBData_split(data.Dataset):
 
 
 
-class RegDBVisibleData_split_VALID(data.Dataset):
+class RegDBVisibleData(data.Dataset):
     def __init__(self, data_dir, transform=None, colorIndex=None, split="training" ):
         # Load training images (path) and labels
         data_dir = '../Datasets/RegDB/'
@@ -224,6 +166,71 @@ class RegDBVisibleData_split_VALID(data.Dataset):
             return len(self.train_color_label)
         elif hasattr(self, "valid_color_image"):
             return len(self.valid_color_label)
+
+class RegDBThermalData(data.Dataset):
+    def __init__(self, data_dir, transform=None, thermalIndex=None, split="training" ):
+        # Load training images (path) and labels
+        data_dir = '../Datasets/RegDB/'
+        train_thermal_list = data_dir + 'idx/train_thermal_1.txt'
+        #Load color and thermal images + labels
+        thermal_img_file, thermal_target = load_data(train_thermal_list)
+        thermal_image = []
+        thermal_lab = []
+
+        #Get real and thermal images with good shape in a list
+        # Training => return 50%
+        first50percent = int(len(thermal_img_file) * 50 / 100)
+        first50percent -= int(len(thermal_img_file) * 50 / 100) % 10
+        first80percent = int(len(thermal_img_file) * 80 / 100)
+        first80percent -= int(len(thermal_img_file) * 80 / 100)%10
+        if split == "training" :
+            for i in range(first80percent):
+                if i%10 < 7 :
+                    img = Image.open(data_dir + thermal_img_file[i])
+                    img = img.resize((144, 288), Image.ANTIALIAS)
+                    pix_array = np.array(img)
+                    thermal_image.append(pix_array)
+                    thermal_lab.append(thermal_target[i])
+
+            thermal_image = np.array(thermal_image)
+            # Init color images / labels
+            self.train_thermal_image = thermal_image
+            self.train_thermal_label = thermal_lab
+
+        if split == "validation" :
+            for i in range(first80percent):
+                if i%10 >= 7 :
+                    img = Image.open(data_dir + thermal_img_file[i])
+                    img = img.resize((144, 288), Image.ANTIALIAS)
+                    pix_array = np.array(img)
+                    thermal_image.append(pix_array)
+                    thermal_lab.append(thermal_target[i])
+
+            thermal_image = np.array(thermal_image)
+
+            # Init color images / labels
+            self.valid_thermal_image = thermal_image
+            self.valid_thermal_label = thermal_lab
+
+        self.transform = transform
+        # Prepare index
+        self.tIndex = thermalIndex
+
+    def __getitem__(self, index):
+        #Dataset[i] return images from both modal and the corresponding label
+        if hasattr(self, "train_thermal_image"):
+            img1, target1 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
+        elif hasattr(self, "valid_thermal_image") :
+            img1, target1 = self.valid_thermal_image[self.tIndex[index]], self.valid_thermal_label[self.tIndex[index]]
+
+        img1 = self.transform(img1)
+
+        return img1, target1
+    def __len__(self):
+        if hasattr(self, "train_thermal_image"):
+            return len(self.train_thermal_label)
+        elif hasattr(self, "valid_thermal_image"):
+            return len(self.valid_thermal_label)
 
 def load_data(input_data_path):
     with open(input_data_path) as f:
