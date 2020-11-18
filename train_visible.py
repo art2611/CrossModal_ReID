@@ -29,7 +29,7 @@ def multi_process() :
 
     # device = 'cpu'
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    writer = SummaryWriter("runs/CrossModal6")
+    writer = SummaryWriter("runs/ThermalOnly1")
 
     # Init variables :
     img_w = 144
@@ -42,9 +42,9 @@ def multi_process() :
     lr = 0.001
     checkpoint_path = '../save_model/'
     if args.train == 'visible' :
-        suffix = f'RegDB_person_Visible({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+        suffix = f'RegDB_person_Visible_only({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
     elif args.train == "thermal" :
-        suffix = f'RegDB_person_Thermal({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+        suffix = f'RegDB_person_Thermal_only({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
     # Data info  :
     data_path = '../Datasets/RegDB/'
