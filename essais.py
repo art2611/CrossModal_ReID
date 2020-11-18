@@ -6,12 +6,12 @@ import torch
 
 t = torch.rand(4, 4)
 
-print(t.size(0))
-print(t.size(1))
-b = t.view(t.size(0), t.size(1))
-
-print(t)
-print(b)
+# print(t.size(0))
+# print(t.size(1))
+# b = t.view(t.size(0), t.size(1))
+#
+# print(t)
+# print(b)
 sys.exit()
 #
 gall_feat_pool = np.zeros((2, 5))
