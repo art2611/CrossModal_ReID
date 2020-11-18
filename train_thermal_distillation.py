@@ -23,7 +23,7 @@ from data_augmentation import data_aug
 def multi_process() :
     device = 'cpu'
     # device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    writer = SummaryWriter("runs/CrossModal3")
+    writer = SummaryWriter("runs/Thermal1")
 
     # Init variables :
     img_w = 144
@@ -242,14 +242,14 @@ def multi_process() :
             end = time.time()
             if batch_idx % 30 == 0:
                 print(f'Epoch: [{epoch}][{batch_idx}/{len(trainloader)}] '
-                      f'Time: {batch_time.val:.3f} , avg : ({batch_time.avg:.3f}) '
+                      f'Time: {batch_time.val:.3f}) '
                       f'lr:{current_lr:.4f} '
-                      f'Loss: {train_loss.val:.4f}, avg : ({train_loss.avg:.4f}) '
+                      f'Loss: {train_loss.val:.4f}) '
                       f'Accu: {100. * correct / total:.2f}')
             # For all batch, write in tensorBoard
-        writer.add_scalar('total_loss', train_loss.avg, epoch)
-        writer.add_scalar('lr', current_lr, epoch)
-        writer.add_scalar('acc_train', 100. * correct / total, epoch)
+        writer.add_scalar('Training loss (MSE)', train_loss.avg, epoch)
+        writer.add_scalar('Training lr', current_lr, epoch)
+        writer.add_scalar('Training accuracy ', 100. * correct / total, epoch)
 
 
     # Training part
@@ -257,18 +257,6 @@ def multi_process() :
     loader_batch = batch_num_identities * num_of_same_id_in_batch
     # define loss function
     criterion_MSE = nn.MSELoss().to(device)
-
-
-    # Prepare valid loader
-    sampler_valid = IdentitySampler(validset.valid_color_label, validset.valid_thermal_label,\
-                                    valid_color_pos, valid_thermal_pos, \
-                                num_of_same_id_in_batch, batch_num_identities)
-
-    validset.cIndex = sampler_valid.index1
-    validset.tIndex = sampler_valid.index2
-
-    validloader = torch.utils.data.DataLoader(validset, batch_size=loader_batch, \
-                            sampler=sampler_valid, num_workers=workers, drop_last=True)
 
     best_acc = 0
     for epoch in range(81):
@@ -288,26 +276,41 @@ def multi_process() :
         # training
         train_thermal(epoch)
         # validation
-        if epoch > 0 and epoch % 20 == 0:
+        if epoch > 0 and epoch % 2 == 0:
             valid_loss = AverageMeter()
-            valid_id_loss = AverageMeter()
-            valid_tri_loss = AverageMeter()
             data_time = AverageMeter()
             batch_time = AverageMeter()
             print(f'Validation epoch: {epoch}')
+            # Prepare valid loader
+            sampler_valid = IdentitySampler(validset.valid_color_label, validset.valid_thermal_label, \
+                                            valid_color_pos, valid_thermal_pos, \
+                                            num_of_same_id_in_batch, batch_num_identities)
+
+            validset.cIndex = sampler_valid.index1
+            validset.tIndex = sampler_valid.index2
+
+            validloader = torch.utils.data.DataLoader(validset, batch_size=loader_batch, \
+                                                      sampler=sampler_valid, num_workers=workers, drop_last=True)
             correct = 0
             total = 0
             with torch.no_grad():
-                for batch_idx, (visible_input, visible_label) in enumerate(validloader):
-                    visible_input = Variable(visible_input.cuda())
-                    visible_label = Variable(visible_label.cuda())
-                    # visible_input = Variable(visible_input)
-                    # visible_label = Variable(visible_label)
-                    feat, out0, = net_thermal(visible_input, visible_input, modal=1)  # Call the visible branch only
+                for batch_idx, (visible_input, thermal_input, visible_label, thermal_label) in enumerate(validloader):
+                    # visible_input = Variable(visible_input.cuda())
+                    # thermal_input = Variable(thermal_input.cuda())
+                    # visible_label = Variable(visible_label.cuda())
+                    # thermal_label = Variable(thermal_label.cuda())
 
-                    loss_MSE = criterion_MSE(out0, visible_label)
-                    _, predicted = out0.max(1)
-                    correct += (predicted.eq(visible_label).sum().item())
+                    visible_input = Variable(visible_input)
+                    thermal_input = Variable(thermal_input)
+                    visible_label = Variable(visible_label)
+                    thermal_label = Variable(thermal_label)
+
+                    feat1, out1, = net_thermal(visible_input)  # Call the visible branch only
+                    feat2, out2 = net_thermal(thermal_input)  # Call the visible branch only
+
+                    loss_MSE = criterion_MSE(out1, out2)
+                    _, predicted = out2.max(1)
+                    correct += (predicted.eq(thermal_label).sum().item())
 
                     total += visible_label.size(0)
                     acc = 100. * correct / total
@@ -315,8 +318,9 @@ def multi_process() :
                     valid_loss.update(loss_MSE.item(), 2 * visible_input.size(0))
 
                     print(f'iLoss: {loss_MSE:.4f}  '
-                          f'Accurac= {acc}'
+                          f'Validation accuracy= {acc}'
                           )
+
             # save model
             if acc > best_acc:
                 best_acc = acc
@@ -329,8 +333,8 @@ def multi_process() :
                 }
                 torch.save(state, checkpoint_path + suffix + '_best.t')
 
-            writer.add_scalar('Valid_total_loss', valid_loss.avg, epoch)
-            writer.add_scalar('acc_valid', acc, epoch)
+            writer.add_scalar('Validation loss (MSE)', valid_loss.avg, epoch)
+            writer.add_scalar('Validation accuracy', acc, epoch)
 
 if __name__ == '__main__':
     freeze_support()
