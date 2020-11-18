@@ -258,8 +258,8 @@ def multi_process() :
                                                     num_of_same_id_in_batch, batch_num_identities)
             trainset.cIndex = sampler_train.index2  # color index
             trainset.tIndex = sampler_train.index2
-        trainset.cIndex = sampler_train.index1  # color index
-        trainset.tIndex = sampler_train.index1
+
+
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=loader_batch, \
                                 sampler=sampler_train, num_workers=workers, drop_last=True)
 
