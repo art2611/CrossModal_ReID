@@ -109,8 +109,8 @@ def multi_process() :
             data_aug(Thermal_images = trainset.train_thermal_image, Thermal_labels = trainset.train_thermal_label)
         _, _, validset.valid_thermal_image, validset.valid_thermal_label =\
             data_aug(Thermal_images = validset.valid_thermal_image, Thermal_labels = validset.valid_thermal_label)
-        train_thermal_pos, _ = GenIdx(trainset.train_thermal_image, trainset.train_thermal_label)
-        valid_thermal_pos, _ = GenIdx(validset.valid_thermal_image, validset.valid_thermal_label)
+        train_thermal_pos, _ = GenIdx(trainset.train_thermal_label, trainset.train_thermal_label)
+        valid_thermal_pos, _ = GenIdx(validset.valid_thermal_label, validset.valid_thermal_label)
 
         print(f'New image number : {len(trainset.train_thermal_image) + len(validset.valid_thermal_image)}')
     ######################################### IMAGE DISPLAY
