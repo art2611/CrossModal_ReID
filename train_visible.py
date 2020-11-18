@@ -83,6 +83,10 @@ def multi_process() :
 
     ######################################### VALIDATION SET
     validset = RegDBData_split(data_path, transform=transform_train, split="validation")
+
+    print(trainset.train_thermal_label)
+    sys.exit()
+
     # print(f'len(trainset.train_color_label) : {len(trainset.train_color_label)}')
     # print(f'len(validset.valid_color_label) : {len(validset.valid_color_label)}')
     if args.train == "visible":
