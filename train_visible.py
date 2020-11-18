@@ -263,6 +263,7 @@ def multi_process() :
         # training
         training(epoch)
 
+        sys.exit()
         ######################################### VALIDATION
         if epoch > 0 and epoch % 2 == 0:
             valid_loss = AverageMeter()
