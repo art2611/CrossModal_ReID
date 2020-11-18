@@ -79,10 +79,10 @@ def multi_process() :
     print('==> Loading images..')
 
     #Get Train set and test set
-    trainset = RegDBVisibleData_split_VALID(data_path, transform=transform_train, split="training")
+    trainset = RegDBData_split(data_path, transform=transform_train, split="training")
 
     ######################################### VALIDATION SET
-    validset = RegDBVisibleData_split_VALID(data_path, transform=transform_train, split="validation")
+    validset = RegDBData_split(data_path, transform=transform_train, split="validation")
     # print(f'len(trainset.train_color_label) : {len(trainset.train_color_label)}')
     # print(f'len(validset.valid_color_label) : {len(validset.valid_color_label)}')
     if args.train == "visible":
