@@ -84,7 +84,7 @@ def multi_process() :
         print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
     elif args.train == "thermal" :
         trainset = RegDBThermalData(data_path, transform=transform_train, split="training")
-        validset = RegDBVisibleData(data_path, transform=transform_train, split="validation")
+        validset = RegDBThermalData(data_path, transform=transform_train, split="validation")
         print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
 
     # print(f'len(trainset.train_color_label) : {len(trainset.train_color_label)}')
