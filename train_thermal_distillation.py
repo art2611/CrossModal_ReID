@@ -134,8 +134,8 @@ def multi_process() :
     print('==> Building model..')
 
     ######################################### MODEL
-    suffix_visible = f'RegDB_person_Visible({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}_best.t'
-    model_path = checkpoint_path + suffix_visible
+    suffix_visible = f'RegDB_person_Visible({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+    model_path = '../save_model/' + suffix_visible + '_best.t'
     if os.path.isfile(model_path):
         print('==> loading checkpoint')
         checkpoint = torch.load(model_path)
