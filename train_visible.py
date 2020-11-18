@@ -250,12 +250,16 @@ def multi_process() :
             sampler_train  = UniModalIdentitySampler(trainset.train_color_label, \
                                 train_color_pos, \
                                 num_of_same_id_in_batch, batch_num_identities)
+            trainset.cIndex = sampler_train.index1  # color index
+            trainset.tIndex = sampler_train.index1
         elif args.train == "thermal":
             sampler_train = UniModalIdentitySampler(trainset.train_thermal_label, \
                                                     train_thermal_pos, \
                                                     num_of_same_id_in_batch, batch_num_identities)
-
+            trainset.cIndex = sampler_train.index2  # color index
+            trainset.tIndex = sampler_train.index2
         trainset.cIndex = sampler_train.index1  # color index
+        trainset.tIndex = sampler_train.index1
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=loader_batch, \
                                 sampler=sampler_train, num_workers=workers, drop_last=True)
 
