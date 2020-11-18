@@ -25,9 +25,9 @@ def data_aug(visible_images = None, Thermal_images = None, Visible_labels = None
         for k in range(thermal_img_number):
             final_thermal_data.append(Thermal_images[k])
             final_thermal_data.append(np.fliplr(Thermal_images[k]))
-            final_thermal_data.append(random_noise(Thermal_images[k], var=0.01))
-            final_thermal_data.append(random_noise(Thermal_images[k], var=0.05))
-            final_thermal_data.append(random_noise(Thermal_images[k], var=0.015))
+            # final_thermal_data.append(random_noise(Thermal_images[k], var=0.01))
+            # final_thermal_data.append(random_noise(Thermal_images[k], var=0.05))
+            # final_thermal_data.append(random_noise(Thermal_images[k], var=0.015))
             for j in range(nbr_of_images_per_image):
                 final_thermal_target.append(Visible_labels[k])
 

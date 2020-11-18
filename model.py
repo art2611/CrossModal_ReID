@@ -157,7 +157,7 @@ class Network(nn.Module):
         x = self.Resnet_module(x)    #torch.Size([64, 2048, 18, 9])
 
         x_pool = self.avgpool(x)
-        x_pool = x_pool.view(x_pool.size(0), x_pool.size(1))
+        x_pool = x_pool.view(x_pool.size(0), x_pool.size(1)) # Incomprehension, on recupere la même chose
 
         feat = self.bottleneck(x_pool) #torch.Size([64, 2048])
 

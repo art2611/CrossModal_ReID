@@ -21,8 +21,8 @@ from data_augmentation import data_aug
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 def multi_process() :
-    device = 'cpu'
-    # device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    # device = 'cpu'
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     writer = SummaryWriter("runs/CrossModal3")
 
     # Init variables :
@@ -34,7 +34,7 @@ def multi_process() :
     num_of_same_id_in_batch = 4 # Number of same identity in a batch
     workers = 4
     lr = 0.001
-    nclass = 206
+    nclass = 164
     checkpoint_path = '../save_model/'
     suffix = f'RegDB_person_Thermal({num_of_same_id_in_batch})_same_id({trainV_batch_num_identities})_lr_{lr}'
     # Data info  :
@@ -88,29 +88,41 @@ def multi_process() :
     ######################################### VALIDATION SET
     validset = RegDBData_split(data_path, transform=transform_train, split="validation")
     # print(validset.valid_color_label)
-    valid_Vcolor_pos, validTcolor_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
+
     loaded_img = len(trainset.train_color_image) + len(validset.valid_color_label) + \
             len(trainset.train_thermal_image) + len(validset.valid_thermal_image)
 
-
+    print(f'Data Loading Time:\t {time.time() - Timer1}')
     print(f'Loaded images : {loaded_img}')
-    print(' ')
+    print(f'')
     ######################################### Image GENERATION
     print('==> Image generation..')
-    # trainset.train_color_image, trainset.train_color_label, _, _ =\
-    #     data_aug(visible_images = trainset.train_color_image, Visible_labels = trainset.train_color_label, \
-    #     Thermal_images = trainset.train_thermal_image, Thermal_labels = trainset.train_thermal_label)
+    end = time.time()
+    trainset.train_color_image,trainset.train_color_label,\
+            trainset.train_thermal_image, trainset.train_thermal_label =\
+                                          data_aug(visible_images = trainset.train_color_image, \
+                                                   Visible_labels = trainset.train_color_label, \
+                                                   Thermal_images = trainset.train_thermal_image, \
+                                                   Thermal_labels = trainset.train_thermal_label\
+                                                   )
+    validset.valid_color_image,validset.valid_color_label,\
+            validset.valid_thermal_image, validset.valid_thermal_label =\
+                                          data_aug(visible_images = validset.valid_color_image, \
+                                                   Visible_labels = validset.valid_color_label, \
+                                                   Thermal_images = validset.valid_thermal_image, \
+                                                   Thermal_labels = validset.valid_thermal_label\
+                                                   )
     loaded_img = len(trainset.train_color_image) + len(validset.valid_color_image) + \
                  len(trainset.train_thermal_image) + len(validset.valid_thermal_image)
+    print(f'Data generation time:\t {time.time() - end:.3f}')
     print(f'New image number : {loaded_img}')
 
     # Get position list
     train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
     valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
 
-    print(f'Identities number : {len(train_color_pos)}')
     print(' ')
-    print('New dataset statistics:')
+    print('Generated dataset statistics:')
     print('   set     |  Nb ids |  Nb img    ')
     print('  ------------------------------')
     print(f'  train_Visible  | {len(np.unique(trainset.train_color_label)):5d} | {len(trainset.train_color_label):8d}')
@@ -118,7 +130,6 @@ def multi_process() :
     print(f'  valid_Visible  | {len(np.unique(validset.valid_color_label)):5d} | {len(validset.valid_color_label):8d}')
     print(f'  valid_Thermal  | {len(np.unique(validset.valid_thermal_label)):5d} | {len(validset.valid_thermal_label):8d}')
     print('  ------------------------------')
-    print(f'Data Loading Time:\t {time.time() - Timer1:.3f}')
     print(' ')
     print('==> Building model..')
 
@@ -137,7 +148,7 @@ def multi_process() :
     else:
         print("Saved model not loaded, care")
         sys.exit()
-    #Keep both in eval mode to get same output size and compare raw vectors
+    #Je pense qu'on peut prendre le vecteur en sortir du FC car ça signifie que l'activation des neurones au préalable est bonne.
     net_visible.train()
     net_thermal.train()
     # Freeze some in thermal model
@@ -189,15 +200,15 @@ def multi_process() :
 
         end = time.time()
         for batch_idx, (visible_input, thermal_input, visible_label, thermal_label) in enumerate(trainloader):
-            # visible_input = Variable(visible_input.cuda())
-            # thermal_input = Variable(thermal_input.cuda())
-            # visible_label = Variable(visible_label.cuda())
-            # thermal_label = Variable(thermal_label.cuda())
-            #
-            visible_input = Variable(visible_input)
-            thermal_input = Variable(thermal_input)
-            visible_label = Variable(visible_label)
-            thermal_label = Variable(thermal_label)
+            visible_input = Variable(visible_input.cuda())
+            thermal_input = Variable(thermal_input.cuda())
+            visible_label = Variable(visible_label.cuda())
+            thermal_label = Variable(thermal_label.cuda())
+
+            # visible_input = Variable(visible_input)
+            # thermal_input = Variable(thermal_input)
+            # visible_label = Variable(visible_label)
+            # thermal_label = Variable(thermal_label)
 
             data_time.update(time.time() - end)
 
@@ -231,9 +242,9 @@ def multi_process() :
             end = time.time()
             if batch_idx % 30 == 0:
                 print(f'Epoch: [{epoch}][{batch_idx}/{len(trainloader)}] '
-                      f'Time: {batch_time.val:.3f} ({batch_time.avg:.3f}) '
+                      f'Time: {batch_time.val:.3f} , avg : ({batch_time.avg:.3f}) '
                       f'lr:{current_lr:.4f} '
-                      f'Loss: {train_loss.val:.4f} ({train_loss.avg:.4f}) '
+                      f'Loss: {train_loss.val:.4f}, avg : ({train_loss.avg:.4f}) '
                       f'Accu: {100. * correct / total:.2f}')
             # For all batch, write in tensorBoard
         writer.add_scalar('total_loss', train_loss.avg, epoch)
@@ -264,7 +275,7 @@ def multi_process() :
 
         print('==> Preparing Data Loader...')
         # Prepare training loader :
-        sampler_train = IdentitySampler(trainset.train_color_label, trainset.train_thermal_label, \
+        sampler_train = IdentitySampler_paired(trainset.train_color_label, trainset.train_thermal_label, \
                                         train_color_pos, train_thermal_pos, \
                                         num_of_same_id_in_batch, batch_num_identities)
         trainset.cIndex = sampler_train.index1  # color index

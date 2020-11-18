@@ -1,19 +1,40 @@
 import numpy as np
 import sys
+import torch.nn as nn
+import torch
+
+
+t = torch.rand(4, 4)
+
+print(t.size(0))
+print(t.size(1))
+b = t.view(t.size(0), t.size(1))
+
+print(t)
+print(b)
+sys.exit()
 #
 gall_feat_pool = np.zeros((2, 5))
 gall_feat_pool[0,0] = 1.1
 gall_feat_pool[0,1] = 3.2
-gall_feat_pool[0,1] = 3.2
-gall_feat_pool[1,0] = 2.1
+gall_feat_pool[0,2] = 3.2
+gall_feat_pool[0,3] = 3.2
+gall_feat_pool[1,0] = 1.1
+gall_feat_pool[1,1] = 3.2
+gall_feat_pool[1,2] = 3.2
+gall_feat_pool[1,3] = 3.2
+gall_feat_pool = torch.tensor(gall_feat_pool)
+criterion_MSE = nn.MSELoss()
+print(criterion_MSE(gall_feat_pool[1,:],gall_feat_pool[0,:]))
+print(gall_feat_pool)
 # print(gall_feat_pool[:,1])
 # print(gall_feat_pool.shape[0])
-print(gall_feat_pool)
-print(np.argsort(gall_feat_pool, axis=1))
-print(gall_feat_pool[:,1])
-print( gall_feat_pool[:,2])
-print( (gall_feat_pool[:,1] == gall_feat_pool[:,2]))
-print( (gall_feat_pool[:,1] == gall_feat_pool[:,2]).astype(np.int32))
+# print(gall_feat_pool)
+# print(np.argsort(gall_feat_pool, axis=1))
+# print(gall_feat_pool[:,1])
+# print( gall_feat_pool[:,2])
+# print( (gall_feat_pool[:,1] == gall_feat_pool[:,2]))
+# print( (gall_feat_pool[:,1] == gall_feat_pool[:,2]).astype(np.int32))
 # print(True.astype(np.int32))
 sys.exit()
 dist = np.linalg.norm(gall_feat_pool[1, :] - gall_feat_pool[0, :])
