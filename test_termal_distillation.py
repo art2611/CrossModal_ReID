@@ -92,7 +92,7 @@ def multi_process():
     end = time.time()
     if os.path.isfile(model_visible_path):
         print('==> loading checkpoint visible ')
-        checkpoint_visible = torch.load(model_thermal_path)
+        checkpoint_visible = torch.load(model_visible_path)
         net_visible = Network(class_num=nclass)
         net_visible.to(device)
         net_visible.load_state_dict(checkpoint_visible['net'])
@@ -104,7 +104,7 @@ def multi_process():
         checkpoint_thermal = torch.load(model_thermal_path)
         net_thermal = Network(class_num=nclass)
         net_thermal.to(device)
-        net_thermal.load_state_dict(checkpoint_thermal['net'])
+        net_thermal.load_state_dict(checkpoint_thermal['net_thermal'])
     else :
         print("Problem : Saved thermal model not loaded, care")
         sys.exit()
