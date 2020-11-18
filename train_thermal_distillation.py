@@ -317,7 +317,7 @@ def multi_process() :
 
                     valid_loss.update(loss_MSE.item(), 2 * visible_input.size(0))
 
-                    print(f'iLoss: {loss_MSE:.4f}  '
+                    print(f'MSE Loss: {loss_MSE:.4f}  '
                           f'Validation accuracy= {acc}'
                           )
 
