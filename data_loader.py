@@ -295,10 +295,10 @@ def process_test_regdb(img_dir, modal='visible', split = False):
         first_label_slice = []
         sec_image_slice = []
         sec_label_slice = []
-        first80percent = int(len(file_image) * 80 / 100)
-        first80percent -= int(len(file_image) * 80 / 100) % 10
+        first80percent = int(len(file_image_visible) * 80 / 100)
+        first80percent -= int(len(file_image_visible) * 80 / 100) % 10
         #Récupération des 20 dernier % d'images pour la phase de test
-        for k in range(first80percent, len(file_image)):
+        for k in range(first80percent, len(file_image_visible)):
             # On chosiit deux personnes en query, le reste dans la gallery
             if (k + 1) % 10 < 2 :
                 #Query
