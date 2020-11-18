@@ -104,7 +104,7 @@ def multi_process():
         checkpoint_thermal = torch.load(model_thermal_path)
         net_thermal = Network(class_num=nclass)
         net_thermal.to(device)
-        net_thermal.load_state_dict(checkpoint_thermal['net'])
+        net_thermal.load_state_dict(checkpoint_thermal['net2'])
     else :
         print("Problem : Saved thermal model not loaded, care")
         sys.exit()
