@@ -266,7 +266,6 @@ def multi_process() :
         # training
         training(epoch)
 
-        sys.exit()
         ######################################### VALIDATION
         if epoch > 0 and epoch % 2 == 0:
             valid_loss = AverageMeter()
@@ -278,11 +277,13 @@ def multi_process() :
             if args.train == "training" :
                 sampler_valid = UniModalIdentitySampler(validset.valid_color_label, valid_color_pos, \
                                                     num_of_same_id_in_batch, batch_num_identities)
+                validset.cIndex = sampler_valid.index1
             if args.train == "thermal" :
                 sampler_valid = UniModalIdentitySampler(validset.valid_thermal_label, valid_thermal_pos, \
                                                     num_of_same_id_in_batch, batch_num_identities)
+                validset.tIndex = sampler_valid.index1
 
-            validset.cIndex = sampler_valid.index1
+
             validloader = torch.utils.data.DataLoader(validset, batch_size=loader_batch, \
                                                       sampler=sampler_valid, num_workers=workers, drop_last=True)
 
