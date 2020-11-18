@@ -21,7 +21,7 @@ def data_aug(visible_images = None, Thermal_images = None, Visible_labels = None
             for j in range(nbr_of_images_per_image):
                 final_visible_target.append(Visible_labels[k])
     if Thermal_images is not None :
-        thermal_img_number = Thermal_labels.shape[0]
+        thermal_img_number = Thermal_images.shape[0]
         for k in range(thermal_img_number):
             final_thermal_data.append(Thermal_images[k])
             final_thermal_data.append(np.fliplr(Thermal_images[k]))
