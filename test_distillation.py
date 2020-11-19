@@ -153,7 +153,7 @@ def multi_process():
         distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
         # print(-distmat_pool[0])
         # print(np.argsort(-distmat_pool, axis = 1)[0])
-        print(gall_feat_pool.shape[0])  # Number of gallery images
+        print(type(gall_feat_pool.shape[0]))  # Number of gallery images
         print(query_feat_pool.shape[0])  # Number of query images
         distance = np.zeros(gall_feat_pool.shape[0], query_feat_pool.shape[0])
 
