@@ -161,10 +161,11 @@ def multi_process():
             for j in range(gall_feat_pool.shape[0]):
                 # print(type(gall_feat_pool[i]))
                 # print(query_feat_pool[j])
-                distance[i][j] = np.linalg.norm(gall_feat_pool[i, :], query_feat_pool[j, :])
-                sys.exit()
+                distance[i][j] = np.linalg.norm(gall_feat_pool[i] - query_feat_pool[j])
+
         print(f'ancient distance : {-distmat_pool[0]}')
         print(f'New distance : {-distance[0]}')
+        sys.exit()
         cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, gall_label, query_label)
 
         # fc feature
