@@ -155,14 +155,13 @@ def multi_process():
         distance = np.zeros((gall_feat_pool.shape[0], query_feat_pool.shape[0]))
         for i in range(gall_feat_pool.shape[0]):
             for j in range(query_feat_pool.shape[0]):
-                print(type(gall_feat_pool[i]))
                 # print(query_feat_pool[j])
                 distance[i][j] = np.linalg.norm(gall_feat_pool[i] - query_feat_pool[j])
-
+        distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
         print(f'ancient distance : {-distmat_pool[0]}')
         print(f'New distance : {-distance[0]}')
         print(np.argsort(distance, axis=1))
-        distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
+
         # cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, gall_label, query_label)
         cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distance, gall_label, query_label)
 
