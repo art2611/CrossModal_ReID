@@ -158,7 +158,7 @@ def multi_process():
         distance = np.zeros((gall_feat_pool.shape[0], query_feat_pool.shape[0]))
         print(f'dist shape {distance.shape}')
         print(gall_feat_pool.shape[1])
-        print(query_feat_pool.shape[0])
+        print(query_feat_pool.shape[1])
         for i in range(gall_feat_pool.shape[0]):
             for j in range(gall_feat_pool.shape[0]):
                 # print(type(gall_feat_pool[i]))
