@@ -14,7 +14,6 @@ from tensorboardX import SummaryWriter
 from model import Network
 from multiprocessing import freeze_support
 import os
-from test import extract_gall_feat, extract_query_feat
 from evaluation import eval_regdb
 import sys
 from data_augmentation import data_aug

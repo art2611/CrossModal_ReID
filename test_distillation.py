@@ -125,6 +125,18 @@ def multi_process():
     queryset = TestData(query_img, query_label, transform=transform_test, img_size=(img_w, img_h))
     query_loader = torch.utils.data.DataLoader(queryset, batch_size=test_batch_size, shuffle=False, num_workers=4)
 
+    ############################## DISPLAY QUERY AND GALLERY
+    # for i in range(6):
+    #      plt.subplot(2, 3, i + 1)
+    #      if i < 3 :
+    #         plt.title("Gallery")
+    #         plt.imshow(np.array(gallset.test_image[i]))
+    #      else :
+    #         plt.title("Query")
+    #         plt.imshow(np.array(queryset.test_image[i]))
+    #      # plt.imshow(final_train_data[i], cmap='gray')
+    # plt.show()
+
     print(f'Data Loading Time:\t {time.time() - end:.3f}')
     print(" ")
     print('==> Feature extraction for queries and gallery')
@@ -135,6 +147,7 @@ def multi_process():
     # if True = thermal to visible, else, the reverse
     print(" ")
     print('==> Evaluation : ')
+
     if False :
         # pool5 feature
         distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
