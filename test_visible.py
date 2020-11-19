@@ -98,7 +98,10 @@ def multi_process() :
         model_path = '../save_model/' + suffix + '_best.t'
         # model_path = checkpoint_path + 'regdb_awg_p4_n8_lr_0.1_seed_0_trial_{}_best.t'.format(test_trial)
         if os.path.isfile(model_path):
-            print('==> loading checkpoint')
+            if args.train == "visible " :
+                print('==> Loading visible checkpoint..')
+            elif args.train == "thermal" :
+                print('==> Loading thermal checkpoint..')
             checkpoint = torch.load(model_path)
             net = Network(class_num=nclass)
             net.to(device)
