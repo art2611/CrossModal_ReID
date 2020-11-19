@@ -152,6 +152,7 @@ def multi_process():
         # pool5 feature
         distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
         print(-distmat_pool[0])
+        print(np.argsort(-distmat_pool[0], axis = 1))
         cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, gall_label, query_label)
 
         # fc feature
