@@ -150,15 +150,9 @@ def multi_process():
 
     if True :
         # pool5 feature
-        distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
-        # print(-distmat_pool[0])
-        # print(np.argsort(-distmat_pool, axis = 1)[0])
-        print(gall_feat_pool.shape[0])  # Number of gallery images
-        print(query_feat_pool.shape[0])  # Number of query images
+
+
         distance = np.zeros((gall_feat_pool.shape[0], query_feat_pool.shape[0]))
-        print(f'dist shape {distance.shape}')
-        print(gall_feat_pool.shape[1])
-        print(query_feat_pool.shape[1])
         for i in range(gall_feat_pool.shape[0]):
             for j in range(query_feat_pool.shape[0]):
                 print(type(gall_feat_pool[i]))
@@ -167,7 +161,8 @@ def multi_process():
 
         print(f'ancient distance : {-distmat_pool[0]}')
         print(f'New distance : {-distance[0]}')
-
+        print(np.argsort(distance, axis=1))
+        distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
         # cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, gall_label, query_label)
         cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distance, gall_label, query_label)
 
