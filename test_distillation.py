@@ -155,7 +155,7 @@ def multi_process():
         # print(np.argsort(-distmat_pool, axis = 1)[0])
         print(type(gall_feat_pool.shape[0]))  # Number of gallery images
         print(query_feat_pool.shape[0])  # Number of query images
-        distance = np.zeros(gall_feat_pool.shape[0], query_feat_pool.shape[0])
+        distance = np.zeros(gall_feat_pool.shape[0], 84)
 
         for i in range(gall_feat_pool.shape[0]):
             for j in range(gall_feat_pool.shape[0]):
