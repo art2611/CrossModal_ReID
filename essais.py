@@ -4,7 +4,8 @@ import torch.nn as nn
 import torch
 
 
-t = torch.rand(4, 4)
+# t = torch.rand(4, 4)
+
 
 # print(t.size(0))
 # print(t.size(1))
@@ -12,17 +13,23 @@ t = torch.rand(4, 4)
 #
 # print(t)
 # print(b)
-sys.exit()
+# sys.exit()
 #
 gall_feat_pool = np.zeros((2, 5))
-gall_feat_pool[0,0] = 1.1
-gall_feat_pool[0,1] = 3.2
+gall_feat_pool[0,0] = 2.
+gall_feat_pool[0,1] = 2
 gall_feat_pool[0,2] = 3.2
 gall_feat_pool[0,3] = 3.2
-gall_feat_pool[1,0] = 1.1
-gall_feat_pool[1,1] = 3.2
+gall_feat_pool[1,0] = 0.
+gall_feat_pool[1,1] = 0
 gall_feat_pool[1,2] = 3.2
 gall_feat_pool[1,3] = 3.2
+print(gall_feat_pool[0])
+print(gall_feat_pool[1])
+print(gall_feat_pool.shape[0])
+dist = np.linalg.norm(gall_feat_pool[0]-gall_feat_pool[1])
+print(dist)
+sys.exit()
 gall_feat_pool = torch.tensor(gall_feat_pool)
 criterion_MSE = nn.MSELoss()
 print(criterion_MSE(gall_feat_pool[1,:],gall_feat_pool[0,:]))
