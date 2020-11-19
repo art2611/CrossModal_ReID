@@ -26,7 +26,7 @@ gall_feat_pool[1,2] = 3.2
 gall_feat_pool[1,3] = 3.2
 print(gall_feat_pool[0])
 print(gall_feat_pool[1])
-print(gall_feat_pool.shape[0])
+print(gall_feat_pool.shape)
 dist = np.linalg.norm(gall_feat_pool[0]-gall_feat_pool[1])
 print(dist)
 sys.exit()
