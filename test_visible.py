@@ -1,9 +1,10 @@
 import os
+import time
 import torch
+import argparse
 import torch.utils.data
 from torch.autograd import Variable
-import time
-from data_loader import RegDBData, GenIdx, process_test_regdb, TestData
+from data_loader import *
 import numpy as np
 from model import Network
 from evaluation import eval_regdb
@@ -17,21 +18,29 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 nclass = 164
 # net = Network(class_num=nclass).to(device)
 
+parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
+parser.add_argument('--dataset', default='regdb', help='dataset name: regdb or sysu]')
+parser.add_argument('--train', default='visible', help='train visible or thermal only')
+args = parser.parse_args()
+
 pool_dim = 2048
 # Init variables :
 img_w = 144
 img_h = 288
 test_batch_size = 64
-batch_num_identities = 16  # 8 different identities in a batch
+batch_num_identities = 16  # 16 different identities in a batch
 num_of_same_id_in_batch = 4  # Number of same identity in a batch
 workers = 4
 lr = 0.001
 checkpoint_path = '../save_model/'
 data_path = '../Datasets/RegDB/'
-suffix = f'RegDB_person_Visible({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
-#
-test_mode = [2, 1]  # visible to thermal
+if args.train == 'visible':
+    suffix = f'RegDB_person_Visible_only({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+elif args.train == "thermal":
+    suffix = f'RegDB_person_Thermal_only({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+
+# suffix = f'RegDB_person_Visible({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 transform_test = transforms.Compose([
@@ -53,10 +62,8 @@ def extract_gall_feat(gall_loader, ngall, net, visible_train = False):
             batch_num = input.size(0)
             # input = Variable(input)
             input = Variable(input.cuda())
-            if visible_train :
-                feat_pool, feat_fc = net(input)
-            else :
-                feat_pool, feat_fc = net(input, input, test_mode[0])
+
+            feat_pool, feat_fc = net(input)
             gall_feat_pool[ptr:ptr + batch_num, :] = feat_pool.detach().cpu().numpy()
             gall_feat_fc[ptr:ptr + batch_num, :] = feat_fc.detach().cpu().numpy()
             ptr = ptr + batch_num
@@ -64,7 +71,7 @@ def extract_gall_feat(gall_loader, ngall, net, visible_train = False):
     return gall_feat_pool, gall_feat_fc
 
 
-def extract_query_feat(query_loader, nquery, net, visible_train = False):
+def extract_query_feat(query_loader, nquery, net):
     net.eval()
     print('Extracting Query Feature...')
     start = time.time()
@@ -76,10 +83,7 @@ def extract_query_feat(query_loader, nquery, net, visible_train = False):
             batch_num = input.size(0)
             input = Variable(input.cuda())
             # input = Variable(input)
-            if visible_train :
-                feat_pool, feat_fc = net(input)
-            else :
-                feat_pool, feat_fc = net(input, input, test_mode[1])
+            feat_pool, feat_fc = net(input)
             query_feat_pool[ptr:ptr + batch_num, :] = feat_pool.detach().cpu().numpy()
             query_feat_fc[ptr:ptr + batch_num, :] = feat_fc.detach().cpu().numpy()
             ptr = ptr + batch_num
@@ -103,7 +107,8 @@ def multi_process() :
             print("Saved model not loaded, care")
             net = Network(class_num = nclass).to(device)
         # Building test set and data loaders
-        query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal='visible', split=True)
+
+        query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.train, split=True)
 
         gallset = TestData(gall_img, gall_label, transform=transform_test, img_size=(img_w, img_h))
         gall_loader = torch.utils.data.DataLoader(gallset, batch_size=test_batch_size, shuffle=False, num_workers=workers)
@@ -113,11 +118,11 @@ def multi_process() :
 
         queryset = TestData(query_img, query_label, transform=transform_test, img_size=(img_w, img_h))
         query_loader = torch.utils.data.DataLoader(queryset, batch_size=test_batch_size, shuffle=False, num_workers=4)
+
         print('Data Loading Time:\t {:.3f}'.format(time.time() - end))
 
-
-        query_feat_pool, query_feat_fc = extract_query_feat(query_loader, nquery = nquery, net = net, visible_train=True)
-        gall_feat_pool,  gall_feat_fc = extract_gall_feat(gall_loader, ngall = ngall, net = net, visible_train=True)
+        query_feat_pool, query_feat_fc = extract_query_feat(query_loader, nquery = nquery, net = net)
+        gall_feat_pool,  gall_feat_fc = extract_gall_feat(gall_loader, ngall = ngall, net = net)
 
         # if True = thermal to visible, else, the reverse
         if True :
