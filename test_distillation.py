@@ -161,7 +161,7 @@ def multi_process():
             for j in range(gall_feat_pool.shape[0]):
                 # print(type(gall_feat_pool[i]))
                 # print(query_feat_pool[j])
-                distance[i][j] = np.linalg.norm(gall_feat_pool[i], query_feat_pool[j])
+                distance[i][j] = np.linalg.norm(gall_feat_pool[i, :], query_feat_pool[j, :])
                 sys.exit()
         print(f'ancient distance : {-distmat_pool[0]}')
         print(f'New distance : {-distance[0]}')
