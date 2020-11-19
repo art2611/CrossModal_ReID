@@ -113,6 +113,12 @@ def multi_process() :
 
         query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.train, split=True)
 
+        for i in range(6):
+             plt.subplot(2, 3, i + 1)
+             plt.imshow(query_img[i])
+             # plt.imshow(final_train_data[i], cmap='gray')
+        plt.show()
+
         gallset = TestData(gall_img, gall_label, transform=transform_test, img_size=(img_w, img_h))
         gall_loader = torch.utils.data.DataLoader(gallset, batch_size=test_batch_size, shuffle=False, num_workers=workers)
 
