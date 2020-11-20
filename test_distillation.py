@@ -162,8 +162,8 @@ def multi_process():
         print(f'New distance : {-distance[0]}')
         print(np.argsort(distance, axis=1))
 
-        # cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, gall_label, query_label)
-        cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distance, gall_label, query_label)
+        cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, gall_label, query_label)
+        # cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distance, gall_label, query_label)
 
         # fc feature
         distmat = np.matmul(gall_feat_fc , np.transpose(query_feat_fc))

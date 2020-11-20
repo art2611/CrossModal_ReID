@@ -8,8 +8,14 @@ def eval_regdb(distmat, query_labels, gallery_labels, max_rank=20):
     if num_g < max_rank:
         max_rank = num_g
         print("Note: number of gallery samples is quite small, got {}".format(num_g))
+    #Extrait par ligne les indices  dans l'ordre croissant des valeurs.
     indices = np.argsort(distmat, axis=1)
     # Return a matrix of 0 and ones, with ones when the same value is find in the two matrix
+    #Gallery[indices] retourne la matrice de la gallerie triée autant de fois qu'il y
+    #a de lignes dans indices. Ensuite, les labels sont présentés dans l'ordre
+    # par lequel ils sont apparus dans la matrice
+    #Du coup on regarde quand est-ce que les indices ayant données les meilleurs résultats
+    # Collent bien avec les labels des personnes recherchées.
     matches = (gallery_labels[indices] == query_labels[:, np.newaxis]).astype(np.int32)
     # print(f"Matches : {matches}")
     # compute cmc curve for each query

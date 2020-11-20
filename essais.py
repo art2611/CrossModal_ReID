@@ -24,6 +24,15 @@ gall_feat_pool[1,0] = 0.
 gall_feat_pool[1,1] = 0
 gall_feat_pool[1,2] = 3.2
 gall_feat_pool[1,3] = 3.2
+a = np.array([[1,3,4],
+       [4,1,2 ],
+              [2,2,12]])
+b = np.array([[0,1,2],
+       [1,2,0],
+              [0,1,2]])
+# a = np.argsort(-a, axis = 1)
+print(a[b])
+sys.exit()
 print(gall_feat_pool[0])
 print(gall_feat_pool[1])
 print(gall_feat_pool.shape)
