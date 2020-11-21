@@ -129,6 +129,12 @@ class SYSUData_split(data.Dataset):
                     if u <= int(u * SeventPercent):
                         _thermal_image.append(color_image[thermal_pos[i][j]])
                         _thermal_lab.append(thermal_pos[i][j])
+            # Labels
+            self.train_color_label = _color_lab
+            self.train_thermal_label = _thermal_lab
+            # BGR to RGB
+            self.train_color_image = _color_image
+            self.train_thermal_image = _thermal_image
         if split == "validation" :
             #Dans chaque liste d'index d'une identité, on prends les 30% dernières images.
             for i in range(len(color_pos)):
@@ -143,19 +149,24 @@ class SYSUData_split(data.Dataset):
                     if u > int(u * SeventPercent):
                         _thermal_image.append(color_image[thermal_pos[i][j]])
                         _thermal_lab.append(thermal_pos[i][j])
-        # Labels
-        self.train_color_label = _color_lab
-        self.train_thermal_label = _thermal_lab
-        # BGR to RGB
-        self.train_color_image = _color_image
-        self.train_thermal_image = _thermal_image
+            # Labels
+            self.valid_color_label = _color_lab
+            self.valid_thermal_label = _thermal_lab
+            # BGR to RGB
+            self.valid_color_image = _color_image
+            self.valid_thermal_image = _thermal_image
+
         self.transform = transform
         self.cIndex = colorIndex
         self.tIndex = thermalIndex
 
     def __getitem__(self, index):
-        img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
-        img2, target2 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
+        if hasattr(self, "train_color_image"):
+            img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
+            img2, target2 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
+        elif hasattr(self, "valid_color_image") :
+            img1, target1 = self.valid_color_image[self.cIndex[index]], self.valid_color_label[self.cIndex[index]]
+            img2, target2 = self.valid_thermal_image[self.tIndex[index]], self.valid_thermal_label[self.tIndex[index]]
 
         img1 = self.transform(img1)
         img2 = self.transform(img2)
