@@ -111,13 +111,11 @@ class RegDBData(data.Dataset):
             return len(self.train_thermal_label)
         return len(self.train_color_label)
 
-
 class SYSUData(data.Dataset):
-    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, modal = "both", split="training" ):
+    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex = None, split="training", modal ="visible"):
+        data_dir = '../Datasets/SYSU/'
         # Load training images (path) and labels
-        data_dir = '../Datasets/RegDB/'
-        # Load training images (path) and labels
-        #395 ids sont loadées sur les 491
+        # 395 ids sont loadées sur les 491
         color_image = np.load(data_dir + 'train_rgb_resized_img.npy')
         color_label = np.load(data_dir + 'train_rgb_resized_label.npy')
 
@@ -130,18 +128,18 @@ class SYSUData(data.Dataset):
         _thermal_image = []
         _thermal_lab = []
         SeventPercent = 0.7
-        if split == "training" :
-            #Dans chaque liste d'index d'une identité, on prends les 70% premieres images.
+        if split == "training":
+            # Dans chaque liste d'index d'une identité, on prends les 70% premieres images.
             for i in range(len(color_pos)):
                 u = len(color_pos[i])
-                for j in range(u) :
-                    if j <= int(u*SeventPercent) :
-                        _color_image.append(color_image[    color_pos[i][j]  ])
+                for j in range(u):
+                    if j <= int(u * SeventPercent):
+                        _color_image.append(color_image[color_pos[i][j]])
                         _color_lab.append(i)
             for i in range(len(thermal_pos)):
                 u = len(thermal_pos[i])
                 for j in range(u):
-                    if j <= int(u * SeventPercent) :
+                    if j <= int(u * SeventPercent):
                         _thermal_image.append(color_image[thermal_pos[i][j]])
                         _thermal_lab.append(i)
             # Labels
@@ -150,12 +148,12 @@ class SYSUData(data.Dataset):
             # BGR to RGB
             self.train_color_image = _color_image
             self.train_thermal_image = _thermal_image
-        if split == "validation" :
-            #Dans chaque liste d'index d'une identité, on prends les 30% dernières images.
+        if split == "validation":
+            # Dans chaque liste d'index d'une identité, on prends les 30% dernières images.
             for i in range(len(color_pos)):
                 u = len(color_pos[i])
-                for j in range(u) :
-                    if j > int(u*SeventPercent):
+                for j in range(u):
+                    if j > int(u * SeventPercent):
                         _color_image.append(color_image[color_pos[i][j]])
                         _color_lab.append(i)
             for i in range(len(thermal_pos)):
@@ -179,191 +177,36 @@ class SYSUData(data.Dataset):
         self.modal = modal
 
     def __getitem__(self, index):
-        #Dataset[i] return images from both modal and the corresponding label
+        # Dataset[i] return images from both modal and the corresponding label
         if hasattr(self, "train_color_image"):
-            if self.modal == "both" or self.modal == "visible" :
+            if self.modal == "both" or self.modal == "visible":
                 img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
             elif self.modal == "both" or self.modal == "thermal":
-                img2, target2 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
-        elif hasattr(self, "valid_color_image") :
-            if self.modal == "both" or self.modal == "visible" :
+                img2, target2 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[
+                    self.tIndex[index]]
+        elif hasattr(self, "valid_color_image"):
+            if self.modal == "both" or self.modal == "visible":
                 img1, target1 = self.valid_color_image[self.cIndex[index]], self.valid_color_label[self.cIndex[index]]
             elif self.modal == "both" or self.modal == "thermal":
-                img2, target2 = self.valid_thermal_image[self.tIndex[index]], self.valid_thermal_label[self.tIndex[index]]
+                img2, target2 = self.valid_thermal_image[self.tIndex[index]], self.valid_thermal_label[
+                    self.tIndex[index]]
 
-        if self.modal == "both" :
+        if self.modal == "both":
             img1 = self.transform(img1)
             img2 = self.transform(img2)
             return img1, img2, target1, target2
-        elif self.modal == "visible" :
+        elif self.modal == "visible":
             img1 = self.transform(img1)
             return img1, target1
-        elif self.modal == "thermal" :
+        elif self.modal == "thermal":
             img2 = self.transform(img2)
             return img2, target2
 
     def __len__(self):
-        if self.modal == "thermal" :
+        if self.modal == "thermal":
             return len(self.train_thermal_label)
         return len(self.train_color_label)
 
-class RegdbSingleData(data.Dataset):
-    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex = None, split="training", modal ="visible"):
-        # Load training images (path) and labels
-        data_dir = '../Datasets/RegDB/'
-        train_color_list = data_dir + 'idx/train_visible_1.txt'
-        #Load color and thermal images + labels
-        color_img_file, color_target = load_data(train_color_list)
-        image = []
-        labels = []
-
-        #Get real and thermal images with good shape in a list
-        # Training and valid are defined in the firsts 80s percent
-        # Training is 70% and Valid is 30% of those 80s percent
-        first80percent = int(len(color_img_file) * 80 / 100)
-        first80percent -= int(len(color_img_file) * 80 / 100)%10
-        if split == "training" :
-            for i in range(first80percent):
-                if i%10 < 7 :
-                    img = Image.open(data_dir + color_img_file[i])
-                    img = img.resize((144, 288), Image.ANTIALIAS)
-                    pix_array = np.array(img)
-                    image.append(pix_array)
-                    labels.append(color_target[i])
-
-            image = np.array(image)
-            # Init color images / labels
-            if modal == "visible" :
-                self.train_color_image = image
-                self.train_color_label = labels
-            elif modal == "thermal" :
-                self.train_thermal_image = image
-                self.train_thermal_label = labels
-
-        if split == "validation" :
-            for i in range(first80percent):
-                if i%10 >= 7 :
-                    img = Image.open(data_dir + color_img_file[i])
-                    img = img.resize((144, 288), Image.ANTIALIAS)
-                    pix_array = np.array(img)
-                    image.append(pix_array)
-                    labels.append(color_target[i])
-
-            image = np.array(image)
-            if modal == "visible":
-                # Init color images / labels
-                self.valid_color_image = image
-                self.valid_color_label = labels
-                self.cIndex = colorIndex
-            elif modal == "thermal" :
-                self.valid_thermal_image = image
-                self.valid_thermal_label = labels
-                self.tIndex = thermalIndex
-
-        self.transform = transform
-
-
-    def __getitem__(self, index):
-        #Dataset[i] return images from both modal and the corresponding label
-        if hasattr(self, "train_color_image"):
-            img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
-        elif hasattr(self, "valid_color_image") :
-            img1, target1 = self.valid_color_image[self.cIndex[index]], self.valid_color_label[self.cIndex[index]]
-        elif hasattr(self, "train_thermal_image"):
-            img1, target1 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
-        elif hasattr(self, "valid_thermal_image") :
-            img1, target1 = self.valid_thermal_image[self.tIndex[index]], self.valid_thermal_label[self.tIndex[index]]
-        img1 = self.transform(img1)
-
-        return img1, target1
-    def __len__(self):
-        if hasattr(self, "train_color_image"):
-            return len(self.train_color_label)
-        elif hasattr(self, "valid_color_image"):
-            return len(self.valid_color_label)
-        elif hasattr(self, "train_thermal_image"):
-            return len(self.train_thermal_label)
-        elif hasattr(self, "valid_thermal_image"):
-            return len(self.valid_thermal_label)
-
-class SYSUData(data.Dataset):
-    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, split="training"):
-        data_dir = '../Datasets/SYSU/'
-        # Load training images (path) and labels
-        #395 ids sont loadées sur les 491
-        color_image = np.load(data_dir + 'train_rgb_resized_img.npy')
-        color_label = np.load(data_dir + 'train_rgb_resized_label.npy')
-
-        thermal_image = np.load(data_dir + 'train_ir_resized_img.npy')
-        thermal_label = np.load(data_dir + 'train_ir_resized_label.npy')
-
-        color_pos, thermal_pos = GenIdx(color_label, thermal_label)
-        _color_image = []
-        _color_lab = []
-        _thermal_image = []
-        _thermal_lab = []
-        SeventPercent = 0.7
-        if split == "training" :
-            #Dans chaque liste d'index d'une identité, on prends les 70% premieres images.
-            for i in range(len(color_pos)):
-                u = len(color_pos[i])
-                for j in range(u) :
-                    if j <= int(u*SeventPercent) :
-                        _color_image.append(color_image[    color_pos[i][j]  ])
-                        _color_lab.append(i)
-            for i in range(len(thermal_pos)):
-                u = len(thermal_pos[i])
-                for j in range(u):
-                    if j <= int(u * SeventPercent) :
-                        _thermal_image.append(color_image[thermal_pos[i][j]])
-                        _thermal_lab.append(i)
-            # Labels
-            self.train_color_label = _color_lab
-            self.train_thermal_label = _thermal_lab
-            # BGR to RGB
-            self.train_color_image = _color_image
-            self.train_thermal_image = _thermal_image
-        if split == "validation" :
-            #Dans chaque liste d'index d'une identité, on prends les 30% dernières images.
-            for i in range(len(color_pos)):
-                u = len(color_pos[i])
-                for j in range(u) :
-                    if j > int(u*SeventPercent):
-                        _color_image.append(color_image[color_pos[i][j]])
-                        _color_lab.append(i)
-            for i in range(len(thermal_pos)):
-                u = len(thermal_pos[i])
-                for j in range(u):
-                    if j > int(u * SeventPercent):
-                        _thermal_image.append(color_image[thermal_pos[i][j]])
-                        _thermal_lab.append(i)
-            # Labels
-            self.valid_color_label = _color_lab
-            self.valid_thermal_label = _thermal_lab
-            # BGR to RGB
-            self.valid_color_image = _color_image
-            self.valid_thermal_image = _thermal_image
-
-        self.transform = transform
-
-        self.cIndex = colorIndex
-        self.tIndex = thermalIndex
-
-    def __getitem__(self, index):
-        if hasattr(self, "train_color_image"):
-            img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
-            img2, target2 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
-        elif hasattr(self, "valid_color_image") :
-            img1, target1 = self.valid_color_image[self.cIndex[index]], self.valid_color_label[self.cIndex[index]]
-            img2, target2 = self.valid_thermal_image[self.tIndex[index]], self.valid_thermal_label[self.tIndex[index]]
-
-        img1 = self.transform(img1)
-        img2 = self.transform(img2)
-
-        return img1, img2, target1, target2
-
-    def __len__(self):
-        return len(self.train_color_label)
 
 class RegDBThermalData(data.Dataset):
     def __init__(self, data_dir, transform=None, thermalIndex=None, split="training" ):
