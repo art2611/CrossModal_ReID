@@ -113,7 +113,7 @@ class RegDBData(data.Dataset):
 
 
 class SYSUData(data.Dataset):
-    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, split="training"):
+    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, split="training", modal="visible"):
         data_dir = '../Datasets/SYSU/'
         # Load training images (path) and labels
         #395 ids sont loadées sur les 491
@@ -175,20 +175,35 @@ class SYSUData(data.Dataset):
         self.cIndex = colorIndex
         self.tIndex = thermalIndex
 
+        self.modal = modal
+
     def __getitem__(self, index):
+        #Dataset[i] return images from both modal and the corresponding label
         if hasattr(self, "train_color_image"):
-            img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
-            img2, target2 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
+            if self.modal == "both" or self.modal == "visible" :
+                img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
+            elif self.modal == "both" or self.modal == "thermal":
+                img2, target2 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
         elif hasattr(self, "valid_color_image") :
-            img1, target1 = self.valid_color_image[self.cIndex[index]], self.valid_color_label[self.cIndex[index]]
-            img2, target2 = self.valid_thermal_image[self.tIndex[index]], self.valid_thermal_label[self.tIndex[index]]
+            if self.modal == "both" or self.modal == "visible" :
+                img1, target1 = self.valid_color_image[self.cIndex[index]], self.valid_color_label[self.cIndex[index]]
+            elif self.modal == "both" or self.modal == "thermal":
+                img2, target2 = self.valid_thermal_image[self.tIndex[index]], self.valid_thermal_label[self.tIndex[index]]
 
-        img1 = self.transform(img1)
-        img2 = self.transform(img2)
-
-        return img1, img2, target1, target2
+        if self.modal == "both" :
+            img1 = self.transform(img1)
+            img2 = self.transform(img2)
+            return img1, img2, target1, target2
+        elif self.modal == "visible" :
+            img1 = self.transform(img1)
+            return img1, target1
+        elif self.modal == "thermal" :
+            img2 = self.transform(img2)
+            return img2, target2
 
     def __len__(self):
+        if self.modal == "thermal" :
+            return len(self.train_thermal_label)
         return len(self.train_color_label)
 
 class RegdbSingleData(data.Dataset):

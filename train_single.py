@@ -83,11 +83,11 @@ def multi_process() :
     if args.dataset == 'sysu':
         print('==> Trainset ..')
         # training set
-        trainset = SYSUData(data_path, transform=transform_train, split ="training")
+        trainset = SYSUData(data_path, transform=transform_train, split ="training", modal=args.train)
         # generate the idx of each person identity
 
         print('==> Validset ..')
-        validset = SYSUData(data_path, transform=transform_train, split ="validation")
+        validset = SYSUData(data_path, transform=transform_train, split ="validation", modal=args.train)
         print("==> Loaded")
         # print(f'Nombres d\'ids train color: {len(np.unique(trainset.train_color_label))}')
         # print(f'Nombres d\'ids valid color: {len(np.unique(validset.valid_color_label))}')
