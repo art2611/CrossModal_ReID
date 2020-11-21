@@ -113,7 +113,7 @@ class RegDBData(data.Dataset):
 
 
 class SYSUData(data.Dataset):
-    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, modal="visible", split="training"):
+    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, modal=None, split="training"):
         data_dir = '../Datasets/SYSU/'
         # Load training images (path) and labels
         #395 ids sont loadées sur les 491
