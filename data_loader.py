@@ -137,7 +137,6 @@ class SYSUData_split(data.Dataset):
             self.train_thermal_image = _thermal_image
         if split == "validation" :
             #Dans chaque liste d'index d'une identité, on prends les 30% dernières images.
-            print("in validation")
             for i in range(len(color_pos)):
                 u = len(color_pos[i])
                 for j in range(u) :
