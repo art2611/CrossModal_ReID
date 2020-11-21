@@ -79,7 +79,7 @@ def multi_process() :
     print('==> Loading images..')
     # dataset = 'sysu'
     # args.dataset = "regdb"
-    args.dataset = "sysu"
+    # args.dataset = "sysu"
     # args.train = "thermal"
     if args.dataset == 'sysu':
         print('==> Trainset ..')
