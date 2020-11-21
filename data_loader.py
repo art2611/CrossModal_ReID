@@ -121,17 +121,14 @@ class SYSUData_split(data.Dataset):
             for i in range(len(color_pos)):
                 u = len(color_pos[i])
                 for j in range(u) :
-                    print(u)
-                    print(int(u*SeventPercent))
-                    sys.exit()
-                    if u <= int(u*SeventPercent) :
+                    if j <= int(u*SeventPercent) :
                         _color_image.append(color_image[    color_pos[i][j]  ])
                         _color_lab.append(color_pos[i][j])
                         print(_color_lab[u])
             for i in range(len(thermal_pos)):
                 u = len(thermal_pos[i])
                 for j in range(u):
-                    if u <= int(u * SeventPercent) :
+                    if j <= int(u * SeventPercent) :
                         _thermal_image.append(color_image[thermal_pos[i][j]])
                         _thermal_lab.append(thermal_pos[i][j])
             # Labels
@@ -145,13 +142,13 @@ class SYSUData_split(data.Dataset):
             for i in range(len(color_pos)):
                 u = len(color_pos[i])
                 for j in range(u) :
-                    if u > int(u*SeventPercent):
+                    if j > int(u*SeventPercent):
                         _color_image.append(color_image[color_pos[i][j]])
                         _color_lab.append(color_pos[i][j])
             for i in range(len(thermal_pos)):
                 u = len(thermal_pos[i])
                 for j in range(u):
-                    if u > int(u * SeventPercent):
+                    if j > int(u * SeventPercent):
                         _thermal_image.append(color_image[thermal_pos[i][j]])
                         _thermal_lab.append(thermal_pos[i][j])
             # Labels
