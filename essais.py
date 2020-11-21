@@ -6,7 +6,8 @@ import torch
 
 # t = torch.rand(4, 4)
 
-
+print(70./100)
+sys.exit()
 # print(t.size(0))
 # print(t.size(1))
 # b = t.view(t.size(0), t.size(1))

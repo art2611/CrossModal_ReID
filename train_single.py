@@ -80,18 +80,20 @@ def multi_process() :
     dataset = 'sysu'
     if dataset == 'sysu':
         # training set
-        trainset = SYSUData_split(data_path, transform=transform_train)
+        trainset = SYSUData_split(data_path, transform=transform_train, split = "training")
         # generate the idx of each person identity
-        color_pos, thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
-    print(f' Même images pour une identité visible :  {len(color_pos[0])}')
-    print(f' Même images pour une identité visible :  {len(color_pos[1])}')
-    print(f' Même images pour une identité visible :  {len(color_pos[130])}')
-    print(f' Même image pour une identité thermal :  {len(thermal_pos[0])}')
-    print(f' Même image pour une identité thermal :  {len(thermal_pos[1])}')
-    print(f' Même image pour une identité thermal :  {len(thermal_pos[len(thermal_pos)-2])}')
-    print(f'On s assure du nombre d ids visible ici : {len(color_pos)}')
-    print(f'On s assure du nombre d ids thermal ici : {len(thermal_pos)}')
+        train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
+        validset = SYSUData_split(data_path, transform=transform_train, split = "validation")
+        valid_color_pos, valid_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
 
+        print(f'Nombres d\'ids train color: {len(trainset.train_color_label)}')
+        print(f'Nombres d\'ids valid color: {len(validset.valid_color_label)}')
+        print(f'Nombres d\'ids train thermal : {len(trainset.train_color_label)}')
+        print(f'Nombres d\'ids valid thermal : {len(validset.valid_thermal_label)}')
+        print(f'Nombres d\'images en 0 train color: {len(train_color_pos[0])}')
+        print(f'Nombres d\'images en 0 valid color: {len(valid_color_pos[0])}')
+        print(f'Nombres d\'images en 0 train thermal : {len(train_thermal_pos)}')
+        print(f'Nombres d\'images en 0 valid thermal : {len(valid_thermal_pos)}')
     sys.exit()
 
     if args.train == "visible ":

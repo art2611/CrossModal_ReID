@@ -20,10 +20,7 @@ class RegDBData_split(data.Dataset):
         thermal_image = []
         thermal_lab = []
         #Get real and thermal images with good shape in a list
-        # Training => return 50%
-        # On s'assure d'avoir 50% mais surtout un multiple de 10 pour coller avec le nb d'images
-        first50percent = int(len(color_img_file) * 50 / 100)
-        first50percent -= int(len(color_img_file) * 50 / 100) % 10
+
         first80percent = int(len(color_img_file) * 80 / 100)
         first80percent -= int(len(color_img_file) * 80 / 100)%10
 
@@ -102,21 +99,56 @@ class RegDBData_split(data.Dataset):
 
 
 class SYSUData_split(data.Dataset):
-    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None):
+    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, split="training"):
         data_dir = '../Datasets/SYSU/'
         # Load training images (path) and labels
         #395 ids sont loadées sur les 491
-        train_color_image = np.load(data_dir + 'train_rgb_resized_img.npy')
+        color_image = np.load(data_dir + 'train_rgb_resized_img.npy')
         color_label = np.load(data_dir + 'train_rgb_resized_label.npy')
-        self.train_color_label = color_label
 
-        train_thermal_image = np.load(data_dir + 'train_ir_resized_img.npy')
+        thermal_image = np.load(data_dir + 'train_ir_resized_img.npy')
         thermal_label = np.load(data_dir + 'train_ir_resized_label.npy')
-        self.train_thermal_label = thermal_label
 
+        color_pos, thermal_pos = GenIdx(color_label, thermal_label)
+        _color_image = []
+        _color_lab = []
+        _thermal_image = []
+        _thermal_lab = []
+        SeventPercent = 0.7
+        if split == "training" :
+            #Dans chaque liste d'index d'une identité, on prends les 70% premieres images.
+            for i in range(len(color_pos)):
+                u = len(color_pos[i])
+                for j in range(u) :
+                    if u <= int(u*SeventPercent):
+                        _color_image.append(color_image[    color_pos[i][j]  ])
+                        _color_lab.append(color_pos[i][j])
+            for i in range(len(thermal_pos)):
+                u = len(thermal_pos[i])
+                for j in range(u):
+                    if u <= int(u * SeventPercent):
+                        _thermal_image.append(color_image[thermal_pos[i][j]])
+                        _thermal_lab.append(thermal_pos[i][j])
+        if split == "validation" :
+            #Dans chaque liste d'index d'une identité, on prends les 30% dernières images.
+            for i in range(len(color_pos)):
+                u = len(color_pos[i])
+                for j in range(u) :
+                    if u > int(u*SeventPercent):
+                        _color_image.append(color_image[    color_pos[i][j]  ])
+                        _color_lab.append(color_pos[i][j])
+            for i in range(len(thermal_pos)):
+                u = len(thermal_pos[i])
+                for j in range(u):
+                    if u > int(u * SeventPercent):
+                        _thermal_image.append(color_image[thermal_pos[i][j]])
+                        _thermal_lab.append(thermal_pos[i][j])
+        # Labels
+        self.train_color_label = _color_lab
+        self.train_thermal_label = _thermal_lab
         # BGR to RGB
-        self.train_color_image = train_color_image
-        self.train_thermal_image = train_thermal_image
+        self.train_color_image = _color_image
+        self.train_thermal_image = _thermal_image
         self.transform = transform
         self.cIndex = colorIndex
         self.tIndex = thermalIndex
@@ -144,9 +176,8 @@ class RegDBVisibleData(data.Dataset):
         color_lab = []
 
         #Get real and thermal images with good shape in a list
-        # Training => return 50%
-        first50percent = int(len(color_img_file) * 50 / 100)
-        first50percent -= int(len(color_img_file) * 50 / 100) % 10
+        # Training and valid are defined in the firsts 80s percent
+        # Training is 70% and Valid is 30% of those 80s percent
         first80percent = int(len(color_img_file) * 80 / 100)
         first80percent -= int(len(color_img_file) * 80 / 100)%10
         if split == "training" :
