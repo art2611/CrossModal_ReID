@@ -83,7 +83,7 @@ def multi_process() :
     if args.dataset == 'sysu':
         print('==> Trainset ..')
         # training set
-        trainset = SYSUData(data_path, transform=transform_train, split ="training", modal=args.train)
+        trainset = SYSUData(data_path, transform=transform_train, split ="training", tester=args.train)
         # trainset = SYSUData(data_path, transform=transform_train, split ="training", modal=args.train)
         # generate the idx of each person identity
 
