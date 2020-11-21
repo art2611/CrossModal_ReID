@@ -103,7 +103,7 @@ class RegDBData_split(data.Dataset):
 
 class SYSUData_split(data.Dataset):
     def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None):
-        data_dir = '../Datasets/SYSU-MM01/'
+        data_dir = '../Datasets/SYSU/'
         # Load training images (path) and labels
         train_color_image = np.load(data_dir + 'train_rgb_resized_img.npy')
         color_label = np.load(data_dir + 'train_rgb_resized_label.npy')
