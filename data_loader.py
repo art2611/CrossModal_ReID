@@ -114,7 +114,6 @@ class SYSUData_split(data.Dataset):
         self.train_thermal_label = thermal_label
         print(f' number of ids in sysu colored {np.unique(color_label)}')
         print(f' number of ids in sysu thermal {np.unique(thermal_label)}')
-
         # BGR to RGB
         self.train_color_image = train_color_image
         self.train_thermal_image = train_thermal_image

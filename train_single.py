@@ -83,8 +83,10 @@ def multi_process() :
         trainset = SYSUData_split(data_path, transform=transform_train)
         # generate the idx of each person identity
         color_pos, thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
-    print(f' color pos :  {color_pos[0]}')
-    print(f' thermal pos :  {thermal_pos[2]}')
+    print(f' Même images pour une identité visible :  {len(color_pos[0])}')
+    print(f' Même image pour une identité thermal :  {len(thermal_pos[2])}')
+    print(f'On s assure du nombre d ids visible ici : {len(color_pos)}')
+    print(f'On s assure du nombre d ids thermal ici : {len(thermal_pos)}')
 
     sys.exit()
 
