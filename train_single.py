@@ -94,8 +94,8 @@ def multi_process() :
         print(f'Nombres d\'ids valid thermal : {len(np.unique(validset.valid_thermal_label))}')
         valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
 
-        print(f'Nombres d\'images en 0 train color: {len(train_color_pos[0])}')
-        print(f'Nombres d\'images en 0 valid color: {len(valid_color_pos[0])}')
+        print(f'Nombres d\'images en 0 train color: {len(train_color_pos[2])}')
+        print(f'Nombres d\'images en 0 valid color: {len(valid_color_pos[2])}')
         print(f'Nombres d\'images en 0 train thermal : {len(train_thermal_pos[0])}')
         print(f'Nombres d\'images en 0 valid thermal : {len(valid_thermal_pos[0])}')
     sys.exit()
