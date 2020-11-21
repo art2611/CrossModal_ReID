@@ -123,13 +123,13 @@ class SYSUData_split(data.Dataset):
                 for j in range(u) :
                     if j <= int(u*SeventPercent) :
                         _color_image.append(color_image[    color_pos[i][j]  ])
-                        _color_lab.append(color_pos[i][j])
+                        _color_lab.append(i)
             for i in range(len(thermal_pos)):
                 u = len(thermal_pos[i])
                 for j in range(u):
                     if j <= int(u * SeventPercent) :
                         _thermal_image.append(color_image[thermal_pos[i][j]])
-                        _thermal_lab.append(thermal_pos[i][j])
+                        _thermal_lab.append(i)
             # Labels
             self.train_color_label = _color_lab
             self.train_thermal_label = _thermal_lab
@@ -143,13 +143,13 @@ class SYSUData_split(data.Dataset):
                 for j in range(u) :
                     if j > int(u*SeventPercent):
                         _color_image.append(color_image[color_pos[i][j]])
-                        _color_lab.append(color_pos[i][j])
+                        _color_lab.append(i)
             for i in range(len(thermal_pos)):
                 u = len(thermal_pos[i])
                 for j in range(u):
                     if j > int(u * SeventPercent):
                         _thermal_image.append(color_image[thermal_pos[i][j]])
-                        _thermal_lab.append(thermal_pos[i][j])
+                        _thermal_lab.append(i)
             # Labels
             self.valid_color_label = _color_lab
             self.valid_thermal_label = _thermal_lab
