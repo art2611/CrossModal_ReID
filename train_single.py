@@ -84,12 +84,12 @@ def multi_process() :
         # generate the idx of each person identity
         train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
         validset = SYSUData_split(data_path, transform=transform_train, split = "validation")
-        valid_color_pos, valid_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
+        valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
 
-        print(f'Nombres d\'ids train color: {len(trainset.train_color_label)}')
-        print(f'Nombres d\'ids valid color: {len(validset.valid_color_label)}')
-        print(f'Nombres d\'ids train thermal : {len(trainset.train_color_label)}')
-        print(f'Nombres d\'ids valid thermal : {len(validset.valid_thermal_label)}')
+        print(f'Nombres d\'ids train color: {len(np.unique(trainset.train_color_label))}')
+        print(f'Nombres d\'ids valid color: {len(np.unique(validset.valid_color_label))}')
+        print(f'Nombres d\'ids train thermal : {len(np.unique(trainset.train_color_label))}')
+        print(f'Nombres d\'ids valid thermal : {len(np.unique(validset.valid_thermal_label))}')
         print(f'Nombres d\'images en 0 train color: {len(train_color_pos[0])}')
         print(f'Nombres d\'images en 0 valid color: {len(valid_color_pos[0])}')
         print(f'Nombres d\'images en 0 train thermal : {len(train_thermal_pos[0])}')
