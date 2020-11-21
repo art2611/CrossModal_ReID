@@ -86,8 +86,9 @@ def multi_process() :
         train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
         print('==> Validset ..')
         validset = SYSUData_split(data_path, transform=transform_train, split = "validation")
-        valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
         print("==> Loaded")
+        valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
+
         # print(f'Nombres d\'ids train color: {len(np.unique(trainset.train_color_label))}')
         # print(f'Nombres d\'ids valid color: {len(np.unique(validset.valid_color_label))}')
         # print(f'Nombres d\'ids train thermal : {len(np.unique(trainset.train_color_label))}')

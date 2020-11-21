@@ -139,12 +139,10 @@ class SYSUData_split(data.Dataset):
             #Dans chaque liste d'index d'une identité, on prends les 30% dernières images.
             print("in validation")
             for i in range(len(color_pos)):
-                print("in boucle 1")
                 u = len(color_pos[i])
                 for j in range(u) :
-                    print("in boucle 2")
                     if u > int(u*SeventPercent):
-                        _color_image.append(color_image[    color_pos[i][j]  ])
+                        _color_image.append(color_image[color_pos[i][j]])
                         _color_lab.append(color_pos[i][j])
             for i in range(len(thermal_pos)):
                 u = len(thermal_pos[i])
@@ -160,6 +158,7 @@ class SYSUData_split(data.Dataset):
             self.valid_thermal_image = _thermal_image
 
         self.transform = transform
+
         self.cIndex = colorIndex
         self.tIndex = thermalIndex
 
