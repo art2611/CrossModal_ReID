@@ -41,11 +41,16 @@ def multi_process() :
     workers = 4
     lr = 0.001
     checkpoint_path = '../save_model/'
-    if args.train == 'visible' :
-        suffix = f'RegDB_person_Visible_only({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
-    elif args.train == "thermal" :
-        suffix = f'RegDB_person_Thermal_only({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
-
+    if args.dataset == "sysu" :
+        if args.train == 'visible' :
+            suffix = f'RegDB_person_Visible_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+        elif args.train == "thermal" :
+            suffix = f'RegDB_person_Thermal_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+    if args.dataset == "regdb" :
+        if args.train == 'visible' :
+            suffix = f'RegDB_person_Visible_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+        elif args.train == "thermal" :
+            suffix = f'RegDB_person_Thermal_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
     # Data info  :
     data_path = '../Datasets/RegDB/'
     #log_path = args.log_path + 'regdb_log/'
@@ -347,7 +352,7 @@ def multi_process() :
                 torch.save(state, checkpoint_path + suffix + '_best.t')
 
             writer.add_scalar('Valid_total_loss', valid_loss.avg, epoch)
-            writer.add_scalar('Valid_loss', valid_id_loss.avg, epoch)
+            writer.add_scalar('Valid_id_loss', valid_id_loss.avg, epoch)
             writer.add_scalar('Valid_tri_loss', valid_tri_loss.avg, epoch)
             writer.add_scalar('Validation accuracy', acc, epoch)
 
