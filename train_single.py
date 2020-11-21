@@ -85,23 +85,12 @@ def multi_process() :
         print('==> Trainset ..')
         # training set
         trainset = SYSUData(data_path, transform=transform_train, split ="training", modal=args.train)
-        # trainset = SYSUData(data_path, transform=transform_train, split ="training", modal=args.train)
-        # generate the idx of each person identity
-
         print('==> Validset ..')
         validset = SYSUData(data_path, transform=transform_train, split ="validation", modal=args.train)
         print("==> Loaded")
-        # print(f'Nombres d\'ids train color: {len(np.unique(trainset.train_color_label))}')
-        # print(f'Nombres d\'ids valid color: {len(np.unique(validset.valid_color_label))}')
-        # print(f'Nombres d\'ids train thermal : {len(np.unique(trainset.train_color_label))}')
-        # print(f'Nombres d\'ids valid thermal : {len(np.unique(validset.valid_thermal_label))}')
         train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
         valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
 
-        # print(f'Nombres d\'images en 0 train color: {len(train_color_pos[2])}')
-        # print(f'Nombres d\'images en 0 valid color: {len(valid_color_pos[2])}')
-        # print(f'Nombres d\'images en 0 train thermal : {len(train_thermal_pos[0])}')
-        # print(f'Nombres d\'images en 0 valid thermal : {len(valid_thermal_pos[0])}')
     if args.dataset == "regdb" :
         trainset = RegDBData(data_path, transform=transform_train, split="training", modal =args.train)
         validset = RegDBData(data_path, transform=transform_train, split="validation", modal =args.train)
@@ -301,7 +290,7 @@ def multi_process() :
             data_time = AverageMeter()
             batch_time = AverageMeter()
             # Prepare valid loader
-            if args.train == "training" :
+            if args.train == "visible" :
                 sampler_valid = UniModalIdentitySampler(validset.valid_color_label, valid_color_pos, \
                                                     num_of_same_id_in_batch, batch_num_identities)
                 validset.cIndex = sampler_valid.index1
