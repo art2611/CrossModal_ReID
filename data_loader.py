@@ -123,6 +123,7 @@ class SYSUData_split(data.Dataset):
                     if u <= int(u*SeventPercent) :
                         _color_image.append(color_image[    color_pos[i][j]  ])
                         _color_lab.append(color_pos[i][j])
+                        print(_color_lab[u])
             for i in range(len(thermal_pos)):
                 u = len(thermal_pos[i])
                 for j in range(u):
