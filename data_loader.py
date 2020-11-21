@@ -119,7 +119,6 @@ class SYSUData_split(data.Dataset):
             #Dans chaque liste d'index d'une identité, on prends les 70% premieres images.
             for i in range(len(color_pos)):
                 u = len(color_pos[i])
-                print(int(u*SeventPercent))
                 for j in range(u) :
                     if u <= int(u*SeventPercent) :
                         _color_image.append(color_image[    color_pos[i][j]  ])
