@@ -77,6 +77,16 @@ def multi_process() :
     ######################################### TRAIN & VALIDATION SETs
     Timer1 = time.time()
     print('==> Loading images..')
+    dataset = 'sysu'
+    if dataset == 'sysu':
+        # training set
+        trainset = SYSUData_split(data_path, transform=transform_train)
+        # generate the idx of each person identity
+        color_pos, thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
+    print(f' color pos :  {color_pos[0]}')
+    print(f' thermal pos :  {thermal_pos[2]}')
+
+    sys.exit()
 
     if args.train == "visible ":
         trainset = RegDBVisibleData(data_path, transform=transform_train, split="training")

@@ -101,6 +101,38 @@ class RegDBData_split(data.Dataset):
         return len(self.train_color_label)
 
 
+class SYSUData_split(data.Dataset):
+    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None):
+        data_dir = '../Datasets/SYSU-MM01/'
+        # Load training images (path) and labels
+        train_color_image = np.load(data_dir + 'train_rgb_resized_img.npy')
+        color_label = np.load(data_dir + 'train_rgb_resized_label.npy')
+        self.train_color_label = color_label
+
+        train_thermal_image = np.load(data_dir + 'train_ir_resized_img.npy')
+        thermal_label = np.load(data_dir + 'train_ir_resized_label.npy')
+        self.train_thermal_label = thermal_label
+        print(f' number of ids in sysu colored {np.unique(color_label)}')
+        print(f' number of ids in sysu thermal {np.unique(thermal_label)}')
+
+        # BGR to RGB
+        self.train_color_image = train_color_image
+        self.train_thermal_image = train_thermal_image
+        self.transform = transform
+        self.cIndex = colorIndex
+        self.tIndex = thermalIndex
+
+    def __getitem__(self, index):
+        img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
+        img2, target2 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
+
+        img1 = self.transform(img1)
+        img2 = self.transform(img2)
+
+        return img1, img2, target1, target2
+
+    def __len__(self):
+        return len(self.train_color_label)
 
 class RegDBVisibleData(data.Dataset):
     def __init__(self, data_dir, transform=None, colorIndex=None, split="training" ):

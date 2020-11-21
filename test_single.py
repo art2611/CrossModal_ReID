@@ -36,6 +36,7 @@ lr = 0.001
 checkpoint_path = '../save_model/'
 data_path = '../Datasets/RegDB/'
 
+
 if args.train == 'visible':
     suffix = f'RegDB_person_Visible_only({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 elif args.train == "thermal":
