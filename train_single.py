@@ -88,7 +88,7 @@ def multi_process() :
     print(f' Même images pour une identité visible :  {len(color_pos[130])}')
     print(f' Même image pour une identité thermal :  {len(thermal_pos[0])}')
     print(f' Même image pour une identité thermal :  {len(thermal_pos[1])}')
-    print(f' Même image pour une identité thermal :  {len(thermal_pos[len(thermal_pos)-1])}')
+    print(f' Même image pour une identité thermal :  {len(thermal_pos[len(thermal_pos)-2])}')
     print(f'On s assure du nombre d ids visible ici : {len(color_pos)}')
     print(f'On s assure du nombre d ids thermal ici : {len(thermal_pos)}')
 
