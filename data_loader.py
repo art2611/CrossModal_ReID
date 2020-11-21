@@ -7,8 +7,8 @@ from torchvision import transforms
 import matplotlib.pyplot as plt
 
 
-class RegDBData_split(data.Dataset):
-    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, split="training" ):
+class RegDBData(data.Dataset):
+    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, modal = "both", split="training" ):
         # Load training images (path) and labels
         data_dir = '../Datasets/RegDB/'
         train_color_list = data_dir + 'idx/train_visible_1.txt'
@@ -80,6 +80,7 @@ class RegDBData_split(data.Dataset):
         self.cIndex = colorIndex
         self.tIndex = thermalIndex
 
+        self.modal = modal
 
     def __getitem__(self, index):
         #Dataset[i] return images from both modal and the corresponding label
@@ -92,14 +93,20 @@ class RegDBData_split(data.Dataset):
 
         img1 = self.transform(img1)
         img2 = self.transform(img2)
-
-        return img1, img2, target1, target2
+        if self.modal == "both" :
+            return img1, img2, target1, target2
+        elif self.modal == "visible" :
+            return img1, target1
+        elif self.modal == "thermal" :
+            return img2, target2
 
     def __len__(self):
+        if self.modal == "thermal" :
+            return len(self.train_thermal_label)
         return len(self.train_color_label)
 
 
-class SYSUData_split(data.Dataset):
+class SYSUData(data.Dataset):
     def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, split="training"):
         data_dir = '../Datasets/SYSU/'
         # Load training images (path) and labels
@@ -178,15 +185,15 @@ class SYSUData_split(data.Dataset):
     def __len__(self):
         return len(self.train_color_label)
 
-class RegDBVisibleData(data.Dataset):
-    def __init__(self, data_dir, transform=None, colorIndex=None, split="training" ):
+class RegdbSingleData(data.Dataset):
+    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex = None, split="training", modal ="visible"):
         # Load training images (path) and labels
         data_dir = '../Datasets/RegDB/'
         train_color_list = data_dir + 'idx/train_visible_1.txt'
         #Load color and thermal images + labels
         color_img_file, color_target = load_data(train_color_list)
-        color_image = []
-        color_lab = []
+        image = []
+        labels = []
 
         #Get real and thermal images with good shape in a list
         # Training and valid are defined in the firsts 80s percent
@@ -199,13 +206,17 @@ class RegDBVisibleData(data.Dataset):
                     img = Image.open(data_dir + color_img_file[i])
                     img = img.resize((144, 288), Image.ANTIALIAS)
                     pix_array = np.array(img)
-                    color_image.append(pix_array)
-                    color_lab.append(color_target[i])
+                    image.append(pix_array)
+                    labels.append(color_target[i])
 
-            color_image = np.array(color_image)
+            image = np.array(image)
             # Init color images / labels
-            self.train_color_image = color_image
-            self.train_color_label = color_lab
+            if modal == "visible" :
+                self.train_color_image = image
+                self.train_color_label = labels
+            elif modal == "thermal" :
+                self.train_thermal_image = image
+                self.train_thermal_label = labels
 
         if split == "validation" :
             for i in range(first80percent):
@@ -213,18 +224,22 @@ class RegDBVisibleData(data.Dataset):
                     img = Image.open(data_dir + color_img_file[i])
                     img = img.resize((144, 288), Image.ANTIALIAS)
                     pix_array = np.array(img)
-                    color_image.append(pix_array)
-                    color_lab.append(color_target[i])
+                    image.append(pix_array)
+                    labels.append(color_target[i])
 
-            color_image = np.array(color_image)
-
-            # Init color images / labels
-            self.valid_color_image = color_image
-            self.valid_color_label = color_lab
+            image = np.array(image)
+            if modal == "visible":
+                # Init color images / labels
+                self.valid_color_image = image
+                self.valid_color_label = labels
+                self.cIndex = colorIndex
+            elif modal == "thermal" :
+                self.valid_thermal_image = image
+                self.valid_thermal_label = labels
+                self.tIndex = thermalIndex
 
         self.transform = transform
-        # Prepare index
-        self.cIndex = colorIndex
+
 
     def __getitem__(self, index):
         #Dataset[i] return images from both modal and the corresponding label
@@ -232,7 +247,10 @@ class RegDBVisibleData(data.Dataset):
             img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
         elif hasattr(self, "valid_color_image") :
             img1, target1 = self.valid_color_image[self.cIndex[index]], self.valid_color_label[self.cIndex[index]]
-
+        elif hasattr(self, "train_thermal_image"):
+            img1, target1 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
+        elif hasattr(self, "valid_thermal_image") :
+            img1, target1 = self.valid_thermal_image[self.tIndex[index]], self.valid_thermal_label[self.tIndex[index]]
         img1 = self.transform(img1)
 
         return img1, target1
@@ -241,6 +259,89 @@ class RegDBVisibleData(data.Dataset):
             return len(self.train_color_label)
         elif hasattr(self, "valid_color_image"):
             return len(self.valid_color_label)
+        elif hasattr(self, "train_thermal_image"):
+            return len(self.train_thermal_label)
+        elif hasattr(self, "valid_thermal_image"):
+            return len(self.valid_thermal_label)
+
+class SYSUData(data.Dataset):
+    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, split="training"):
+        data_dir = '../Datasets/SYSU/'
+        # Load training images (path) and labels
+        #395 ids sont loadées sur les 491
+        color_image = np.load(data_dir + 'train_rgb_resized_img.npy')
+        color_label = np.load(data_dir + 'train_rgb_resized_label.npy')
+
+        thermal_image = np.load(data_dir + 'train_ir_resized_img.npy')
+        thermal_label = np.load(data_dir + 'train_ir_resized_label.npy')
+
+        color_pos, thermal_pos = GenIdx(color_label, thermal_label)
+        _color_image = []
+        _color_lab = []
+        _thermal_image = []
+        _thermal_lab = []
+        SeventPercent = 0.7
+        if split == "training" :
+            #Dans chaque liste d'index d'une identité, on prends les 70% premieres images.
+            for i in range(len(color_pos)):
+                u = len(color_pos[i])
+                for j in range(u) :
+                    if j <= int(u*SeventPercent) :
+                        _color_image.append(color_image[    color_pos[i][j]  ])
+                        _color_lab.append(i)
+            for i in range(len(thermal_pos)):
+                u = len(thermal_pos[i])
+                for j in range(u):
+                    if j <= int(u * SeventPercent) :
+                        _thermal_image.append(color_image[thermal_pos[i][j]])
+                        _thermal_lab.append(i)
+            # Labels
+            self.train_color_label = _color_lab
+            self.train_thermal_label = _thermal_lab
+            # BGR to RGB
+            self.train_color_image = _color_image
+            self.train_thermal_image = _thermal_image
+        if split == "validation" :
+            #Dans chaque liste d'index d'une identité, on prends les 30% dernières images.
+            for i in range(len(color_pos)):
+                u = len(color_pos[i])
+                for j in range(u) :
+                    if j > int(u*SeventPercent):
+                        _color_image.append(color_image[color_pos[i][j]])
+                        _color_lab.append(i)
+            for i in range(len(thermal_pos)):
+                u = len(thermal_pos[i])
+                for j in range(u):
+                    if j > int(u * SeventPercent):
+                        _thermal_image.append(color_image[thermal_pos[i][j]])
+                        _thermal_lab.append(i)
+            # Labels
+            self.valid_color_label = _color_lab
+            self.valid_thermal_label = _thermal_lab
+            # BGR to RGB
+            self.valid_color_image = _color_image
+            self.valid_thermal_image = _thermal_image
+
+        self.transform = transform
+
+        self.cIndex = colorIndex
+        self.tIndex = thermalIndex
+
+    def __getitem__(self, index):
+        if hasattr(self, "train_color_image"):
+            img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
+            img2, target2 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
+        elif hasattr(self, "valid_color_image") :
+            img1, target1 = self.valid_color_image[self.cIndex[index]], self.valid_color_label[self.cIndex[index]]
+            img2, target2 = self.valid_thermal_image[self.tIndex[index]], self.valid_thermal_label[self.tIndex[index]]
+
+        img1 = self.transform(img1)
+        img2 = self.transform(img2)
+
+        return img1, img2, target1, target2
+
+    def __len__(self):
+        return len(self.train_color_label)
 
 class RegDBThermalData(data.Dataset):
     def __init__(self, data_dir, transform=None, thermalIndex=None, split="training" ):

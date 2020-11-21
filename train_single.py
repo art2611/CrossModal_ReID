@@ -77,16 +77,17 @@ def multi_process() :
     ######################################### TRAIN & VALIDATION SETs
     Timer1 = time.time()
     print('==> Loading images..')
-    dataset = 'sysu'
-    # dataset = 'regdb'
-    if dataset == 'sysu':
+    # dataset = 'sysu'
+    # args.dataset = "regdb"
+    # args.train = "thermal"
+    if args.dataset == 'sysu':
         print('==> Trainset ..')
         # training set
-        trainset = SYSUData_split(data_path, transform=transform_train, split = "training")
+        trainset = SYSUData(data_path, transform=transform_train, split ="training")
         # generate the idx of each person identity
 
         print('==> Validset ..')
-        validset = SYSUData_split(data_path, transform=transform_train, split = "validation")
+        validset = SYSUData(data_path, transform=transform_train, split ="validation")
         print("==> Loaded")
         # print(f'Nombres d\'ids train color: {len(np.unique(trainset.train_color_label))}')
         # print(f'Nombres d\'ids valid color: {len(np.unique(validset.valid_color_label))}')
@@ -99,15 +100,16 @@ def multi_process() :
         # print(f'Nombres d\'images en 0 valid color: {len(valid_color_pos[2])}')
         # print(f'Nombres d\'images en 0 train thermal : {len(train_thermal_pos[0])}')
         # print(f'Nombres d\'images en 0 valid thermal : {len(valid_thermal_pos[0])}')
-    if dataset == "regdb" :
-        if args.train == "visible ":
-            trainset = RegDBVisibleData(data_path, transform=transform_train, split="training")
-            validset = RegDBVisibleData(data_path, transform=transform_train, split="validation")
+    if args.dataset == "regdb" :
+        trainset = RegDBData(data_path, transform=transform_train, split="training", modal =args.train)
+        validset = RegDBData(data_path, transform=transform_train, split="validation", modal =args.train)
+        if args.train == "visible":
             print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
         elif args.train == "thermal" :
-            trainset = RegDBThermalData(data_path, transform=transform_train, split="training")
-            validset = RegDBThermalData(data_path, transform=transform_train, split="validation")
             print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
+
+        #     trainset = RegDBThermalData(data_path, transform=transform_train, split="training")
+        #     validset = RegDBThermalData(data_path, transform=transform_train, split="validation")
 
     # print(f'len(trainset.train_color_label) : {len(trainset.train_color_label)}')
     # print(f'len(validset.valid_color_label) : {len(validset.valid_color_label)}')
@@ -116,7 +118,7 @@ def multi_process() :
     ######################################### Image GENERATION
 
     print('==> Image generation..')
-    if dataset == 'regdb' :
+    if args.dataset == 'regdb' :
         if args.train == "visible" :
             trainset.train_color_image, trainset.train_color_label, _, _ =\
                 data_aug(visible_images = trainset.train_color_image, Visible_labels = trainset.train_color_label)
@@ -136,13 +138,12 @@ def multi_process() :
 
             print(f'New image number : {len(trainset.train_thermal_image) + len(validset.valid_thermal_image)}')
 
-    ######################################### IMAGE DISPLAY
-    for i in range(6):
-         plt.subplot(2, 3, i + 1)
-         plt.imshow(trainset.train_color_label[i])
-         plt.imshow(trainset.train_color_label[i], cmap='gray')
-    plt.show()
-    sys.exit()
+    # ######################################### IMAGE DISPLAY
+    # for i in range(6):
+    #     plt.subplot(2, 3, i + 1)
+    #     plt.imshow(np.array(trainset.train_color_image[i]))
+    # plt.show()
+    # sys.exit()
     ######################################### DATASET PROPERTIES
     # print(len(valid_color_pos[0]))
     # print(len(train_color_pos[0]))

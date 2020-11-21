@@ -3,7 +3,7 @@ from PIL import Image
 import pdb
 import os
 
-data_path = '/home/ens/AR04990/projet/Datasets/SYSU/'
+data_path = '../Datasets/SYSU/'
 
 rgb_cameras = ['cam1', 'cam2', 'cam4', 'cam5']
 ir_cameras = ['cam3', 'cam6']
