@@ -1,6 +1,7 @@
 import numpy as np
 from PIL import Image
 import torch.utils.data as data
+import sys
 import math
 from torchvision import transforms
 import matplotlib.pyplot as plt
@@ -120,6 +121,9 @@ class SYSUData_split(data.Dataset):
             for i in range(len(color_pos)):
                 u = len(color_pos[i])
                 for j in range(u) :
+                    print(u)
+                    print(int(u*SeventPercent))
+                    sys.exit()
                     if u <= int(u*SeventPercent) :
                         _color_image.append(color_image[    color_pos[i][j]  ])
                         _color_lab.append(color_pos[i][j])
