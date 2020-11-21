@@ -84,63 +84,65 @@ def multi_process() :
         # training set
         trainset = SYSUData_split(data_path, transform=transform_train, split = "training")
         # generate the idx of each person identity
-        train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
+
         print('==> Validset ..')
         validset = SYSUData_split(data_path, transform=transform_train, split = "validation")
         print("==> Loaded")
-        print(f'Nombres d\'ids train color: {len(np.unique(trainset.train_color_label))}')
-        print(f'Nombres d\'ids valid color: {len(np.unique(validset.valid_color_label))}')
-        print(f'Nombres d\'ids train thermal : {len(np.unique(trainset.train_color_label))}')
-        print(f'Nombres d\'ids valid thermal : {len(np.unique(validset.valid_thermal_label))}')
+        # print(f'Nombres d\'ids train color: {len(np.unique(trainset.train_color_label))}')
+        # print(f'Nombres d\'ids valid color: {len(np.unique(validset.valid_color_label))}')
+        # print(f'Nombres d\'ids train thermal : {len(np.unique(trainset.train_color_label))}')
+        # print(f'Nombres d\'ids valid thermal : {len(np.unique(validset.valid_thermal_label))}')
+        train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
         valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
 
-        print(f'Nombres d\'images en 0 train color: {len(train_color_pos[2])}')
-        print(f'Nombres d\'images en 0 valid color: {len(valid_color_pos[2])}')
-        print(f'Nombres d\'images en 0 train thermal : {len(train_thermal_pos[0])}')
-        print(f'Nombres d\'images en 0 valid thermal : {len(valid_thermal_pos[0])}')
-    sys.exit()
-
-    if args.train == "visible ":
-        trainset = RegDBVisibleData(data_path, transform=transform_train, split="training")
-        validset = RegDBVisibleData(data_path, transform=transform_train, split="validation")
-        print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
-    elif args.train == "thermal" :
-        trainset = RegDBThermalData(data_path, transform=transform_train, split="training")
-        validset = RegDBThermalData(data_path, transform=transform_train, split="validation")
-        print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
+        # print(f'Nombres d\'images en 0 train color: {len(train_color_pos[2])}')
+        # print(f'Nombres d\'images en 0 valid color: {len(valid_color_pos[2])}')
+        # print(f'Nombres d\'images en 0 train thermal : {len(train_thermal_pos[0])}')
+        # print(f'Nombres d\'images en 0 valid thermal : {len(valid_thermal_pos[0])}')
+    if dataset == "regdb" :
+        if args.train == "visible ":
+            trainset = RegDBVisibleData(data_path, transform=transform_train, split="training")
+            validset = RegDBVisibleData(data_path, transform=transform_train, split="validation")
+            print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
+        elif args.train == "thermal" :
+            trainset = RegDBThermalData(data_path, transform=transform_train, split="training")
+            validset = RegDBThermalData(data_path, transform=transform_train, split="validation")
+            print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
 
     # print(f'len(trainset.train_color_label) : {len(trainset.train_color_label)}')
     # print(f'len(validset.valid_color_label) : {len(validset.valid_color_label)}')
 
     print(' ')
     ######################################### Image GENERATION
+
     print('==> Image generation..')
+    if dataset == 'regdb' :
+        if args.train == "visible" :
+            trainset.train_color_image, trainset.train_color_label, _, _ =\
+                data_aug(visible_images = trainset.train_color_image, Visible_labels = trainset.train_color_label)
+            validset.valid_color_image, validset.valid_color_label, _, _ =\
+                data_aug(visible_images = validset.valid_color_image, Visible_labels = validset.valid_color_label)
+            train_color_pos, _ = GenIdx(trainset.train_color_label, trainset.train_color_label)
+            valid_color_pos, _ = GenIdx(validset.valid_color_label, validset.valid_color_label)
 
-    if args.train == "visible" :
-        trainset.train_color_image, trainset.train_color_label, _, _ =\
-            data_aug(visible_images = trainset.train_color_image, Visible_labels = trainset.train_color_label)
-        validset.valid_color_image, validset.valid_color_label, _, _ =\
-            data_aug(visible_images = validset.valid_color_image, Visible_labels = validset.valid_color_label)
-        train_color_pos, _ = GenIdx(trainset.train_color_label, trainset.train_color_label)
-        valid_color_pos, _ = GenIdx(validset.valid_color_label, validset.valid_color_label)
+            print(f'New image number : {len(trainset.train_color_image)+ len(validset.valid_color_image)}')
+        elif args.train == "thermal" :
+            _, _, trainset.train_thermal_image, trainset.train_thermal_label =\
+                data_aug(Thermal_images = trainset.train_thermal_image, Thermal_labels = trainset.train_thermal_label)
+            _, _, validset.valid_thermal_image, validset.valid_thermal_label =\
+                data_aug(Thermal_images = validset.valid_thermal_image, Thermal_labels = validset.valid_thermal_label)
+            train_thermal_pos, _ = GenIdx(trainset.train_thermal_label, trainset.train_thermal_label)
+            valid_thermal_pos, _ = GenIdx(validset.valid_thermal_label, validset.valid_thermal_label)
 
-        print(f'New image number : {len(trainset.train_color_image)+ len(validset.valid_color_image)}')
-    elif args.train == "thermal" :
-        _, _, trainset.train_thermal_image, trainset.train_thermal_label =\
-            data_aug(Thermal_images = trainset.train_thermal_image, Thermal_labels = trainset.train_thermal_label)
-        _, _, validset.valid_thermal_image, validset.valid_thermal_label =\
-            data_aug(Thermal_images = validset.valid_thermal_image, Thermal_labels = validset.valid_thermal_label)
-        train_thermal_pos, _ = GenIdx(trainset.train_thermal_label, trainset.train_thermal_label)
-        valid_thermal_pos, _ = GenIdx(validset.valid_thermal_label, validset.valid_thermal_label)
+            print(f'New image number : {len(trainset.train_thermal_image) + len(validset.valid_thermal_image)}')
 
-        print(f'New image number : {len(trainset.train_thermal_image) + len(validset.valid_thermal_image)}')
     ######################################### IMAGE DISPLAY
-    # for i in range(6):
-    #      plt.subplot(2, 3, i + 1)
-    #      plt.imshow(final_train_data[i])
-    #      # plt.imshow(final_train_data[i], cmap='gray')
-    # plt.show()
-
+    for i in range(6):
+         plt.subplot(2, 3, i + 1)
+         plt.imshow(trainset.train_color_label[i])
+         plt.imshow(trainset.train_color_label[i], cmap='gray')
+    plt.show()
+    sys.exit()
     ######################################### DATASET PROPERTIES
     # print(len(valid_color_pos[0]))
     # print(len(train_color_pos[0]))
