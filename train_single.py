@@ -79,10 +79,12 @@ def multi_process() :
     print('==> Loading images..')
     dataset = 'sysu'
     if dataset == 'sysu':
+        print('==> Trainset ..')
         # training set
         trainset = SYSUData_split(data_path, transform=transform_train, split = "training")
         # generate the idx of each person identity
         train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
+        print('==> Validset ..')
         validset = SYSUData_split(data_path, transform=transform_train, split = "validation")
         valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
 
