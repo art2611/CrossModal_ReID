@@ -123,7 +123,7 @@ def multi_process() :
         if args.dataset == "regdb" :
             query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.train, split=True)
         elif args.dataset == "sysu" :
-            ir_img, ir_id, vis_img, vis_id = process_test_sysu(data_path, split=True)
+            ir_img, ir_id, vis_img, vis_id = process_test_sysu(data_path)
             vis_pos, ir_pos  = GenIdx(vis_id, ir_id)
             if args.train == "visible" :
                 query_img, query_label, gall_img, gall_label = \
