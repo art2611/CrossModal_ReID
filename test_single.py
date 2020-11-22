@@ -132,10 +132,6 @@ def multi_process() :
                 query_img, query_label, gall_img, gall_label = \
                 process2_test_sysu(data_path, modal=args.train, ir_img =ir_img , ir_id=ir_id, ir_pos = ir_pos)
 
-        print(len(np.unique(query_label)))
-        print(len(np.unique(gall_label)))
-        sys.exit()
-
         gallset = TestData(gall_img, gall_label, transform=transform_test, img_size=(img_w, img_h))
         gall_loader = torch.utils.data.DataLoader(gallset, batch_size=test_batch_size, shuffle=False, num_workers=workers)
 
