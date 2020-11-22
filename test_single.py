@@ -16,7 +16,9 @@ from multiprocessing import freeze_support
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # device = 'cpu'
+
 nclass = 164
+nclass = 395
 # net = Network(class_num=nclass).to(device)
 
 parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
