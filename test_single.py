@@ -178,15 +178,43 @@ def multi_process() :
             distmat = np.matmul(query_feat_fc, np.transpose(gall_feat_fc))
             cmc, mAP, mINP = eval_regdb(-distmat, query_label, gall_label)
 
+        if trial == 1 :
+            all_cmc = cmc
+            all_mAP = mAP
+            all_mINP = mINP
+            all_cmc_pool = cmc_pool
+            all_mAP_pool = mAP_pool
+            all_mINP_pool = mINP_pool
+        else:
+            all_cmc = all_cmc + cmc
+            all_mAP = all_mAP + mAP
+            all_mINP = all_mINP + mINP
+            all_cmc_pool = all_cmc_pool + cmc_pool
+            all_mAP_pool = all_mAP_pool + mAP_pool
+            all_mINP_pool = all_mINP_pool + mINP_pool
 
-        print('==> Test results:')
+        print('Test Trial: {}'.format(trial))
         print(
-            f'FC:     Rank-1: {cmc[0]:.2%} | Rank-5: {cmc[4]:.2%} | Rank-10: {cmc[9]:.2%}| Rank-20: {cmc[19]:.2%}| mAP: {mAP:.2%}| mINP: {mINP:.2%}')
+            'FC:     Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
+                cmc[0], cmc[4], cmc[9], cmc[19], mAP, mINP))
         print(
             'POOL:   Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
                 cmc_pool[0], cmc_pool[4], cmc_pool[9], cmc_pool[19], mAP_pool, mINP_pool))
 
+    cmc = all_cmc / 10
+    mAP = all_mAP / 10
+    mINP = all_mINP / 10
 
+    cmc_pool = all_cmc_pool / 10
+    mAP_pool = all_mAP_pool / 10
+    mINP_pool = all_mINP_pool / 10
+    print('All Average:')
+    print(
+        'FC:     Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
+            cmc[0], cmc[4], cmc[9], cmc[19], mAP, mINP))
+    print(
+        'POOL:   Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
+            cmc_pool[0], cmc_pool[4], cmc_pool[9], cmc_pool[19], mAP_pool, mINP_pool))
 
 if __name__ == '__main__':
     freeze_support()
