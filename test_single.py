@@ -124,7 +124,6 @@ def multi_process() :
             query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.train, split=True)
         elif args.dataset == "sysu" :
             ir_img, ir_id, vis_img, vis_id = process_test_sysu(data_path)
-            sys.exit()
             vis_pos, ir_pos  = GenIdx(vis_id, ir_id)
             if args.train == "visible" :
                 for k in range(len(vis_pos)):
@@ -132,6 +131,7 @@ def multi_process() :
                 print("ir")
                 for k in range(len(vis_pos)):
                     print(len(ir_pos[k]))
+                sys.exit()
                 query_img, query_label, gall_img, gall_label = \
                 process2_test_sysu(data_path, modal=args.train, vis_img=vis_img, vis_id=vis_id, vis_pos=vis_pos )
             if args.train == "thermal" :

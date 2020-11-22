@@ -406,9 +406,6 @@ def process_test_sysu(data_path, mode='all'):
         vis_img.append(img_path)
         vis_id.append(pid)
         vis_cam.append(camid)
-    print(ir_id)
-    print(" ")
-    print(vis_id)
     return ir_img, np.array(ir_id), vis_img, np.array(vis_id)
 
 def process2_test_sysu(data_path, ir_img=[], ir_id=[], ir_pos=[],  vis_img=[], vis_id=[],vis_pos=[], modal="visible"):
