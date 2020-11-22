@@ -29,7 +29,7 @@ def multi_process() :
 
     # device = 'cpu'
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    writer = SummaryWriter("runs/NewVisible1")
+    writer = SummaryWriter("runs/NewVisible2")
 
     # Init variables :
     img_w = 144
