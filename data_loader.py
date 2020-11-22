@@ -24,11 +24,9 @@ class RegDBData(data.Dataset):
         thermal_lab = []
         #Get real and thermal images with good shape in a list
 
-        first80percent = int(len(color_img_file) * 80 / 100)
-        first80percent -= int(len(color_img_file) * 80 / 100)%10
 
         if split == "training":
-            for i in range(first80percent):
+            for i in range(len(color_img_file)):
                 if i % 10 < 7 :
                     #Visible
                     img = Image.open(data_dir + color_img_file[i])
@@ -53,7 +51,7 @@ class RegDBData(data.Dataset):
             self.train_thermal_image = thermal_image
             self.train_thermal_label = thermal_lab
         if split == "validation" :
-            for i in range(first80percent):
+            for i in range(len(color_img_file)):
                 if i % 10 >= 7:
                     #Visible
                     img = Image.open(data_dir + color_img_file[i])
@@ -300,10 +298,10 @@ def GenIdx(train_color_label, train_thermal_label):
 
     return color_pos, thermal_pos
 
-def process_test_regdb(img_dir, modal='visible', split = False):
+def process_test_regdb(img_dir, modal='visible', trial = 1, split = False):
 
-    input_visible_data_path = img_dir + 'idx/train_visible_1.txt'
-    input_thermal_data_path = img_dir + 'idx/train_thermal_1.txt'
+    input_visible_data_path = img_dir + f'idx/test_visible_{trial}.txt'
+    input_thermal_data_path = img_dir + f'idx/test_thermal_{trial}.txt'
     if modal == "visible" or modal == "VtoT" :
         with open(input_visible_data_path) as f:
             data_file_list = open(input_visible_data_path, 'rt').read().splitlines()
@@ -328,27 +326,31 @@ def process_test_regdb(img_dir, modal='visible', split = False):
         first_label_slice = []
         sec_image_slice = []
         sec_label_slice = []
-        first80percent = int(len(file_image) * 80 / 100)
-        first80percent -= int(len(file_image) * 80 / 100) % 10
-        #Récupération des 20 dernier % d'images pour la phase de test
-        for k in range(first80percent, len(file_image)):
-            # On chosiit deux personnes en query, le reste dans la gallery
-            if (k + 1) % 10 < 2 :
-                first_image_slice.append(file_image[k])
-                first_label_slice.append(file_label[k])
-            else :
-                sec_image_slice.append(file_image[k])
-                sec_label_slice.append(file_label[k])
+        #On regarde pour chaque id
+        for k in range(len(np.unique(file_label))):
+            appeared=[]
+            # On choisit deux personnes en query aléatoirement, le reste est placé dans la gallery
+            for i in range(2):
+                rand = random.choice(file_image[k*10:k*10+9])
+                while rand in appeared:
+                    rand = random.choice(file_image[k*10:k*10+9])
+                appeared.append(rand)
+                first_image_slice.append(rand)
+                first_label_slice.append(file_label[k*10])
+            #On regarde la liste d'images de l'id k, on récupère les images n'étant pas dans query
+            for i in file_image[k*10:k*10+9] :
+                if i not in appeared :
+                    sec_image_slice.append(file_image[k])
+                    sec_label_slice.append(file_label[k])
         return(first_image_slice, np.array(first_label_slice), sec_image_slice, np.array(sec_label_slice))
+    #Ancienne version, on verra comment on fait ici
     elif modal == "VtoT" :
         first_image_slice = []
         first_label_slice = []
         sec_image_slice = []
         sec_label_slice = []
-        first80percent = int(len(file_image_visible) * 80 / 100)
-        first80percent -= int(len(file_image_visible) * 80 / 100) % 10
-        #Récupération des 20 dernier % d'images pour la phase de test
-        for k in range(first80percent, len(file_image_visible)):
+
+        for k in range(len(file_image_visible)):
             # On chosiit deux personnes en query, le reste dans la gallery
             if (k + 1) % 10 < 2 :
                 #Query

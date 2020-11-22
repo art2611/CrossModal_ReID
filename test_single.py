@@ -103,25 +103,26 @@ def extract_query_feat(query_loader, nquery, net):
 
 def multi_process() :
 
-        end = time.time()
+    end = time.time()
 
-        #model_path = checkpoint_path +  args.resume
-        model_path = '../save_model/' + suffix + '_best.t'
-        # model_path = checkpoint_path + 'regdb_awg_p4_n8_lr_0.1_seed_0_trial_{}_best.t'.format(test_trial)
-        if os.path.isfile(model_path):
+    #model_path = checkpoint_path +  args.resume
+    model_path = '../save_model/' + suffix + '_best.t'
+    # model_path = checkpoint_path + 'regdb_awg_p4_n8_lr_0.1_seed_0_trial_{}_best.t'.format(test_trial)
+    if os.path.isfile(model_path):
 
-            print(f'==> Loading {args.train} checkpoint..')
+        print(f'==> Loading {args.train} checkpoint..')
 
-            checkpoint = torch.load(model_path)
-            net = Network(class_num=nclass)
-            net.to(device)
-            net.load_state_dict(checkpoint['net'])
-        else :
-            sys.exit("Saved model not found")
-        # Building test set and data loaders
+        checkpoint = torch.load(model_path)
+        net = Network(class_num=nclass)
+        net.to(device)
+        net.load_state_dict(checkpoint['net'])
+    else :
+        sys.exit("Saved model not found")
+    # Building test set and data loaders
 
+    for trial in range(1, 10):
         if args.dataset == "regdb" :
-            query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.train, split=True)
+            query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.train, split=True, trial = trial)
         elif args.dataset == "sysu" :
             ir_img, ir_id, vis_img, vis_id = process_test_sysu(data_path)
             vis_pos, ir_pos  = GenIdx(vis_id, ir_id)
