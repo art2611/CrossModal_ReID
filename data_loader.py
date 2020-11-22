@@ -432,16 +432,16 @@ def process2_test_sysu(data_path, ir_img=[], ir_id=[], ir_pos=[],  vis_img=[], v
                 print("len(file_pos[k] >= 10")
                 #On prend 2 images en query, les 8 autres en gallery
                 for i in range(2) :
-                    rand = random.choise(file_pos[k])
+                    rand = random.choice(file_pos[k])
                     while rand in appeared :
-                        rand = random.choise(file_pos[k])
+                        rand = random.choice(file_pos[k])
                     appeared.append(rand)
                     first_image_slice.append(file_image[appeared[i]])
                     first_label_slice.append(k)
                 for i in range(8):
-                    rand = random.choise(file_pos[k])
+                    rand = random.choice(file_pos[k])
                     while rand in appeared :
-                        rand = random.choise(file_pos[k])
+                        rand = random.choice(file_pos[k])
                     #On s'assure d'avoir que des images différentes dans query + dans gallery
                     appeared.append(rand)
                     sec_image_slice.append(file_image[appeared[i+2]])
@@ -467,18 +467,18 @@ def process2_test_sysu(data_path, ir_img=[], ir_id=[], ir_pos=[],  vis_img=[], v
         appeared = []
         # On chosiit deux personnes en query, le reste dans la gallery
         for j in range(2):
-            rand = random.choise(from_pos[k])
+            rand = random.choice(from_pos[k])
             while rand in appeared:
-                rand = random.choise(from_pos[k])
+                rand = random.choice(from_pos[k])
             appeared.append(rand)
             first_image_slice.append(from_image[appeared[j]])
             first_label_slice.append(k)
     for k in range(len(to_pos)):
         appeared = []
         for j in range(8):
-            rand = random.choise(to_pos[k])
+            rand = random.choice(to_pos[k])
             while rand in appeared:
-                rand = random.choise(to_pos[k])
+                rand = random.choice(to_pos[k])
             appeared.append(rand)
             sec_image_slice.append(from_image[appeared[j]])
             sec_label_slice.append(k)
