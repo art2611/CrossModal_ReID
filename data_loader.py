@@ -430,6 +430,7 @@ def process2_test_sysu(data_path, ir_img=[], ir_id=[], ir_pos=[],  vis_img=[], v
             appeared = []
             #On s'assure qu'on a bien 10 images de l'identité k
             if len(file_pos[k]) >=10 :
+                print("len(file_pos[k] >= 10")
                 #On prend 2 images en query, les 8 autres en gallery
                 for i in range(2) :
                     rand = random.choise(file_pos[k])
