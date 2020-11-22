@@ -114,7 +114,8 @@ def multi_process() :
     ######################################### Image GENERATION
 
     print('==> Image generation..')
-    if args.dataset == 'regdb' :
+    # if args.dataset == 'regdb' :
+    if False :
         if args.train == "visible" :
             trainset.train_color_image, trainset.train_color_label, _, _ =\
                 data_aug(visible_images = trainset.train_color_image, Visible_labels = trainset.train_color_label)
