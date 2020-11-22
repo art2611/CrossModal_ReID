@@ -127,6 +127,7 @@ def multi_process() :
             ir_img, ir_id, vis_img, vis_id = process_test_sysu(data_path)
             vis_pos, ir_pos  = GenIdx(vis_id, ir_id)
             if args.train == "visible" :
+                print("coucou")
                 query_img, query_label, gall_img, gall_label = \
                 process2_test_sysu(data_path, modal=args.train, vis_img=vis_img, vis_id=vis_id, vis_pos=vis_pos )
             if args.train == "thermal" :
