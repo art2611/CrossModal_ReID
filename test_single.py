@@ -117,14 +117,14 @@ def multi_process() :
             net.to(device)
             net.load_state_dict(checkpoint['net'])
         else :
-            print("Saved model not loaded, care")
-            net = Network(class_num = nclass).to(device)
+            sys.exit("Saved model not found")
         # Building test set and data loaders
 
         if args.dataset == "regdb" :
             query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.train, split=True)
         elif args.dataset == "sysu" :
             ir_img, ir_id, vis_img, vis_id = process_test_sysu(data_path)
+            sys.exit()
             vis_pos, ir_pos  = GenIdx(vis_id, ir_id)
             if args.train == "visible" :
                 for k in range(len(vis_pos)):
