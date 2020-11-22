@@ -27,7 +27,7 @@ class RegDBData(data.Dataset):
 
         if split == "training":
             for i in range(len(color_img_file)):
-                if i % 10 < 7 :
+                if i % 10 < 8 :
                     #Visible
                     img = Image.open(data_dir + color_img_file[i])
                     img = img.resize((144, 288), Image.ANTIALIAS)
@@ -52,7 +52,7 @@ class RegDBData(data.Dataset):
             self.train_thermal_label = thermal_lab
         if split == "validation" :
             for i in range(len(color_img_file)):
-                if i % 10 >= 7:
+                if i % 10 >= 8:
                     #Visible
                     img = Image.open(data_dir + color_img_file[i])
                     img = img.resize((144, 288), Image.ANTIALIAS)
