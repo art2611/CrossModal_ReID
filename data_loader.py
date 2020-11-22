@@ -388,7 +388,7 @@ def process_test_sysu(data_path, mode='all'):
             img_dir = os.path.join(data_path,cam,id)
             if os.path.isdir(img_dir):
                 new_files = sorted([img_dir+'/'+i for i in os.listdir(img_dir)])
-                files_rgb.append(random.choice(new_files))
+                files_rgb.extend(new_files)
     ir_img = []
     ir_id = []
     ir_cam = []
