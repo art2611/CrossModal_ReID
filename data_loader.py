@@ -1,6 +1,8 @@
 import numpy as np
 from PIL import Image
 import torch.utils.data as data
+import os
+import random
 import sys
 import math
 from torchvision import transforms
@@ -358,6 +360,130 @@ def process_test_regdb(img_dir, modal='visible', split = False):
                 sec_label_slice.append(file_label_thermal[k])
         return(first_image_slice, np.array(first_label_slice), sec_image_slice, np.array(sec_label_slice))
 
+
+def process_test_sysu(data_path, mode='all'):
+    if mode == 'all':
+        ir_cameras = ['cam3', 'cam6']
+        rgb_cameras = ['cam1', 'cam2', 'cam4', 'cam5']
+    elif mode == 'indoor':
+        ir_cameras = ['cam3', 'cam6']
+        rgb_cameras = ['cam1','cam2']
+
+    file_path = os.path.join(data_path, 'exp/test_id.txt')
+    files_rgb = []
+    files_ir = []
+
+    with open(file_path, 'r') as file:
+        ids = file.read().splitlines()
+        ids = [int(y) for y in ids[0].split(',')]
+        ids = ["%04d" % x for x in ids]
+
+    for id in sorted(ids):
+        for cam in ir_cameras:
+            img_dir = os.path.join(data_path, cam, id)
+            if os.path.isdir(img_dir):
+                new_files = sorted([img_dir + '/' + i for i in os.listdir(img_dir)])
+                files_ir.extend(new_files)
+        for cam in rgb_cameras:
+            img_dir = os.path.join(data_path,cam,id)
+            if os.path.isdir(img_dir):
+                new_files = sorted([img_dir+'/'+i for i in os.listdir(img_dir)])
+                files_rgb.append(random.choice(new_files))
+    ir_img = []
+    ir_id = []
+    ir_cam = []
+    vis_img = []
+    vis_id = []
+    vis_cam = []
+    for img_path in files_ir:
+        camid, pid = int(img_path[-15]), int(img_path[-13:-9])
+        ir_img.append(img_path)
+        ir_id.append(pid)
+        ir_cam.append(camid)
+
+    for img_path in files_rgb:
+        camid, pid = int(img_path[-15]), int(img_path[-13:-9])
+        vis_img.append(img_path)
+        vis_id.append(pid)
+        vis_cam.append(camid)
+
+    return ir_img, np.array(ir_id), vis_img, np.array(vis_id)
+
+def process2_test_sysu(data_path, ir_img=[], ir_id=[], ir_pos=[],  vis_img=[], vis_id=[],vis_pos=[], modal="visible"):
+    first_image_slice = []
+    first_label_slice = []
+    sec_image_slice = []
+    sec_label_slice = []
+    modality = ['visible', 'thermal', 'VtoT', 'TtoV']
+    if modal not in modality :
+        sys.exit(f"Error, args.train not in {modality}")
+    if modal == "visible":
+        file_image = vis_img
+        file_label = vis_id
+        file_pos = vis_pos
+    if modal == "thermal":
+        file_image = ir_img
+        file_label = ir_id
+        file_pos = ir_pos
+    if modal == "thermal" or modal == "visible":
+        for k in range(len(file_pos)):
+            appeared = []
+            #On s'assure qu'on a bien 10 images de l'identité k
+            if len(file_pos[k]) >=10 :
+                #On prend 2 images en query, les 8 autres en gallery
+                for i in range(2) :
+                    rand = random.choise(file_pos[k])
+                    while rand in appeared :
+                        rand = random.choise(file_pos[k])
+                    appeared.append(rand)
+                    first_image_slice.append(file_image[appeared[i]])
+                    first_label_slice.append(k)
+                for i in range(8):
+                    rand = random.choise(file_pos[k])
+                    while rand in appeared :
+                        rand = random.choise(file_pos[k])
+                    #On s'assure d'avoir que des images différentes dans query + dans gallery
+                    appeared.append(rand)
+                    sec_image_slice.append(file_image[appeared[i+2]])
+                    sec_label_slice.append(k)
+
+        return (first_image_slice, np.array(first_label_slice), sec_image_slice, np.array(sec_label_slice))
+    if modal == "VtoT" :
+        from_image = vis_img
+        from_label = vis_id
+        from_pos = vis_pos
+        to_image = ir_img
+        to_label = ir_id
+        to_pos = ir_pos
+    elif modal == "TtoV" :
+        from_image = ir_img
+        from_label = ir_id
+        from_pos = ir_pos
+        to_image = vis_img
+        to_label = vis_id
+        to_pos = vis_pos
+        # Récupération des 20 dernier % d'images pour la phase de test
+    for k in range(len(from_pos)):
+        appeared = []
+        # On chosiit deux personnes en query, le reste dans la gallery
+        for j in range(2):
+            rand = random.choise(from_pos[k])
+            while rand in appeared:
+                rand = random.choise(from_pos[k])
+            appeared.append(rand)
+            first_image_slice.append(from_image[appeared[j]])
+            first_label_slice.append(k)
+    for k in range(len(to_pos)):
+        appeared = []
+        for j in range(8):
+            rand = random.choise(to_pos[k])
+            while rand in appeared:
+                rand = random.choise(to_pos[k])
+            appeared.append(rand)
+            sec_image_slice.append(from_image[appeared[j]])
+            sec_label_slice.append(k)
+
+    return (first_image_slice, np.array(first_label_slice), sec_image_slice, np.array(sec_label_slice))
 
 class TestData(data.Dataset):
     def __init__(self, test_img_file, test_label, transform=None, img_size = (144,288)):

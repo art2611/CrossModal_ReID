@@ -6,7 +6,9 @@ import torch
 
 # t = torch.rand(4, 4)
 
-print(70./100)
+def aste(test):
+    return(test)
+print(aste("coucou"))
 sys.exit()
 # print(t.size(0))
 # print(t.size(1))

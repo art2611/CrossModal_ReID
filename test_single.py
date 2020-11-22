@@ -21,7 +21,7 @@ nclass = 164
 
 parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
 parser.add_argument('--dataset', default='regdb', help='dataset name: regdb or sysu]')
-parser.add_argument('--train', default='thermal', help='train visible or thermal only')
+parser.add_argument('--train', default='visible', help='train visible or thermal only')
 args = parser.parse_args()
 
 pool_dim = 2048
@@ -36,11 +36,17 @@ lr = 0.001
 checkpoint_path = '../save_model/'
 data_path = '../Datasets/RegDB/'
 
+if args.dataset == "sysu":
+    if args.train == 'visible':
+        suffix = f'RegDB_person_Visible_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+    elif args.train == "thermal":
+        suffix = f'RegDB_person_Thermal_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+if args.dataset == "regdb":
+    if args.train == 'visible':
+        suffix = f'RegDB_person_Visible_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+    elif args.train == "thermal":
+        suffix = f'RegDB_person_Thermal_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
-if args.train == 'visible':
-    suffix = f'RegDB_person_Visible_only({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
-elif args.train == "thermal":
-    suffix = f'RegDB_person_Thermal_only({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 print(f'Testing {args.train} ReID')
 # suffix = f'RegDB_person_Visible({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
@@ -100,10 +106,9 @@ def multi_process() :
         model_path = '../save_model/' + suffix + '_best.t'
         # model_path = checkpoint_path + 'regdb_awg_p4_n8_lr_0.1_seed_0_trial_{}_best.t'.format(test_trial)
         if os.path.isfile(model_path):
-            if args.train == "visible " :
-                print('==> Loading visible checkpoint..')
-            elif args.train == "thermal" :
-                print('==> Loading thermal checkpoint..')
+
+            print(f'==> Loading {args.train} checkpoint..')
+
             checkpoint = torch.load(model_path)
             net = Network(class_num=nclass)
             net.to(device)
@@ -113,7 +118,17 @@ def multi_process() :
             net = Network(class_num = nclass).to(device)
         # Building test set and data loaders
 
-        query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.train, split=True)
+        if args.dataset == "regdb" :
+            query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.train, split=True)
+        elif args.dataset == "sysu" :
+            ir_img, ir_id, vis_img, vis_id = process_test_sysu(data_path, split=True)
+            vis_pos, ir_pos  = GenIdx(vis_id, ir_id)
+            if args.train == "visible" :
+                query_img, query_label, gall_img, gall_label = \
+                process2_test_sysu(data_path, modal=args.train, vis_img=vis_img, vis_id=vis_id, vis_pos=vis_pos )
+            if args.train == "thermal" :
+                query_img, query_label, gall_img, gall_label = \
+                process2_test_sysu(data_path, modal=args.train, ir_img =ir_img , ir_id=ir_id, ir_pos = ir_pos)
 
 
         gallset = TestData(gall_img, gall_label, transform=transform_test, img_size=(img_w, img_h))
