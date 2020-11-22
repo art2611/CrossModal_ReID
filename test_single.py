@@ -37,6 +37,7 @@ workers = 4
 lr = 0.001
 checkpoint_path = '../save_model/'
 data_path = '../Datasets/RegDB/'
+data_path = '../Datasets/SYSU/'
 
 if args.dataset == "sysu":
     if args.train == 'visible':
