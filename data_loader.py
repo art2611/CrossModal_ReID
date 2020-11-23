@@ -349,15 +349,13 @@ def process_test_regdb(img_dir, modal='visible', trial = 1, split = False):
         sec_label_slice = []
 
         for k in range(len(file_image_visible)):
-            # On chosiit deux personnes en query, le reste dans la gallery
-            if (k + 1) % 10 < 2 :
-                #Query
-                first_image_slice.append(file_image_visible[k])
-                first_label_slice.append(file_label_visible[k])
-            else :
-                #Gallery
-                sec_image_slice.append(file_image_thermal[k])
-                sec_label_slice.append(file_label_thermal[k])
+            # On chosiit TOUTES les personnes en query, le TOUTES les autres dans la gallery
+            first_image_slice.append(file_image_visible[k])
+            first_label_slice.append(file_label_visible[k])
+
+            sec_image_slice.append(file_image_thermal[k])
+            sec_label_slice.append(file_label_thermal[k])
+
         return(first_image_slice, np.array(first_label_slice), sec_image_slice, np.array(sec_label_slice))
 
 
