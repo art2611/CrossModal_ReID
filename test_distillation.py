@@ -114,77 +114,108 @@ def multi_process():
     # Building test set and data loaders
     end = time.time()
 
-    query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal='VtoT', split=True)
+    for trial in range(1, 11):
 
-    gallset = TestData(gall_img, gall_label, transform=transform_test, img_size=(img_w, img_h))
-    gall_loader = torch.utils.data.DataLoader(gallset, batch_size=test_batch_size, shuffle=False, num_workers=workers)
+        query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal='VtoT', trial = trial)
 
-    nquery = len(query_label)
-    ngall = len(gall_label)
+        gallset = TestData(gall_img, gall_label, transform=transform_test, img_size=(img_w, img_h))
+        gall_loader = torch.utils.data.DataLoader(gallset, batch_size=test_batch_size, shuffle=False, num_workers=workers)
 
-    queryset = TestData(query_img, query_label, transform=transform_test, img_size=(img_w, img_h))
-    query_loader = torch.utils.data.DataLoader(queryset, batch_size=test_batch_size, shuffle=False, num_workers=4)
+        nquery = len(query_label)
+        ngall = len(gall_label)
 
-    ############################## DISPLAY QUERY AND GALLERY
-    # for i in range(6):
-    #      plt.subplot(2, 3, i + 1)
-    #      if i < 3 :
-    #         plt.title("Gallery")
-    #         plt.imshow(np.array(gallset.test_image[i]))
-    #      else :
-    #         plt.title("Query")
-    #         plt.imshow(np.array(queryset.test_image[i]))
-    #      # plt.imshow(final_train_data[i], cmap='gray')
-    # plt.show()
+        queryset = TestData(query_img, query_label, transform=transform_test, img_size=(img_w, img_h))
+        query_loader = torch.utils.data.DataLoader(queryset, batch_size=test_batch_size, shuffle=False, num_workers=4)
 
-    print(f'Data Loading Time:\t {time.time() - end:.3f}')
-    print(" ")
-    print('==> Feature extraction for queries and gallery')
-    end = time.time()
-    query_feat_pool, query_feat_fc = extract_query_feat(query_loader, nquery = nquery, net = net_visible)
-    gall_feat_pool,  gall_feat_fc = extract_gall_feat(gall_loader, ngall = ngall, net = net_thermal)
-    print(f'Feature Extraction Time {time.time() - end}')
-    # if True = thermal to visible, else, the reverse
-    print(" ")
-    print('==> Evaluation : ')
+        ############################## DISPLAY QUERY AND GALLERY
+        # for i in range(6):
+        #      plt.subplot(2, 3, i + 1)
+        #      if i < 3 :
+        #         plt.title("Gallery")
+        #         plt.imshow(np.array(gallset.test_image[i]))
+        #      else :
+        #         plt.title("Query")
+        #         plt.imshow(np.array(queryset.test_image[i]))
+        #      # plt.imshow(final_train_data[i], cmap='gray')
+        # plt.show()
 
-    if True :
-        # pool5 feature
+        print(f'Data Loading Time:\t {time.time() - end:.3f}')
+        print(" ")
+        print('==> Feature extraction for queries and gallery')
+        end = time.time()
+        query_feat_pool, query_feat_fc = extract_query_feat(query_loader, nquery = nquery, net = net_visible)
+        gall_feat_pool,  gall_feat_fc = extract_gall_feat(gall_loader, ngall = ngall, net = net_thermal)
+        print(f'Feature Extraction Time {time.time() - end}')
+        # if True = thermal to visible, else, the reverse
+        print(" ")
+        print('==> Evaluation : ')
 
-
-        # distance = np.zeros((gall_feat_pool.shape[0], query_feat_pool.shape[0]))
-        # for i in range(gall_feat_pool.shape[0]):
-        #     for j in range(query_feat_pool.shape[0]):
-        #         # print(query_feat_pool[j])
-        #         distance[i][j] = np.linalg.norm(gall_feat_pool[i] - query_feat_pool[j])
-        distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
-        # print(f'ancient distance : {-distmat_pool[0]}')
-        # print(f'New distance : {-distance[0]}')
-        # print(np.argsort(distance, axis=1))
-
-        cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, gall_label, query_label)
-        # cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distance, gall_label, query_label)
-
-        # fc feature
-        distmat = np.matmul(gall_feat_fc , np.transpose(query_feat_fc))
-        cmc, mAP, mINP = eval_regdb(-distmat,gall_label,  query_label )
-    else:
-        # pool5 feature
-        distmat_pool = np.matmul(query_feat_pool, np.transpose(gall_feat_pool))
-        cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, query_label, gall_label)
-
-        # fc feature
-        distmat = np.matmul(query_feat_fc, np.transpose(gall_feat_fc))
-        cmc, mAP, mINP = eval_regdb(-distmat, query_label, gall_label)
+        if True :
+            # pool5 feature
 
 
-    print('==> Test results:')
+            # distance = np.zeros((gall_feat_pool.shape[0], query_feat_pool.shape[0]))
+            # for i in range(gall_feat_pool.shape[0]):
+            #     for j in range(query_feat_pool.shape[0]):
+            #         # print(query_feat_pool[j])
+            #         distance[i][j] = np.linalg.norm(gall_feat_pool[i] - query_feat_pool[j])
+            distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
+            # print(f'ancient distance : {-distmat_pool[0]}')
+            # print(f'New distance : {-distance[0]}')
+            # print(np.argsort(distance, axis=1))
+
+            cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, gall_label, query_label)
+            # cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distance, gall_label, query_label)
+
+            # fc feature
+            distmat = np.matmul(gall_feat_fc , np.transpose(query_feat_fc))
+            cmc, mAP, mINP = eval_regdb(-distmat,gall_label,  query_label )
+        else:
+            # pool5 feature
+            distmat_pool = np.matmul(query_feat_pool, np.transpose(gall_feat_pool))
+            cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, query_label, gall_label)
+
+            # fc feature
+            distmat = np.matmul(query_feat_fc, np.transpose(gall_feat_fc))
+            cmc, mAP, mINP = eval_regdb(-distmat, query_label, gall_label)
+
+        if trial == 1:
+            all_cmc = cmc
+            all_mAP = mAP
+            all_mINP = mINP
+            all_cmc_pool = cmc_pool
+            all_mAP_pool = mAP_pool
+            all_mINP_pool = mINP_pool
+        else:
+            all_cmc = all_cmc + cmc
+            all_mAP = all_mAP + mAP
+            all_mINP = all_mINP + mINP
+            all_cmc_pool = all_cmc_pool + cmc_pool
+            all_mAP_pool = all_mAP_pool + mAP_pool
+            all_mINP_pool = all_mINP_pool + mINP_pool
+
+        print('Test Trial: {}'.format(trial))
+        print(
+            'FC:     Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
+                cmc[0], cmc[4], cmc[9], cmc[19], mAP, mINP))
+        print(
+            'POOL:   Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
+                cmc_pool[0], cmc_pool[4], cmc_pool[9], cmc_pool[19], mAP_pool, mINP_pool))
+
+    cmc = all_cmc / 10
+    mAP = all_mAP / 10
+    mINP = all_mINP / 10
+
+    cmc_pool = all_cmc_pool / 10
+    mAP_pool = all_mAP_pool / 10
+    mINP_pool = all_mINP_pool / 10
+    print('All Average:')
     print(
-        f'FC:     Rank-1: {cmc[0]:.2%} | Rank-5: {cmc[4]:.2%} | Rank-10: {cmc[9]:.2%}| Rank-20: {cmc[19]:.2%}| mAP: {mAP:.2%}| mINP: {mINP:.2%}')
+        'FC:     Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
+            cmc[0], cmc[4], cmc[9], cmc[19], mAP, mINP))
     print(
         'POOL:   Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
             cmc_pool[0], cmc_pool[4], cmc_pool[9], cmc_pool[19], mAP_pool, mINP_pool))
-
 
 
 if __name__ == '__main__':
