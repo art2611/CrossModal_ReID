@@ -35,8 +35,8 @@ num_of_same_id_in_batch = 4  # Number of same identity in a batch
 workers = 4
 lr = 0.001
 checkpoint_path = '../save_model/'
-data_path = '../Datasets/RegDB/'
-data_path = '../Datasets/SYSU/'
+# data_path = '../Datasets/RegDB/'
+# data_path = '../Datasets/SYSU/'
 
 if args.dataset == "sysu":
     nclass = 395
