@@ -85,12 +85,12 @@ class RegDBData(data.Dataset):
         if hasattr(self, "train_color_image"):
             if self.modal == "both" or self.modal == "visible" :
                 img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
-            elif self.modal == "both" or self.modal == "thermal":
+            if self.modal == "both" or self.modal == "thermal":
                 img2, target2 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
         elif hasattr(self, "valid_color_image") :
             if self.modal == "both" or self.modal == "visible" :
                 img1, target1 = self.valid_color_image[self.cIndex[index]], self.valid_color_label[self.cIndex[index]]
-            elif self.modal == "both" or self.modal == "thermal":
+            if self.modal == "both" or self.modal == "thermal":
                 img2, target2 = self.valid_thermal_image[self.tIndex[index]], self.valid_thermal_label[self.tIndex[index]]
 
         if self.modal == "both" :
