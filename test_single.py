@@ -45,7 +45,7 @@ if args.dataset == "sysu":
     elif args.train == "thermal":
         suffix = f'RegDB_person_Thermal_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 if args.dataset == "regdb":
-    nclass = 164
+    nclass = 206
     if args.train == 'visible':
         suffix = f'RegDB_person_Visible_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
     elif args.train == "thermal":
