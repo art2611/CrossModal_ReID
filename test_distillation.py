@@ -14,7 +14,7 @@ import sys
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # device = 'cpu'
-nclass = 164
+nclass = 206
 # net = Network(class_num=nclass).to(device)
 
 pool_dim = 2048
