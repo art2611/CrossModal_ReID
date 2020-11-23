@@ -88,14 +88,16 @@ def multi_process() :
     # args.dataset = "sysu"
     # args.train = "thermal"
     if args.dataset == 'sysu':
-        print('==> Trainset ..')
-        # training set
         trainset = SYSUData(data_path, transform=transform_train, split ="training", modal=args.train)
-        print('==> Validset ..')
         validset = SYSUData(data_path, transform=transform_train, split ="validation", modal=args.train)
-        print("==> Loaded")
-        train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
-        valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
+        if args.train == "visible":
+            print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
+            train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
+            valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
+        elif args.train == "thermal" :
+            print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
+            train_thermal_pos, _ = GenIdx(trainset.train_thermal_label, trainset.train_thermal_label)
+            valid_thermal_pos, _ = GenIdx(validset.valid_thermal_label, validset.valid_thermal_label)
 
     if args.dataset == "regdb" :
         trainset = RegDBData(data_path, transform=transform_train, split="training", modal =args.train)

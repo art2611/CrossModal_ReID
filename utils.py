@@ -83,17 +83,17 @@ class UniModalIdentitySampler(Sampler):
             color_pos, thermal_pos: positions of each identity
             batchSize: batch size
     """
-    def __init__(self, train_color_label, color_pos, num_pos, batchSize):
-        uni_label = np.unique(train_color_label)
+    def __init__(self, train_label, _pos, num_pos, batchSize):
+        uni_label = np.unique(train_label)
         self.n_classes = len(uni_label)
         # print(len(color_pos))
-        N = len(train_color_label)
+        N = len(train_label)
         for j in range(int(N / (batchSize * num_pos) + 1)):
             batch_idx = np.random.choice(uni_label, batchSize, replace=False)
             for i in range(batchSize):
                 #On choisit un nombre num pos au hasard de même personne d'identité batchidx[i]
                 #print(f'chosen id : {batch_idx[i] - train_color_label[0]}')
-                sample_color = np.random.choice(color_pos[batch_idx[i]-train_color_label[0]], num_pos)
+                sample_color = np.random.choice(_pos[batch_idx[i] - train_label[0]], num_pos)
                 if j == 0 and i == 0:
                     index1 = sample_color
                 else:

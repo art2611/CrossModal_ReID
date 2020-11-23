@@ -23,8 +23,6 @@ class RegDBData(data.Dataset):
         thermal_image = []
         thermal_lab = []
         #Get real and thermal images with good shape in a list
-
-
         if split == "training":
             for i in range(len(color_img_file)):
                 if i % 10 < 8 :
@@ -127,20 +125,20 @@ class SYSUData(data.Dataset):
         _color_lab = []
         _thermal_image = []
         _thermal_lab = []
-        SeventPercent = 0.7
+        heightyPercent = 0.8
         if split == "training":
-            # Dans chaque liste d'index d'une identité, on prends les 70% premieres images.
+            # Dans chaque liste d'index d'une identité, on prends les 80% premieres images de chaque ids pour train.
             for i in range(len(color_pos)):
                 u = len(color_pos[i])
                 for j in range(u):
-                    if j <= int(u * SeventPercent):
+                    if j <= int(u * heightyPercent):
                         _color_image.append(color_image[color_pos[i][j]])
                         _color_lab.append(i)
             for i in range(len(thermal_pos)):
                 u = len(thermal_pos[i])
                 for j in range(u):
-                    if j <= int(u * SeventPercent):
-                        _thermal_image.append(color_image[thermal_pos[i][j]])
+                    if j <= int(u * heightyPercent):
+                        _thermal_image.append(thermal_image[thermal_pos[i][j]])
                         _thermal_lab.append(i)
             # Labels
             self.train_color_label = _color_lab
@@ -149,18 +147,18 @@ class SYSUData(data.Dataset):
             self.train_color_image = _color_image
             self.train_thermal_image = _thermal_image
         if split == "validation":
-            # Dans chaque liste d'index d'une identité, on prends les 30% dernières images.
+            # Dans chaque liste d'index d'une identité, on prends les 20% dernières images pour validation.
             for i in range(len(color_pos)):
                 u = len(color_pos[i])
                 for j in range(u):
-                    if j > int(u * SeventPercent):
+                    if j > int(u * heightyPercent):
                         _color_image.append(color_image[color_pos[i][j]])
                         _color_lab.append(i)
             for i in range(len(thermal_pos)):
                 u = len(thermal_pos[i])
                 for j in range(u):
-                    if j > int(u * SeventPercent):
-                        _thermal_image.append(color_image[thermal_pos[i][j]])
+                    if j > int(u * heightyPercent):
+                        _thermal_image.append(thermal_image[thermal_pos[i][j]])
                         _thermal_lab.append(i)
             # Labels
             self.valid_color_label = _color_lab
