@@ -2,6 +2,7 @@ import torch
 import torch.optim as optim
 import torch.utils.data
 import torch.nn as nn
+import argparse
 from torch.autograd import Variable
 import time
 from data_loader import *
@@ -24,6 +25,12 @@ def multi_process() :
     # device = 'cuda' if torch.cuda.is_available() else 'cpu'
     writer = SummaryWriter("runs/Thermal1")
 
+    parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
+    parser.add_argument('--dataset', default='regdb', help='dataset name: regdb or sysu]')
+    parser.add_argument('--train', default='visible', help='train visible or thermal only')
+    parser.add_argument('--board', default='default', help='tensorboard name')
+    args = parser.parse_args()
+
     # Init variables :
     img_w = 144
     img_h = 288
@@ -33,9 +40,25 @@ def multi_process() :
     num_of_same_id_in_batch = 4 # Number of same identity in a batch
     workers = 4
     lr = 0.001
-    nclass = 164
+
+    if args.dataset == "sysu":
+        data_path = '../Datasets/SYSU/'
+
+        if args.train == 'visible':
+            suffix = f'RegDB_person_Visible_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+        elif args.train == "thermal":
+            suffix = f'RegDB_person_Thermal_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+    if args.dataset == "regdb":
+        data_path = '../Datasets/RegDB/'
+        if args.train == 'visible':
+            suffix = f'RegDB_person_Visible_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+        elif args.train == "thermal":
+            suffix = f'RegDB_person_Thermal_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+
     checkpoint_path = '../save_model/'
-    suffix = f'RegDB_person_Thermal({num_of_same_id_in_batch})_same_id({trainV_batch_num_identities})_lr_{lr}'
+
+    suffix_distilled = f'RegDB_person_Thermal_distilled({num_of_same_id_in_batch})_same_id({trainV_batch_num_identities})_lr_{lr}'
+
     # Data info  :
     data_path = '../Datasets/RegDB/'
     #log_path = args.log_path + 'regdb_log/'
@@ -82,10 +105,10 @@ def multi_process() :
     print('==> Loading images..')
 
     #Get Train set and test set
-    trainset = RegDBData(data_path, transform=transform_train, split="training")
+    trainset = RegDBData(data_path, transform=transform_train, split="training", modal="both")
 
     ######################################### VALIDATION SET
-    validset = RegDBData(data_path, transform=transform_train, split="validation")
+    validset = RegDBData(data_path, transform=transform_train, split="validation", modal="both")
     # print(validset.valid_color_label)
 
     loaded_img = len(trainset.train_color_image) + len(validset.valid_color_label) + \
@@ -133,8 +156,10 @@ def multi_process() :
     print('==> Building model..')
 
     ######################################### MODEL
-    suffix_visible = f'RegDB_person_Visible({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
-    model_path = '../save_model/' + suffix_visible + '_best.t'
+
+    model_path = '../save_model/' + suffix + '_best.t'
+
+    nclass = len(np.unique(trainset.train_color_label))
     if os.path.isfile(model_path):
         print('==> loading checkpoint')
         checkpoint = torch.load(model_path)
@@ -330,7 +355,7 @@ def multi_process() :
                     'acc': acc,
                     'epoch': epoch,
                 }
-                torch.save(state, checkpoint_path + suffix + '_best.t')
+                torch.save(state, checkpoint_path + suffix_distilled + '_best.t')
 
             writer.add_scalar('Validation loss (MSE)', valid_loss.avg, epoch)
             writer.add_scalar('Validation accuracy', acc, epoch)
