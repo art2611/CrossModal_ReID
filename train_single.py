@@ -25,11 +25,12 @@ def multi_process() :
     parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
     parser.add_argument('--dataset', default='regdb', help='dataset name: regdb or sysu]')
     parser.add_argument('--train', default='visible', help='train visible or thermal only')
+    parser.add_argument('--board', default='default', help='tensorboard name')
     args = parser.parse_args()
 
     # device = 'cpu'
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    writer = SummaryWriter("runs/NewVisible4")
+    writer = SummaryWriter(f"runs/{args.board}")
 
     # Init variables :
     img_w = 144
