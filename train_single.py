@@ -102,13 +102,14 @@ def multi_process() :
         validset = RegDBData(data_path, transform=transform_train, split="validation", modal =args.train)
         if args.train == "visible":
             print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
-
             train_color_pos, _ = GenIdx(trainset.train_color_label, trainset.train_color_label)
             valid_color_pos, _ = GenIdx(validset.valid_color_label, validset.valid_color_label)
         elif args.train == "thermal" :
             print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
-            trainset = RegDBThermalData(data_path, transform=transform_train, split="training")
-            validset = RegDBThermalData(data_path, transform=transform_train, split="validation")
+            train_thermal_pos, _ = GenIdx(trainset.train_thermal_label, trainset.train_thermal_label)
+            valid_thermal_pos, _ = GenIdx(validset.valid_thermal_label, validset.valid_thermal_label)
+        #     trainset = RegDBThermalData(data_path, transform=transform_train, split="training")
+        #     validset = RegDBThermalData(data_path, transform=transform_train, split="validation")
 
     # print(f'len(trainset.train_color_label) : {len(trainset.train_color_label)}')
     # print(f'len(validset.valid_color_label) : {len(validset.valid_color_label)}')
