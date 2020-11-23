@@ -122,7 +122,7 @@ def multi_process() :
         sys.exit("Saved model not found")
     # Building test set and data loaders
 
-    for trial in range(1, 10):
+    for trial in range(1, 11):
         if args.dataset == "regdb" :
             query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.train, split=True, trial = trial)
         elif args.dataset == "sysu" :
