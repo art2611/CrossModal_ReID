@@ -35,16 +35,17 @@ num_of_same_id_in_batch = 4  # Number of same identity in a batch
 workers = 4
 lr = 0.001
 checkpoint_path = '../save_model/'
-# data_path = '../Datasets/RegDB/'
-# data_path = '../Datasets/SYSU/'
 
 if args.dataset == "sysu":
     nclass = 395
+    data_path = '../Datasets/SYSU/'
+
     if args.train == 'visible':
         suffix = f'RegDB_person_Visible_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
     elif args.train == "thermal":
         suffix = f'RegDB_person_Thermal_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 if args.dataset == "regdb":
+    data_path = '../Datasets/RegDB/'
     nclass = 206
     if args.train == 'visible':
         suffix = f'RegDB_person_Visible_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
