@@ -17,8 +17,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # device = 'cpu'
 
-nclass = 164
-nclass = 395
+
 # net = Network(class_num=nclass).to(device)
 
 parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
@@ -40,11 +39,13 @@ data_path = '../Datasets/RegDB/'
 data_path = '../Datasets/SYSU/'
 
 if args.dataset == "sysu":
+    nclass = 395
     if args.train == 'visible':
         suffix = f'RegDB_person_Visible_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
     elif args.train == "thermal":
         suffix = f'RegDB_person_Thermal_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 if args.dataset == "regdb":
+    nclass = 164
     if args.train == 'visible':
         suffix = f'RegDB_person_Visible_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
     elif args.train == "thermal":
