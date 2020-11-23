@@ -23,15 +23,16 @@ from data_augmentation import data_aug
 def multi_process() :
     device = 'cpu'
     # device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    writer = SummaryWriter("runs/Thermal1")
+
 
     parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
     parser.add_argument('--dataset', default='regdb', help='dataset name: regdb or sysu]')
-    parser.add_argument('--train', default='visible', help='train visible or thermal only')
+    # parser.add_argument('--trained', default='visible', help='train visible or thermal only')
     parser.add_argument('--board', default='default', help='tensorboard name')
     parser.add_argument('--distilled', default='VtoT', help='tensorboard name')
     args = parser.parse_args()
 
+    writer = SummaryWriter(f"runs/{args.board}")
     # Init variables :
     img_w = 144
     img_h = 288
@@ -44,15 +45,15 @@ def multi_process() :
 
     if args.dataset == "sysu":
         data_path = '../Datasets/SYSU/'
-        if args.train == 'visible':
+        if args.distilled == 'VtoT':
             suffix = f'RegDB_person_Visible_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
-        elif args.train == "thermal":
+        elif args.distilled == "TtoV":
             suffix = f'RegDB_person_Thermal_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
     if args.dataset == "regdb":
         data_path = '../Datasets/RegDB/'
-        if args.train == 'visible':
+        if args.distilled == 'VtoT':
             suffix = f'RegDB_person_Visible_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
-        elif args.train == "thermal":
+        elif args.distilled == "TtoV":
             suffix = f'RegDB_person_Thermal_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
     checkpoint_path = '../save_model/'
@@ -159,7 +160,7 @@ def multi_process() :
 
     nclass = len(np.unique(trainset.train_color_label))
     if os.path.isfile(model_path):
-        print(f'==> loading {args.train} checkpoint')
+        print(f'==> loading checkpoint')
         checkpoint = torch.load(model_path)
         net_thermal = Network(class_num=nclass)
         net_thermal.to(device)
