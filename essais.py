@@ -6,9 +6,8 @@ import torch
 
 # t = torch.rand(4, 4)
 
-def aste(test):
-    return(test)
-print(aste("coucou"))
+a = [2,3,4]
+print(a[0:2])
 sys.exit()
 # print(t.size(0))
 # print(t.size(1))
