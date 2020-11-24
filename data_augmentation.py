@@ -7,7 +7,7 @@ def data_aug(visible_images = None, Thermal_images = None, Visible_labels = None
     final_visible_target = []
     final_thermal_data = []
     final_thermal_target = []
-    nbr_of_images_per_image = 2
+    nbr_of_images_per_image = 3
     # print(trainset.train_color_label)
     if visible_images is not None :
         visible_img_number = visible_images.shape[0]
