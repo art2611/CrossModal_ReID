@@ -220,7 +220,7 @@ def multi_process():
 
     for k in range(len(cmc)):
         print(k)
-        writer.add_scalar('cmc curve', cmc[k], k + 1)
+        writer.add_scalar('cmc curve', cmc[k]*100, k + 1)
 
 if __name__ == '__main__':
     freeze_support()
