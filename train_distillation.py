@@ -162,9 +162,10 @@ def multi_process() :
     if os.path.isfile(model_path):
         print(f'==> loading checkpoint')
         checkpoint = torch.load(model_path)
+        # No weight init for thermal
         net_thermal = Network(class_num=nclass)
         net_thermal.to(device)
-        net_thermal.load_state_dict(checkpoint['net'])
+        # net_thermal.load_state_dict(checkpoint['net'])
         net_visible = Network(class_num=nclass)
         net_visible.to(device)
         net_visible.load_state_dict(checkpoint['net'])
@@ -175,15 +176,15 @@ def multi_process() :
     net_visible.train()
     net_thermal.train()
     # Freeze some in thermal model
-
-    if args.distilled == "VtoT" :
-        net_thermal.Resnet_module.res.layer2.requires_grad = False
-        net_thermal.Resnet_module.res.layer3.requires_grad = False
-        net_thermal.Resnet_module.res.layer4.requires_grad = False
-    elif args.distilled == "TtoV" :
-        net_visible.Resnet_module.res.layer2.requires_grad = False
-        net_visible.Resnet_module.res.layer3.requires_grad = False
-        net_visible.Resnet_module.res.layer4.requires_grad = False
+    #And no freeze
+    # if args.distilled == "VtoT" :
+    #     net_thermal.Resnet_module.res.layer2.requires_grad = False
+    #     net_thermal.Resnet_module.res.layer3.requires_grad = False
+    #     net_thermal.Resnet_module.res.layer4.requires_grad = False
+    # elif args.distilled == "TtoV" :
+    #     net_visible.Resnet_module.res.layer2.requires_grad = False
+    #     net_visible.Resnet_module.res.layer3.requires_grad = False
+    #     net_visible.Resnet_module.res.layer4.requires_grad = False
 
     ######################################### TRAINING
     print('==> Start Training...')
