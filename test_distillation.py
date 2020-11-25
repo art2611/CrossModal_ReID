@@ -202,9 +202,9 @@ def multi_process():
         print(
             'POOL:   Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
                 cmc_pool[0], cmc_pool[4], cmc_pool[9], cmc_pool[19], mAP_pool, mINP_pool))
-        cmc_curve = [i for i in range(1, len(cmc) + 1)]
 
-        writer.add_scalar('Training accuracy ', cmc, cmc_curve)
+        for k in range(len(cmc)):
+            writer.add_scalar('Training accuracy ', cmc[k], k+1)
 
     cmc = all_cmc / 10
     mAP = all_mAP / 10
