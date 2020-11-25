@@ -153,13 +153,16 @@ def multi_process():
 
         if True :
             # pool5 feature
-
+            criterion_MSE = nn.MSELoss().to(device)
 
             distance = np.zeros((gall_feat_pool.shape[0], query_feat_pool.shape[0]))
             for i in range(gall_feat_pool.shape[0]):
                 for j in range(query_feat_pool.shape[0]):
                     # print(query_feat_pool[j])
-                    distance[i][j] = np.linalg.norm(gall_feat_pool[i] - query_feat_pool[j])
+                    loss_MSE = criterion_MSE(gall_feat_pool[i], query_feat_pool[j])
+                    # distance[i][j] = np.linalg.norm(gall_feat_pool[i] - query_feat_pool[j])
+                    distance[i][j] = loss_MSE
+
             #distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
             # print(f'ancient distance : {-distmat_pool[0]}')
             # print(f'New distance : {-distance[0]}')
