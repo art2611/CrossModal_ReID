@@ -167,7 +167,7 @@ def multi_process() :
         net_thermal.to(device)
         net_thermal.load_state_dict(checkpoint['net'])
         net_visible = Network(class_num=nclass)
-        net_visible.to(device2)
+        net_visible.to(device)
         net_visible.load_state_dict(checkpoint['net'])
     else:
         print("Saved model not loaded, care")
