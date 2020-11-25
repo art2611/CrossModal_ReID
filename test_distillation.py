@@ -219,7 +219,6 @@ def multi_process():
             cmc_pool[0], cmc_pool[4], cmc_pool[9], cmc_pool[19], mAP_pool, mINP_pool))
 
     for k in range(len(cmc)):
-        print(k)
         writer.add_scalar('cmc curve', cmc[k]*100, k + 1)
 
 if __name__ == '__main__':
