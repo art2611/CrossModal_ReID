@@ -203,10 +203,6 @@ def multi_process():
             'POOL:   Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
                 cmc_pool[0], cmc_pool[4], cmc_pool[9], cmc_pool[19], mAP_pool, mINP_pool))
 
-        for k in range(len(cmc)):
-            print(k)
-            writer.add_scalar('cmc_curve', cmc[k], k+1)
-
     cmc = all_cmc / 10
     mAP = all_mAP / 10
     mINP = all_mINP / 10
@@ -222,6 +218,9 @@ def multi_process():
         'POOL:   Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
             cmc_pool[0], cmc_pool[4], cmc_pool[9], cmc_pool[19], mAP_pool, mINP_pool))
 
+    for k in range(len(cmc)):
+        print(k)
+        writer.add_scalar('cmc curve', cmc[k], k + 1)
 
 if __name__ == '__main__':
     freeze_support()
