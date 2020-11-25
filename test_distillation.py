@@ -12,6 +12,8 @@ import torch.utils.data
 from multiprocessing import freeze_support
 from tensorboardX import SummaryWriter
 import sys
+import torch.nn as nn
+
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # device = 'cpu'
