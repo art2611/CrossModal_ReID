@@ -155,17 +155,17 @@ def multi_process():
             # pool5 feature
 
 
-            # distance = np.zeros((gall_feat_pool.shape[0], query_feat_pool.shape[0]))
-            # for i in range(gall_feat_pool.shape[0]):
-            #     for j in range(query_feat_pool.shape[0]):
-            #         # print(query_feat_pool[j])
-            #         distance[i][j] = np.linalg.norm(gall_feat_pool[i] - query_feat_pool[j])
-            distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
+            distance = np.zeros((gall_feat_pool.shape[0], query_feat_pool.shape[0]))
+            for i in range(gall_feat_pool.shape[0]):
+                for j in range(query_feat_pool.shape[0]):
+                    # print(query_feat_pool[j])
+                    distance[i][j] = np.linalg.norm(gall_feat_pool[i] - query_feat_pool[j])
+            #distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
             # print(f'ancient distance : {-distmat_pool[0]}')
             # print(f'New distance : {-distance[0]}')
             # print(np.argsort(distance, axis=1))
 
-            cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, gall_label, query_label)
+            cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distance, gall_label, query_label)
             # cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distance, gall_label, query_label)
 
             # fc feature
@@ -218,8 +218,8 @@ def multi_process():
         'POOL:   Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
             cmc_pool[0], cmc_pool[4], cmc_pool[9], cmc_pool[19], mAP_pool, mINP_pool))
 
-    for k in range(len(cmc)):
-        writer.add_scalar('cmc curve', cmc[k]*100, k + 1)
+    # for k in range(len(cmc)):
+    #     writer.add_scalar('cmc curve test', cmc[k]*100, k + 1)
 
 if __name__ == '__main__':
     freeze_support()
