@@ -204,7 +204,8 @@ def multi_process():
                 cmc_pool[0], cmc_pool[4], cmc_pool[9], cmc_pool[19], mAP_pool, mINP_pool))
 
         for k in range(len(cmc)):
-            writer.add_scalar('Training accuracy ', cmc[k], k+1)
+            print(k)
+            writer.add_scalar('cmc_curve', cmc[k], k+1)
 
     cmc = all_cmc / 10
     mAP = all_mAP / 10
