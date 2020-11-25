@@ -177,14 +177,14 @@ def multi_process() :
     net_thermal.train()
     # Freeze some in thermal model
 
-    if args.distilled == "VtoT" :
-        net_thermal.Resnet_module.res.layer2.requires_grad = False
-        net_thermal.Resnet_module.res.layer3.requires_grad = False
-        net_thermal.Resnet_module.res.layer4.requires_grad = False
-    elif args.distilled == "TtoV" :
-        net_visible.Resnet_module.res.layer2.requires_grad = False
-        net_visible.Resnet_module.res.layer3.requires_grad = False
-        net_visible.Resnet_module.res.layer4.requires_grad = False
+    # if args.distilled == "VtoT" :
+    #     net_thermal.Resnet_module.res.layer2.requires_grad = False
+    #     net_thermal.Resnet_module.res.layer3.requires_grad = False
+    #     net_thermal.Resnet_module.res.layer4.requires_grad = False
+    # elif args.distilled == "TtoV" :
+    #     net_visible.Resnet_module.res.layer2.requires_grad = False
+    #     net_visible.Resnet_module.res.layer3.requires_grad = False
+    #     net_visible.Resnet_module.res.layer4.requires_grad = False
 
     ######################################### TRAINING
     print('==> Start Training...')
