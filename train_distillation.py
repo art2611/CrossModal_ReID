@@ -19,10 +19,10 @@ from evaluation import eval_regdb
 import sys
 from data_augmentation import data_aug
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 def multi_process() :
-    # device = 'cpu'
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = 'cpu'
+    # device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
     parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
@@ -229,15 +229,15 @@ def multi_process() :
 
         end = time.time()
         for batch_idx, (visible_input, thermal_input, visible_label, thermal_label) in enumerate(trainloader):
-            visible_input = Variable(visible_input.cuda())
-            thermal_input = Variable(thermal_input.cuda())
-            visible_label = Variable(visible_label.cuda())
-            thermal_label = Variable(thermal_label.cuda())
-
-            # visible_input = Variable(visible_input)
-            # thermal_input = Variable(thermal_input)
-            # visible_label = Variable(visible_label)
-            # thermal_label = Variable(thermal_label)
+            # visible_input = Variable(visible_input.cuda())
+            # thermal_input = Variable(thermal_input.cuda())
+            # visible_label = Variable(visible_label.cuda())
+            # thermal_label = Variable(thermal_label.cuda())
+            #
+            visible_input = Variable(visible_input)
+            thermal_input = Variable(thermal_input)
+            visible_label = Variable(visible_label)
+            thermal_label = Variable(thermal_label)
 
             data_time.update(time.time() - end)
 
@@ -335,15 +335,15 @@ def multi_process() :
             total = 0
             with torch.no_grad():
                 for batch_idx, (visible_input, thermal_input, visible_label, thermal_label) in enumerate(validloader):
-                    visible_input = Variable(visible_input.cuda())
-                    thermal_input = Variable(thermal_input.cuda())
-                    visible_label = Variable(visible_label.cuda())
-                    thermal_label = Variable(thermal_label.cuda())
-                    #
-                    # visible_input = Variable(visible_input)
-                    # thermal_input = Variable(thermal_input)
-                    # visible_label = Variable(visible_label)
-                    # thermal_label = Variable(thermal_label)
+                    # visible_input = Variable(visible_input.cuda())
+                    # thermal_input = Variable(thermal_input.cuda())
+                    # visible_label = Variable(visible_label.cuda())
+                    # thermal_label = Variable(thermal_label.cuda())
+
+                    visible_input = Variable(visible_input)
+                    thermal_input = Variable(thermal_input)
+                    visible_label = Variable(visible_label)
+                    thermal_label = Variable(thermal_label)
 
                     feat1, out1, = net_thermal(visible_input)  # Call the visible branch only
                     feat2, out2 = net_thermal(thermal_input)  # Call the visible branch only
