@@ -206,7 +206,7 @@ def multi_process() :
                 'POOL:   Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
                     cmc_pool[0], cmc_pool[4], cmc_pool[9], cmc_pool[19], mAP_pool, mINP_pool))
 
-    if dargs.dataset == 'sysu':
+    if args.dataset == 'sysu':
 
         print('==> Resuming from checkpoint..')
         model_path = checkpoint_path + suffix + '_best.t'
