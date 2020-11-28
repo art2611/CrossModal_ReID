@@ -18,7 +18,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # device = 'cpu'
 
-writer = SummaryWriter(f"runs/cmc_test_visible_sysu")
+writer = SummaryWriter(f"runs/cmc_test_visible_regdb")
 # net = Network(class_num=nclass).to(device)
 
 parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
@@ -256,7 +256,6 @@ def multi_process() :
 
             # fc feature
             distmat = np.matmul(query_feat_fc, np.transpose(gall_feat_fc))
-            distmat = np.matmul(gall_feat_fc, np.transpose(query_feat_fc))
             cmc, mAP, mINP = eval_sysu(-distmat, query_label, gall_label, query_cam, gall_cam)
 
             if trial == 0:
