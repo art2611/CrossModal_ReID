@@ -19,7 +19,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # device = 'cpu'
 nclass = 206
 # net = Network(class_num=nclass).to(device)
-writer = SummaryWriter(f"runs/cmc_test")
+writer = SummaryWriter(f"runs/cmc_test2")
 pool_dim = 2048
 # Init variables :
 img_w = 144
