@@ -256,7 +256,9 @@ def multi_process() :
 
             # fc feature
             distmat = np.matmul(query_feat_fc, np.transpose(gall_feat_fc))
+            distmat = np.matmul(gall_feat_fc, np.transpose(query_feat_fc))
             cmc, mAP, mINP = eval_sysu(-distmat, query_label, gall_label, query_cam, gall_cam)
+
             if trial == 0:
                 all_cmc = cmc
                 all_mAP = mAP
