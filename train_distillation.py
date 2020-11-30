@@ -345,7 +345,7 @@ def multi_process() :
                     visible_label = Variable(visible_label)
                     thermal_label = Variable(thermal_label)
 
-                    feat1, out1, = net_thermal(visible_input)  # Call the visible branch only
+                    feat1, out1, = net_visible(visible_input)  # Call the visible branch only
                     feat2, out2 = net_thermal(thermal_input)  # Call the visible branch only
 
                     loss_MSE = criterion_MSE(out1, out2)
