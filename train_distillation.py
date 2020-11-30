@@ -177,14 +177,14 @@ def multi_process() :
     net_thermal.train()
     # Freeze some in thermal model
 
-    # if args.distilled == "VtoT" :
-    #     net_thermal.Resnet_module.res.layer2.requires_grad = False
-    #     net_thermal.Resnet_module.res.layer3.requires_grad = False
-    #     net_thermal.Resnet_module.res.layer4.requires_grad = False
-    # elif args.distilled == "TtoV" :
-    #     net_visible.Resnet_module.res.layer2.requires_grad = False
-    #     net_visible.Resnet_module.res.layer3.requires_grad = False
-    #     net_visible.Resnet_module.res.layer4.requires_grad = False
+    if args.distilled == "VtoT" :
+        net_thermal.Resnet_module.res.layer2.requires_grad = False
+        net_thermal.Resnet_module.res.layer3.requires_grad = False
+        net_thermal.Resnet_module.res.layer4.requires_grad = False
+    elif args.distilled == "TtoV" :
+        net_visible.Resnet_module.res.layer2.requires_grad = False
+        net_visible.Resnet_module.res.layer3.requires_grad = False
+        net_visible.Resnet_module.res.layer4.requires_grad = False
 
     ######################################### TRAINING
     print('==> Start Training...')
@@ -234,30 +234,24 @@ def multi_process() :
             # visible_label = Variable(visible_label.cuda())
             # thermal_label = Variable(thermal_label.cuda())
             #
+            labels = torch.cat((visible_label, thermal_label), 0)
             visible_input = Variable(visible_input)
             thermal_input = Variable(thermal_input)
             visible_label = Variable(visible_label)
             thermal_label = Variable(thermal_label)
-
+            labels = Variable(labels)
             data_time.update(time.time() - end)
 
-            # feat is the feature vector out of
-            # Out is the last output
-            # with torch.no_grad():
-                # net_visible.train()
-            feat1, out1, = net_visible(visible_input)  # Call the visible branch only
+            feat1, out1, = net_visible(visible_input)  # Call the visible trained net
 
-            feat2, out2, = net_thermal(thermal_input)
-            #
-            # print(f'Visible output shape : {out1.shape}')
-            # print(f'Thermal output shape : {out2.shape}')
+            feat2, out2, = net_thermal(thermal_input) # Call the  net thermal to train net
 
             loss_MSE = criterion_MSE(out1, out2)
 
-            # print(f'Loss : {loss_MSE}')
             if args.distilled == "VtoT" :
                 _, predicted = out2.max(1)
-                correct += (predicted.eq(thermal_label).sum().item())
+                #correct += (predicted.eq(thermal_label).sum().item())
+                correct += (predicted.eq(labels).sum().item())
 
                 optimizer_thermal.zero_grad()
                 loss_MSE.backward()
@@ -265,7 +259,7 @@ def multi_process() :
 
                 # update P
                 train_loss.update(loss_MSE.item(), 2 * visible_input.size(0))
-                total += visible_label.size(0)
+                total += labels.size(0)
             elif args.distilled == "TtoV" :
                 _, predicted = out1.max(1)
                 correct += (predicted.eq(visible_label).sum().item())
@@ -276,6 +270,7 @@ def multi_process() :
 
                 # update P
                 train_loss.update(loss_MSE.item(), 2 * visible_input.size(0))
+                # total += visible_label.size(0)
                 total += visible_label.size(0)
             # measure elapsed time
             batch_time.update(time.time() - end)
@@ -339,7 +334,7 @@ def multi_process() :
                     # thermal_input = Variable(thermal_input.cuda())
                     # visible_label = Variable(visible_label.cuda())
                     # thermal_label = Variable(thermal_label.cuda())
-
+                    labels = torch.cat((visible_label, thermal_label), 0)
                     visible_input = Variable(visible_input)
                     thermal_input = Variable(thermal_input)
                     visible_label = Variable(visible_label)
@@ -350,9 +345,11 @@ def multi_process() :
 
                     loss_MSE = criterion_MSE(out1, out2)
                     _, predicted = out2.max(1)
-                    correct += (predicted.eq(thermal_label).sum().item())
+                    #correct += (predicted.eq(thermal_label).sum().item())
+                    correct += (predicted.eq(labels).sum().item())
 
-                    total += visible_label.size(0)
+                    # total += visible_label.size(0)
+                    total += labels.size(0)
                     acc = 100. * correct / total
 
                     valid_loss.update(loss_MSE.item(), 2 * visible_input.size(0))
