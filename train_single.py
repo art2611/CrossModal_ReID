@@ -18,7 +18,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from evaluation import eval_regdb
 import sys
-from test_single import extract_query_feat, extract_gall_feat
+#from test_single import extract_query_feat, extract_gall_feat
 from datetime import date
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
