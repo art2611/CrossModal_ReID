@@ -103,11 +103,13 @@ def multi_process() :
         trainset = RegDBData(data_path, transform=transform_train, split="training", modal =args.train)
         #validset = RegDBData(data_path, transform=transform_train, split="validation", modal =args.train)
         if args.train == "visible":
-            print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
+            # print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
+            print(f'Loaded images : {len(trainset.train_color_image)}')
             train_color_pos, _ = GenIdx(trainset.train_color_label, trainset.train_color_label)
             # valid_color_pos, _ = GenIdx(validset.valid_color_label, validset.valid_color_label)
         elif args.train == "thermal" :
-            print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
+           # print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
+            print(f'Loaded images : {len(trainset.train_thermal_image)}')
             train_thermal_pos, _ = GenIdx(trainset.train_thermal_label, trainset.train_thermal_label)
             # valid_thermal_pos, _ = GenIdx(validset.valid_thermal_label, validset.valid_thermal_label)
         #     trainset = RegDBThermalData(data_path, transform=transform_train, split="training")
@@ -169,7 +171,7 @@ def multi_process() :
         print('   set     |  Nb ids |  Nb img    ')
         print('  ------------------------------')
         print(f'  train_Visible  | {len(np.unique(trainset.train_color_label)):5d} | {len(trainset.train_color_label):8d}')
-        print(f'  valid_Visible  | {len(np.unique(validset.valid_color_label)):5d} | {len(validset.valid_color_label):8d}')
+        #print(f'  valid_Visible  | {len(np.unique(validset.valid_color_label)):5d} | {len(validset.valid_color_label):8d}')
         print('  ------------------------------')
         print(f'  query    | {len(np.unique(query_label)):5d} | {n_query:8d}')
         print(f'  gallery  | {len(np.unique(gall_label)):5d} | {n_gall:8d}')
@@ -185,8 +187,8 @@ def multi_process() :
         print('  ------------------------------')
         print(
             f'  train_Thermal  | {len(np.unique(trainset.train_thermal_label)):5d} | {len(trainset.train_thermal_label):8d}')
-        print(
-            f'  valid_Thermal  | {len(np.unique(validset.valid_thermal_label)):5d} | {len(validset.valid_thermal_label):8d}')
+        # print(
+        #     f'  valid_Thermal  | {len(np.unique(validset.valid_thermal_label)):5d} | {len(validset.valid_thermal_label):8d}')
         print('  ------------------------------')
         print(f'  query    | {len(np.unique(query_label)):5d} | {n_query:8d}')
         print(f'  gallery  | {len(np.unique(gall_label)):5d} | {n_gall:8d}')
