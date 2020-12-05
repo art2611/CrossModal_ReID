@@ -27,7 +27,7 @@ args = parser.parse_args()
 ### Tensorboard init
 today = date.today()
 d1 = today.strftime("%d")
-writer = SummaryWriter(f"runs/{args.test}_singleReID_test_{args.dataset}_day{d1}_{time.time()}")
+writer = SummaryWriter(f"runs/{args.train}_singleReID_test_{args.dataset}_day{d1}_{time.time()}")
 
 pool_dim = 2048
 # Init variables :
