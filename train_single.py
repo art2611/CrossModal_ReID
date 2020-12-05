@@ -24,6 +24,7 @@ from datetime import date
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 def multi_process() :
+    print("TRAIN SINGLE")
     parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
     parser.add_argument('--dataset', default='regdb', help='dataset name: regdb or sysu]')
     parser.add_argument('--train', default='visible', help='train visible or thermal only')
