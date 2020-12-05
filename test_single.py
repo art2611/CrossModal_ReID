@@ -13,18 +13,21 @@ from torchvision import transforms
 import torch.utils.data
 from multiprocessing import freeze_support
 from tensorboardX import SummaryWriter
+from datetime import date
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # device = 'cpu'
 
-writer = SummaryWriter(f"runs/cmc_test_visible_regdb")
-# net = Network(class_num=nclass).to(device)
-
 parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
 parser.add_argument('--dataset', default='regdb', help='dataset name: regdb or sysu]')
-parser.add_argument('--train', default='visible', help='train visible or thermal only')
+parser.add_argument('--test', default='visible', help='train visible or thermal only')
 args = parser.parse_args()
+
+### Tensorboard init
+today = date.today()
+d1 = today.strftime("%d")
+writer = SummaryWriter(f"runs/{args.test}_singleReID_test_{args.dataset}_day{d1}_{time.time()}")
 
 pool_dim = 2048
 # Init variables :
@@ -124,17 +127,17 @@ def multi_process() :
     # Building test set and data loaders
     if args.dataset == "regdb" :
         for trial in range(1, 11):
-            if args.dataset == "regdb" :
-                query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.train, split=True, trial = trial)
-            elif args.dataset == "sysu" :
-                ir_img, ir_id, vis_img, vis_id = process_test_sysu(data_path)
-                vis_pos, ir_pos  = GenIdx(vis_id, ir_id)
-                if args.train == "visible" :
-                    query_img, query_label, gall_img, gall_label = \
-                    process2_test_sysu(data_path, modal=args.train, vis_img=vis_img, vis_id=vis_id, vis_pos=vis_pos )
-                if args.train == "thermal" :
-                    query_img, query_label, gall_img, gall_label = \
-                    process2_test_sysu(data_path, modal=args.train, ir_img =ir_img , ir_id=ir_id, ir_pos = ir_pos)
+
+            query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.train, trial = trial)
+            # elif args.dataset == "sysu" :
+            #     ir_img, ir_id, vis_img, vis_id = process_test_sysu(data_path)
+            #     vis_pos, ir_pos  = GenIdx(vis_id, ir_id)
+            #     if args.train == "visible" :
+            #         query_img, query_label, gall_img, gall_label = \
+            #         process2_test_sysu(data_path, modal=args.train, vis_img=vis_img, vis_id=vis_id, vis_pos=vis_pos )
+            #     if args.train == "thermal" :
+            #         query_img, query_label, gall_img, gall_label = \
+            #         process2_test_sysu(data_path, modal=args.train, ir_img =ir_img , ir_id=ir_id, ir_pos = ir_pos)
 
             gallset = TestData(gall_img, gall_label, transform=transform_test, img_size=(img_w, img_h))
             gall_loader = torch.utils.data.DataLoader(gallset, batch_size=test_batch_size, shuffle=False, num_workers=workers)

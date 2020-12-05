@@ -8,8 +8,76 @@ import math
 from torchvision import transforms
 import matplotlib.pyplot as plt
 
-
 class RegDBData(data.Dataset):
+    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, modal = "both", split="training" ):
+        # Load training images (path) and labels
+        data_dir = '../Datasets/RegDB/'
+        train_color_list = data_dir + 'idx/train_visible_1.txt'
+        train_thermal_list = data_dir + 'idx/train_thermal_1.txt'
+        #Load color and thermal images + labels
+        color_img_file, color_target = load_data(train_color_list)
+        thermal_img_file, thermal_target= load_data(train_thermal_list)
+        color_image = []
+        color_lab = []
+        thermal_image = []
+        thermal_lab = []
+        #Get real and thermal images with good shape in a list
+
+        for i in range(len(color_img_file)):
+            #Visible
+            img = Image.open(data_dir + color_img_file[i])
+            img = img.resize((144, 288), Image.ANTIALIAS)
+            pix_array = np.array(img)
+            color_image.append(pix_array)
+            color_lab.append(color_target[i])
+            #Thermal
+            img = Image.open(data_dir + thermal_img_file[i])
+            img = img.resize((144, 288), Image.ANTIALIAS)
+            pix_array = np.array(img)
+            thermal_image.append(pix_array)
+            thermal_lab.append(thermal_target[i])
+
+        color_image = np.array(color_image)
+        thermal_image = np.array(thermal_image)
+        # Init color images / labels
+        self.train_color_image = color_image
+        self.train_color_label = color_lab
+
+        # Init themal images / labels
+        self.train_thermal_image = thermal_image
+        self.train_thermal_label = thermal_lab
+
+        self.transform = transform
+        # Prepare index
+        self.cIndex = colorIndex
+        self.tIndex = thermalIndex
+
+        self.modal = modal
+
+    def __getitem__(self, index):
+        #Dataset[i] return images from both modal and the corresponding label
+        if self.modal == "both" or self.modal == "visible" :
+            img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
+        if self.modal == "both" or self.modal == "thermal":
+            img2, target2 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
+
+        if self.modal == "both" :
+            img1 = self.transform(img1)
+            img2 = self.transform(img2)
+            return img1, img2, target1, target2
+        elif self.modal == "visible" :
+            img1 = self.transform(img1)
+            return img1, target1
+        elif self.modal == "thermal" :
+            img2 = self.transform(img2)
+            return img2, target2
+
+    def __len__(self):
+        if self.modal == "thermal" :
+            return len(self.train_thermal_label)
+        return len(self.train_color_label)
+
+class RegDBData_split(data.Dataset):
     def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, modal = "both", split="training" ):
         # Load training images (path) and labels
         data_dir = '../Datasets/RegDB/'
@@ -296,7 +364,7 @@ def GenIdx(train_color_label, train_thermal_label):
 
     return color_pos, thermal_pos
 
-def process_test_regdb(img_dir, modal='visible', trial = 1, split = False):
+def process_test_regdb(img_dir, modal='visible', trial = 1):
 
     input_visible_data_path = img_dir + f'idx/test_visible_{trial}.txt'
     input_thermal_data_path = img_dir + f'idx/test_thermal_{trial}.txt'
@@ -327,15 +395,15 @@ def process_test_regdb(img_dir, modal='visible', trial = 1, split = False):
         #On regarde pour chaque id
         for k in range(len(np.unique(file_label))):
             appeared=[]
-            # On choisit deux personnes en query aléatoirement, le reste est placé dans la gallery
-            for i in range(2):
+            # On choisit deux personnes en query aléatoirement, le reste est placé dans la gallery (5 images)
+            for i in range(5):
                 rand = random.choice(file_image[k*10:k*10+9])
                 while rand in appeared:
                     rand = random.choice(file_image[k*10:k*10+9])
                 appeared.append(rand)
                 first_image_slice.append(rand)
                 first_label_slice.append(file_label[k*10])
-            #On regarde la liste d'images de l'id k, on récupère les images n'étant pas dans query
+            #On regarde la liste d'images de l'id k, on récupère les images n'étant pas dans query (5 images)
             for i in file_image[k*10:k*10+9] :
                 if i not in appeared :
                     sec_image_slice.append(file_image[k])

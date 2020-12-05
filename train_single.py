@@ -18,6 +18,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from evaluation import eval_regdb
 import sys
+from test_single import extract_query_feat, extract_gall_feat
+from datetime import date
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
@@ -25,12 +27,15 @@ def multi_process() :
     parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
     parser.add_argument('--dataset', default='regdb', help='dataset name: regdb or sysu]')
     parser.add_argument('--train', default='visible', help='train visible or thermal only')
-    parser.add_argument('--board', default='default', help='tensorboard name')
     args = parser.parse_args()
 
     # device = 'cpu'
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    writer = SummaryWriter(f"runs/{args.board}")
+
+    ### Tensorboard init
+    today = date.today()
+    d1 = today.strftime("%d")
+    writer = SummaryWriter(f"runs/{args.train}_singleReID_train_{args.dataset}_day{d1}_{time.time()}")
 
     # Init variables :
     img_w = 144
@@ -42,16 +47,9 @@ def multi_process() :
     workers = 4
     lr = 0.001
     checkpoint_path = '../save_model/'
-    if args.dataset == "sysu" :
-        if args.train == 'visible' :
-            suffix = f'RegDB_person_Visible_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
-        elif args.train == "thermal" :
-            suffix = f'RegDB_person_Thermal_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
-    if args.dataset == "regdb" :
-        if args.train == 'visible' :
-            suffix = f'RegDB_person_Visible_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
-        elif args.train == "thermal" :
-            suffix = f'RegDB_person_Thermal_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+
+    suffix = f'{args.dataset}_person_{args.train}_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+
     # Data info  :
     data_path = '../Datasets/RegDB/'
     #log_path = args.log_path + 'regdb_log/'
@@ -100,29 +98,37 @@ def multi_process() :
             valid_thermal_pos, _ = GenIdx(validset.valid_thermal_label, validset.valid_thermal_label)
 
     if args.dataset == "regdb" :
+        #Split args has no longer influence there
         trainset = RegDBData(data_path, transform=transform_train, split="training", modal =args.train)
-        validset = RegDBData(data_path, transform=transform_train, split="validation", modal =args.train)
+        #validset = RegDBData(data_path, transform=transform_train, split="validation", modal =args.train)
         if args.train == "visible":
             print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
             train_color_pos, _ = GenIdx(trainset.train_color_label, trainset.train_color_label)
-            valid_color_pos, _ = GenIdx(validset.valid_color_label, validset.valid_color_label)
+            # valid_color_pos, _ = GenIdx(validset.valid_color_label, validset.valid_color_label)
         elif args.train == "thermal" :
             print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
             train_thermal_pos, _ = GenIdx(trainset.train_thermal_label, trainset.train_thermal_label)
-            valid_thermal_pos, _ = GenIdx(validset.valid_thermal_label, validset.valid_thermal_label)
+            # valid_thermal_pos, _ = GenIdx(validset.valid_thermal_label, validset.valid_thermal_label)
         #     trainset = RegDBThermalData(data_path, transform=transform_train, split="training")
         #     validset = RegDBThermalData(data_path, transform=transform_train, split="validation")
+        query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.train, trial=1)
 
     # print(f'len(trainset.train_color_label) : {len(trainset.train_color_label)}')
     # print(f'len(validset.valid_color_label) : {len(validset.valid_color_label)}')
+    # Gallery of thermal images - Queryset = Gallery of visible query
 
+    gallset = TestData(gall_img, gall_label, transform=transform_test, img_size=( img_w, img_h))
+    queryset = TestData(query_img, query_label, transform=transform_test, img_size=( img_w, img_h))
+    # Test data loader
+    gall_loader = torch.utils.data.DataLoader(gallset, batch_size= test_batch_size, shuffle=False, num_workers= workers)
+    query_loader = torch.utils.data.DataLoader(queryset, batch_size= test_batch_size, shuffle=False, num_workers= workers)
     print(' ')
     ######################################### Image GENERATION
+    # No longer image generation, keep it just in case
 
-    print('==> Image generation..')
     # if args.dataset == 'regdb' :
-
     if False :
+        # print('==> Image generation..')
         if args.train == "visible" :
             trainset.train_color_image, trainset.train_color_label, _, _ =\
                 data_aug(visible_images = trainset.train_color_image, Visible_labels = trainset.train_color_label)
@@ -151,6 +157,9 @@ def multi_process() :
     ######################################### DATASET PROPERTIES
     # print(len(valid_color_pos[0]))
     # print(len(train_color_pos[0]))
+
+    n_query = len(query_label)
+    n_gall = len(gall_label)
     if args.train == "visible":
 
         print(f'Identities number : {len(train_color_pos)}')
@@ -161,7 +170,11 @@ def multi_process() :
         print(f'  train_Visible  | {len(np.unique(trainset.train_color_label)):5d} | {len(trainset.train_color_label):8d}')
         print(f'  valid_Visible  | {len(np.unique(validset.valid_color_label)):5d} | {len(validset.valid_color_label):8d}')
         print('  ------------------------------')
+        print(f'  query    | {len(np.unique(query_label)):5d} | {n_query:8d}')
+        print(f'  gallery  | {len(np.unique(gall_label)):5d} | {n_gall:8d}')
+        print('  ------------------------------')
         class_number = len(np.unique(trainset.train_color_label))
+
     elif args.train == "thermal":
 
         print(f'Identities number : {len(train_thermal_pos)}')
@@ -173,6 +186,10 @@ def multi_process() :
             f'  train_Thermal  | {len(np.unique(trainset.train_thermal_label)):5d} | {len(trainset.train_thermal_label):8d}')
         print(
             f'  valid_Thermal  | {len(np.unique(validset.valid_thermal_label)):5d} | {len(validset.valid_thermal_label):8d}')
+        print('  ------------------------------')
+        print(f'  query    | {len(np.unique(query_label)):5d} | {n_query:8d}')
+        print(f'  gallery  | {len(np.unique(gall_label)):5d} | {n_gall:8d}')
+        print('  ------------------------------')
         class_number = len(np.unique(trainset.train_thermal_label))
 
     print(f'Data Loading Time:\t {time.time() - Timer1:.3f}')
@@ -255,12 +272,38 @@ def multi_process() :
                       f'TLoss: {tri_loss.val:.4f} ({tri_loss.avg:.4f}) '
                       f'Accu: {100. * correct / total:.2f}')
             # For all batch, write in tensorBoard
-        writer.add_scalar('Train_total_loss', train_loss.avg, epoch)
-        writer.add_scalar('Train_id_loss', id_loss.avg, epoch)
-        writer.add_scalar('Train_tri_loss', tri_loss.avg, epoch)
+        # writer.add_scalar('Train_total_loss', train_loss.avg, epoch)
+        # writer.add_scalar('Train_id_loss', id_loss.avg, epoch)
+        # writer.add_scalar('Train_tri_loss', tri_loss.avg, epoch)
         # writer.add_scalar('lr', current_lr, epoch)
         writer.add_scalar('Training accuracy', 100. * correct / total, epoch)
 
+
+    def test(epoch):
+
+        end = time.time()
+        #Get all normalized distance
+        query_feat_pool, query_feat_fc = extract_query_feat(query_loader, nquery=n_query, net=net)
+        gall_feat_pool, gall_feat_fc = extract_gall_feat(gall_loader, ngall=n_gall, net=net)
+        print(f"Feature extraction time : {time.time() - end}")
+        start = time.time()
+        # compute the similarity
+        distmat_pool = np.matmul(query_feat_pool, np.transpose(gall_feat_pool))
+        distmat_fc = np.matmul(query_feat_fc, np.transpose(gall_feat_fc))
+
+        # evaluation
+        if args.dataset == 'regdb':
+            cmc, mAP, mINP      = eval_regdb(-distmat_pool, query_label, gall_label)
+            cmc_att, mAP_att, mINP_att  = eval_regdb(-distmat_fc, query_label, gall_label)
+
+        # elif args.dataset == 'sysu':
+        #     cmc, mAP, mINP = eval_sysu(-distmat_pool, query_label, gall_label, query_cam, gall_cam)
+        #     cmc_att, mAP_att, mINP_att = eval_sysu(-distmat_fc, query_label, gall_label, query_cam, gall_cam)
+
+        print('Evaluation Time:\t {:.3f}'.format(time.time() - start))
+        writer.add_scalar('Accuracy validation', mAP, epoch)
+
+        return cmc, mAP, mINP, cmc_att, mAP_att, mINP_att
     ######################################### TRAINING
     # start_epoch = 0
     loader_batch = batch_num_identities * num_of_same_id_in_batch
@@ -295,8 +338,45 @@ def multi_process() :
         # training
         training(epoch)
 
-        ######################################### VALIDATION
-        if epoch > 0 and epoch % 2 == 0:
+        if epoch > 0 and epoch % 2 == 0  :
+            print(f'Test Epoch: {epoch}')
+
+            # testing
+            cmc, mAP, mINP, cmc_att, mAP_att, mINP_att = test(epoch)
+            # save model
+            if cmc_att[0] > best_acc:  # not the real best for sysu-mm01
+                best_acc = cmc_att[0]
+                best_epoch = epoch
+                state = {
+                    'net': net.state_dict(),
+                    'cmc': cmc_att,
+                    'mAP': mAP_att,
+                    'mINP': mINP_att,
+                    'epoch': epoch,
+                }
+                torch.save(state, checkpoint_path + suffix + '_best.t')
+
+            # save model
+            if epoch > 10 and epoch % 20 == 0:
+                state = {
+                    'net': net.state_dict(),
+                    'cmc': cmc,
+                    'mAP': mAP,
+                    'epoch': epoch,
+                }
+                torch.save(state, checkpoint_path + suffix + '_epoch_{}.t'.format(epoch))
+
+            print(
+                'POOL:   Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
+                    cmc[0], cmc[4], cmc[9], cmc[19], mAP, mINP))
+            print(
+                'FC:   Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
+                    cmc_att[0], cmc_att[4], cmc_att[9], cmc_att[19], mAP_att, mINP_att))
+            print('Best Epoch [{}]'.format(best_epoch))
+
+        ######################################### ANCIENT VALIDATION
+        #if epoch > 0 and epoch % 2 == 0:
+        if False :
             valid_loss = AverageMeter()
             valid_id_loss = AverageMeter()
             valid_tri_loss = AverageMeter()

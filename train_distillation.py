@@ -234,24 +234,23 @@ def multi_process() :
             # visible_label = Variable(visible_label.cuda())
             # thermal_label = Variable(thermal_label.cuda())
             #
-            labels = torch.cat((visible_label, thermal_label), 0)
+            # labels = torch.cat((visible_label, thermal_label), 0)
             visible_input = Variable(visible_input)
             thermal_input = Variable(thermal_input)
             visible_label = Variable(visible_label)
             thermal_label = Variable(thermal_label)
-            labels = Variable(labels)
+            # labels = Variable(labels)
             data_time.update(time.time() - end)
 
             feat1, out1, = net_visible(visible_input)  # Call the visible trained net
-
-            feat2, out2, = net_thermal(thermal_input) # Call the  net thermal to train net
+            feat2, out2, = net_thermal(thermal_input)  # Call the  net thermal to train net
 
             loss_MSE = criterion_MSE(out1, out2)
 
             if args.distilled == "VtoT" :
                 _, predicted = out2.max(1)
-                #correct += (predicted.eq(thermal_label).sum().item())
-                correct += (predicted.eq(labels).sum().item())
+                correct += (predicted.eq(thermal_label).sum().item())
+                # correct += (predicted.eq(labels).sum().item())
 
                 optimizer_thermal.zero_grad()
                 loss_MSE.backward()
@@ -259,7 +258,7 @@ def multi_process() :
 
                 # update P
                 train_loss.update(loss_MSE.item(), 2 * visible_input.size(0))
-                total += labels.size(0)
+                total += thermal_label.size(0)
             elif args.distilled == "TtoV" :
                 _, predicted = out1.max(1)
                 correct += (predicted.eq(visible_label).sum().item())
