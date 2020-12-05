@@ -21,7 +21,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
 parser.add_argument('--dataset', default='regdb', help='dataset name: regdb or sysu]')
-parser.add_argument('--test', default='visible', help='train visible or thermal only')
+parser.add_argument('--train', default='visible', help='train visible or thermal only')
 args = parser.parse_args()
 
 ### Tensorboard init
