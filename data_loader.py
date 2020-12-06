@@ -457,7 +457,7 @@ def process_test_regdb(img_dir, modal='visible', trial = 1):
             # print(file_image[k * 10:k * 10 + 10])
             for i in file_image[k*10:k*10+10] :
                 if i not in appeared :
-                    sec_image_slice.append(file_image[k])
+                    sec_image_slice.append(i)
                     sec_label_slice.append(file_label[k*10])
         return(first_image_slice, np.array(first_label_slice), sec_image_slice, np.array(sec_label_slice))
     #Ancienne version, on verra comment on fait ici

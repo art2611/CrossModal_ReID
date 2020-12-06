@@ -301,7 +301,7 @@ def multi_process() :
 
         # evaluation
         if args.dataset == 'regdb':
-            cmc, mAP, mINP      = eval_regdb(-distmat_pool, query_label, gall_label)
+            cmc, mAP, mINP = eval_regdb(-distmat_pool, query_label, gall_label)
             cmc_att, mAP_att, mINP_att  = eval_regdb(-distmat_fc, query_label, gall_label)
 
         # elif args.dataset == 'sysu':
