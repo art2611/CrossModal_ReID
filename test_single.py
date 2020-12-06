@@ -41,7 +41,7 @@ lr = 0.001
 checkpoint_path = '../save_model/'
 
 if args.dataset == "sysu":
-    nclass = 395
+    nclass = 296
     data_path = '../Datasets/SYSU/'
 
 if args.dataset == "regdb":
