@@ -442,7 +442,7 @@ def process_test_regdb(img_dir, modal='visible', trial = 1):
         sec_image_slice = []
         sec_label_slice = []
         #On regarde pour chaque id
-        print(f"number of ids : {len(np.unique(file_label))}")
+
         for k in range(len(np.unique(file_label))):
             appeared=[]
             # On choisit cinq personnes en query aléatoirement, le reste est placé dans la gallery (5 images)
@@ -453,10 +453,11 @@ def process_test_regdb(img_dir, modal='visible', trial = 1):
                 appeared.append(rand)
                 first_image_slice.append(rand)
                 first_label_slice.append(file_label[k*10])
-            print(appeared)
+            print(len(appeared))
             #On regarde la liste d'images de l'id k, on récupère les images n'étant pas dans query (5 images)
             for i in file_image[k*10:k*10+9] :
                 if i not in appeared :
+                    print("NOT APPEARED")
                     sec_image_slice.append(file_image[k])
                     sec_label_slice.append(file_label[k])
         return(first_image_slice, np.array(first_label_slice), sec_image_slice, np.array(sec_label_slice))
