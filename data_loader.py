@@ -452,17 +452,13 @@ def process_test_regdb(img_dir, modal='visible', trial = 1):
                 appeared.append(rand)
                 first_image_slice.append(rand)
                 first_label_slice.append(file_label[k*10])
-            print(len(np.unique(appeared)))
             #On regarde la liste d'images de l'id k, on récupère les images n'étant pas dans query (5 images)
             # print(len(file_image[k * 10:k * 10 + 10]))
             # print(file_image[k * 10:k * 10 + 10])
             for i in file_image[k*10:k*10+10] :
-                print(i)
                 if i not in appeared :
-                    print("NOT APPEARED")
                     sec_image_slice.append(file_image[k])
                     sec_label_slice.append(file_label[k*10])
-            print(len(sec_image_slice))
         return(first_image_slice, np.array(first_label_slice), sec_image_slice, np.array(sec_label_slice))
     #Ancienne version, on verra comment on fait ici
     elif modal == "VtoT" :
