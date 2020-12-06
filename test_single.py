@@ -225,8 +225,9 @@ def multi_process() :
             net = Network(class_num = nclass).to(device)
 
         # testing set
-        query_img, query_label, query_cam = process_query_sysu(data_path, mode="all")
-        gall_img, gall_label, gall_cam = process_gallery_sysu(data_path, mode="all", trial=0)
+        query_img, query_label, query_cam, gall_img, gall_label, gall_cam =\
+            process_test_single_sysu(data_path, "test", trial=0, mode='all', relabel=False, reid=args.train)
+
 
         nquery = len(query_label)
         ngall = len(gall_label)

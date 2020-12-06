@@ -100,8 +100,9 @@ def multi_process() :
             # print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
             # valid_thermal_pos, _ = GenIdx(validset.valid_thermal_label, validset.valid_thermal_label)
         # testing set
-        query_img, query_label, query_cam = process_query_sysu(data_path, "valid", mode="all", trial=0, reid=args.reid)
-        gall_img, gall_label, gall_cam = process_gallery_sysu(data_path, "valid", mode="all", trial=0, reid=args.reid)
+        query_img, query_label, query_cam, gall_img, gall_label, gall_cam = \
+            process_test_single_sysu(data_path, "valid", trial=0, mode='all', relabel=False, reid=args.train)
+
     if args.dataset == "regdb" :
         data_path = '../Datasets/RegDB/'
         #Split args has no longer influence there

@@ -7,8 +7,8 @@ import torch
 # t = torch.rand(4, 4)
 
 a = [2,3,4]
-for i in a :
-    print(i)
+if 6 in a :
+    print("TRUE")
 sys.exit()
 # print(t.size(0))
 # print(t.size(1))
