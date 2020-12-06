@@ -16,7 +16,7 @@ from multiprocessing import freeze_support
 from data_augmentation import data_aug
 import numpy as np
 import matplotlib.pyplot as plt
-from evaluation import eval_regdb
+from evaluation import eval_regdb, eval_sysu
 import sys
 from test_single import extract_query_feat, extract_gall_feat
 from datetime import date
@@ -305,9 +305,9 @@ def multi_process() :
             cmc, mAP, mINP = eval_regdb(-distmat_pool, query_label, gall_label)
             cmc_att, mAP_att, mINP_att  = eval_regdb(-distmat_fc, query_label, gall_label)
 
-        # elif args.dataset == 'sysu':
-        #     cmc, mAP, mINP = eval_sysu(-distmat_pool, query_label, gall_label, query_cam, gall_cam)
-        #     cmc_att, mAP_att, mINP_att = eval_sysu(-distmat_fc, query_label, gall_label, query_cam, gall_cam)
+        elif args.dataset == 'sysu':
+            cmc, mAP, mINP = eval_sysu(-distmat_pool, query_label, gall_label, query_cam, gall_cam)
+            cmc_att, mAP_att, mINP_att = eval_sysu(-distmat_fc, query_label, gall_label, query_cam, gall_cam)
 
         print('Evaluation Time:\t {:.3f}'.format(time.time() - start))
         writer.add_scalar('Accuracy validation', mAP, epoch)
