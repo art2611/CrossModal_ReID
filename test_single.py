@@ -110,12 +110,13 @@ def multi_process() :
     # model_path = checkpoint_path + 'regdb_awg_p4_n8_lr_0.1_seed_0_trial_{}_best.t'.format(test_trial)
     if os.path.isfile(model_path):
 
-        print(f'==> Loading {args.train} checkpoint..')
+        print(f'==> Loading {args.train} checkpoint on {args.dataset} dataset..')
 
         checkpoint = torch.load(model_path)
         net = Network(class_num=nclass)
         net.to(device)
         net.load_state_dict(checkpoint['net'])
+        print("Model_loaded")
     else :
         sys.exit("Saved model not found")
     # Building test set and data loaders
@@ -240,8 +241,9 @@ def multi_process() :
         query_feat_pool, query_feat_fc = extract_query_feat(query_loader,nquery = nquery, net = net)
 
         for trial in range(10):
-
-            gall_img, gall_label, gall_cam = process_gallery_sysu(data_path, mode="all",  trial=trial)
+            # testing set
+            query_img, query_label, query_cam, gall_img, gall_label, gall_cam = \
+                process_test_single_sysu(data_path, "test", trial=trial, mode='all', relabel=False, reid=args.train)
 
             trial_gallset = TestData(gall_img, gall_label, transform=transform_test, img_size=(img_w, img_h))
             trial_gall_loader = data.DataLoader(trial_gallset, batch_size=test_batch_size, shuffle=False, num_workers=4)
