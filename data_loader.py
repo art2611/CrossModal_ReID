@@ -77,6 +77,55 @@ class RegDBData(data.Dataset):
             return len(self.train_thermal_label)
         return len(self.train_color_label)
 
+class SYSUData(data.Dataset):
+    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex = None, split="training", modal ="visible"):
+        data_dir = '../Datasets/SYSU/'
+        # Load training images (path) and labels
+        # 395 ids sont loadées sur les 491
+        color_image = np.load(data_dir + 'train_rgb_resized_img.npy')
+        color_label = np.load(data_dir + 'train_rgb_resized_label.npy')
+
+        thermal_image = np.load(data_dir + 'train_ir_resized_img.npy')
+        thermal_label = np.load(data_dir + 'train_ir_resized_label.npy')
+
+        # Labels
+        self.train_color_label = color_label
+        self.train_thermal_label = thermal_label
+        # BGR to RGB
+        self.train_color_image = color_image
+        self.train_thermal_image = thermal_image
+
+        self.transform = transform
+
+        self.cIndex = colorIndex
+        self.tIndex = thermalIndex
+
+        self.modal = modal
+
+    def __getitem__(self, index):
+        # Dataset[i] return images from both modal and the corresponding label
+        if self.modal == "both" or self.modal == "visible":
+            img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
+        elif self.modal == "both" or self.modal == "thermal":
+            img2, target2 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
+
+        if self.modal == "both":
+            img1 = self.transform(img1)
+            img2 = self.transform(img2)
+            return img1, img2, target1, target2
+        elif self.modal == "visible":
+            img1 = self.transform(img1)
+            return img1, target1
+        elif self.modal == "thermal":
+            img2 = self.transform(img2)
+            return img2, target2
+
+    def __len__(self):
+        if self.modal == "thermal":
+            return len(self.train_thermal_label)
+        return len(self.train_color_label)
+
+#The two next class were used with custom train and data split
 class RegDBData_split(data.Dataset):
     def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, modal = "both", split="training" ):
         # Load training images (path) and labels
@@ -177,7 +226,7 @@ class RegDBData_split(data.Dataset):
             return len(self.train_thermal_label)
         return len(self.train_color_label)
 
-class SYSUData(data.Dataset):
+class SYSUData_split(data.Dataset):
     def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex = None, split="training", modal ="visible"):
         data_dir = '../Datasets/SYSU/'
         # Load training images (path) and labels
@@ -587,13 +636,23 @@ class TestData(data.Dataset):
 # gall_img, gall_label = process_test_regdb(data_path, trial=args.trial, modal='thermal')
 
 
-def process_query_sysu(data_path, mode='all', relabel=False):
+def process_query_sysu(data_path, method, trial=0, mode='all', relabel=False, reid="VtoT"):
+    random.seed(trial)
+    print("query")
     if mode == 'all':
+        rgb_cameras = ['cam1', 'cam2', 'cam4', 'cam5']
         ir_cameras = ['cam3', 'cam6']
     elif mode == 'indoor':
+        rgb_cameras = ['cam1', 'cam2']
         ir_cameras = ['cam3', 'cam6']
 
-    file_path = os.path.join(data_path, 'exp/test_id.txt')
+    if method == "test":
+        print("Test set called")
+        file_path = os.path.join(data_path, 'exp/test_id.txt')
+    elif method == "valid":
+        print("Validation set called")
+        file_path = os.path.join(data_path, 'exp/val_id.txt')
+
     files_rgb = []
     files_ir = []
 
@@ -603,32 +662,52 @@ def process_query_sysu(data_path, mode='all', relabel=False):
         ids = ["%04d" % x for x in ids]
 
     for id in sorted(ids):
+        for cam in rgb_cameras:
+            img_dir = os.path.join(data_path, cam, id)
+            if os.path.isdir(img_dir):
+                new_files = sorted([img_dir + '/' + i for i in os.listdir(img_dir)])
+                files_rgb.extend(new_files)
         for cam in ir_cameras:
             img_dir = os.path.join(data_path, cam, id)
             if os.path.isdir(img_dir):
                 new_files = sorted([img_dir + '/' + i for i in os.listdir(img_dir)])
                 files_ir.extend(new_files)
+
     query_img = []
     query_id = []
     query_cam = []
-    for img_path in files_ir:
+    if reid=="VtoT" :
+        files = files_rgb
+    elif reid=="TtoV" :
+        files = files_ir
+    for img_path in files:
         camid, pid = int(img_path[-15]), int(img_path[-13:-9])
         query_img.append(img_path)
         query_id.append(pid)
         query_cam.append(camid)
+    #print(query_img)
     return query_img, np.array(query_id), np.array(query_cam)
 
 
-def process_gallery_sysu(data_path, mode='all', trial=0, relabel=False):
+def process_gallery_sysu(data_path, method, mode='all', trial=0, relabel=False, reid="VtoT"):
     random.seed(trial)
 
     if mode == 'all':
         rgb_cameras = ['cam1', 'cam2', 'cam4', 'cam5']
+        ir_cameras = ['cam3', 'cam6']
     elif mode == 'indoor':
         rgb_cameras = ['cam1', 'cam2']
+        ir_cameras = ['cam3', 'cam6']
 
-    file_path = os.path.join(data_path, 'exp/test_id.txt')
+    if method == "test":
+        print("Test set called")
+        file_path = os.path.join(data_path, 'exp/test_id.txt')
+    elif method == "valid":
+        print("Validation set called")
+        file_path = os.path.join(data_path, 'exp/val_id.txt')
+
     files_rgb = []
+    files_ir = []
     with open(file_path, 'r') as file:
         ids = file.read().splitlines()
         ids = [int(y) for y in ids[0].split(',')]
@@ -640,12 +719,24 @@ def process_gallery_sysu(data_path, mode='all', trial=0, relabel=False):
             if os.path.isdir(img_dir):
                 new_files = sorted([img_dir + '/' + i for i in os.listdir(img_dir)])
                 files_rgb.append(random.choice(new_files))
+            # else :
+            #     print(f'this dir does not exist : {img_dir}')
+        for cam in ir_cameras:
+            img_dir = os.path.join(data_path, cam, id)
+            if os.path.isdir(img_dir):
+                new_files = sorted([img_dir + '/' + i for i in os.listdir(img_dir)])
+                files_ir.append(random.choice(new_files))
     gall_img = []
     gall_id = []
     gall_cam = []
-    for img_path in files_rgb:
+    if reid=="VtoT" :
+        files = files_ir
+    elif reid=="TtoV" :
+        files = files_rgb
+    for img_path in files:
         camid, pid = int(img_path[-15]), int(img_path[-13:-9])
         gall_img.append(img_path)
         gall_id.append(pid)
         gall_cam.append(camid)
+
     return gall_img, np.array(gall_id), np.array(gall_cam)

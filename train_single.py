@@ -24,12 +24,12 @@ from datetime import date
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 def multi_process() :
-    print("TRAIN SINGLE")
+
     parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
     parser.add_argument('--dataset', default='regdb', help='dataset name: regdb or sysu]')
     parser.add_argument('--train', default='visible', help='train visible or thermal only')
     args = parser.parse_args()
-
+    print(f"Starting train_single.py, {args.train} training on {args.dataset} dataset")
     # device = 'cpu'
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -51,8 +51,7 @@ def multi_process() :
 
     suffix = f'{args.dataset}_person_{args.train}_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
-    # Data info  :
-    data_path = '../Datasets/RegDB/'
+
     #log_path = args.log_path + 'regdb_log/'
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     transform_train = transforms.Compose([
@@ -87,18 +86,24 @@ def multi_process() :
     # args.dataset = "sysu"
     # args.train = "thermal"
     if args.dataset == 'sysu':
+        # Data info  :
+        data_path = '../Datasets/SYSU/'
         trainset = SYSUData(data_path, transform=transform_train, split ="training", modal=args.train)
-        validset = SYSUData(data_path, transform=transform_train, split ="validation", modal=args.train)
+        #validset = SYSUData_split(data_path, transform=transform_train, split ="validation", modal=args.train)
         if args.train == "visible":
-            print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
+            print(f'Loaded images : {len(trainset.train_color_image)}')
             train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
-            valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
+            # valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
         elif args.train == "thermal" :
-            print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
+            print(f'Loaded images : {len(trainset.train_thermal_image)}')
             train_thermal_pos, _ = GenIdx(trainset.train_thermal_label, trainset.train_thermal_label)
-            valid_thermal_pos, _ = GenIdx(validset.valid_thermal_label, validset.valid_thermal_label)
-
+            # print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
+            # valid_thermal_pos, _ = GenIdx(validset.valid_thermal_label, validset.valid_thermal_label)
+        # testing set
+        query_img, query_label, query_cam = process_query_sysu(data_path, "valid", mode="all", trial=0, reid=args.reid)
+        gall_img, gall_label, gall_cam = process_gallery_sysu(data_path, "valid", mode="all", trial=0, reid=args.reid)
     if args.dataset == "regdb" :
+        data_path = '../Datasets/RegDB/'
         #Split args has no longer influence there
         trainset = RegDBData(data_path, transform=transform_train, split="training", modal =args.train)
         #validset = RegDBData(data_path, transform=transform_train, split="validation", modal =args.train)
