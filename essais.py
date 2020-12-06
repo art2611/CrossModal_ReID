@@ -7,7 +7,8 @@ import torch
 # t = torch.rand(4, 4)
 
 a = [2,3,4]
-print(a[0:2])
+for i in a :
+    print(i)
 sys.exit()
 # print(t.size(0))
 # print(t.size(1))
