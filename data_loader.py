@@ -437,10 +437,10 @@ def process_test_regdb(img_dir, modal='visible', trial = 1):
         file_image = file_image_thermal
         file_label = file_label_thermal
     if modal == "thermal" or modal == "visible" :
-        first_image_slice = []
-        first_label_slice = []
-        sec_image_slice = []
-        sec_label_slice = []
+        first_image_slice_query = []
+        first_label_slice_query = []
+        sec_image_slice_gallery = []
+        sec_label_slice_gallery = []
         #On regarde pour chaque id
         for k in range(len(np.unique(file_label))):
             appeared=[]
@@ -450,32 +450,20 @@ def process_test_regdb(img_dir, modal='visible', trial = 1):
                 while rand in appeared:
                     rand = random.choice(file_image[k*10:k*10+9])
                 appeared.append(rand)
-                first_image_slice.append(rand)
-                first_label_slice.append(file_label[k*10])
+                first_image_slice_query.append(rand)
+                first_label_slice_query.append(file_label[k*10])
             #On regarde la liste d'images de l'id k, on récupère les images n'étant pas dans query (5 images)
-            # print(len(file_image[k * 10:k * 10 + 10]))
-            # print(file_image[k * 10:k * 10 + 10])
             for i in file_image[k*10:k*10+10] :
                 if i not in appeared :
-                    sec_image_slice.append(i)
-                    sec_label_slice.append(file_label[k*10])
-        return(first_image_slice, np.array(first_label_slice), sec_image_slice, np.array(sec_label_slice))
+                    sec_image_slice_gallery.append(i)
+                    sec_label_slice_gallery.append(file_label[k*10])
+        return(first_image_slice_query, np.array(first_label_slice_query), sec_image_slice_gallery, np.array(sec_label_slice_gallery))
     #Ancienne version, on verra comment on fait ici
-    elif modal == "VtoT" :
-        first_image_slice = []
-        first_label_slice = []
-        sec_image_slice = []
-        sec_label_slice = []
-
-        for k in range(len(file_image_visible)):
-            # On chosiit TOUTES les personnes en query, le TOUTES les autres dans la gallery
-            first_image_slice.append(file_image_visible[k])
-            first_label_slice.append(file_label_visible[k])
-
-            sec_image_slice.append(file_image_thermal[k])
-            sec_label_slice.append(file_label_thermal[k])
-
-        return(first_image_slice, np.array(first_label_slice), sec_image_slice, np.array(sec_label_slice))
+    if modal == "VtoT" :
+        return (file_image_visible, np.array(file_label_visible), file_image_thermal,
+                np.array(file_label_thermal))
+    elif modal == "TtoV" :
+        return(file_image_thermal, np.array(file_label_thermal), file_image_visible, np.array(file_label_visible))
 
 
 def process_test_sysu(data_path, mode='all'):
