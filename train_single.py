@@ -241,7 +241,6 @@ def multi_process() :
         net.train()
         end = time.time()
         for batch_idx, (input, label) in enumerate(trainloader):
-            print("In loader ")
             input = Variable(input.cuda())
             label = Variable(label.cuda())
             # input = Variable(input)
