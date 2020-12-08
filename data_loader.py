@@ -12,46 +12,43 @@ class RegDBData(data.Dataset):
     def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, modal = "both"):
         # Load training images (path) and labels
         data_dir = '../Datasets/RegDB/'
-        train_color_list = data_dir + 'idx/train_visible_1.txt'
-        train_thermal_list = data_dir + 'idx/train_thermal_1.txt'
+        train_color_list = data_dir + 'idx/train_visible_0.txt'
+        train_thermal_list = data_dir + 'idx/train_thermal_0.txt'
         #Load color and thermal images + labels
-        color_img_file, color_target = load_data(train_color_list)
-        thermal_img_file, thermal_target= load_data(train_thermal_list)
-        color_image = []
-        color_lab = []
-        thermal_image = []
-        thermal_lab = []
-        #Get real and thermal images with good shape in a list
+        color_img_file, train_color_label = load_data(train_color_list)
+        thermal_img_file, train_thermal_label = load_data(train_thermal_list)
 
+        #Get real and thermal images with good shape in a list
+        train_color_image = []
         for i in range(len(color_img_file)):
-            #Visible
             img = Image.open(data_dir + color_img_file[i])
             img = img.resize((144, 288), Image.ANTIALIAS)
             pix_array = np.array(img)
-            color_image.append(pix_array)
-            color_lab.append(color_target[i])
-            #Thermal
+            train_color_image.append(pix_array)
+
+        train_thermal_image = []
+        for i in range(len(thermal_img_file)):
             img = Image.open(data_dir + thermal_img_file[i])
             img = img.resize((144, 288), Image.ANTIALIAS)
             pix_array = np.array(img)
-            thermal_image.append(pix_array)
-            thermal_lab.append(thermal_target[i])
+            train_thermal_image.append(pix_array)
 
-        color_image = np.array(color_image)
-        thermal_image = np.array(thermal_image)
+        train_color_image = np.array(train_color_image)
+        train_thermal_image = np.array(train_thermal_image)
+
         # Init color images / labels
-        self.train_color_image = color_image
-        self.train_color_label = color_lab
+        self.train_color_image = train_color_image
+        self.train_color_label = train_color_label
 
         # Init themal images / labels
-        self.train_thermal_image = thermal_image
-        self.train_thermal_label = thermal_lab
+        self.train_thermal_image = train_thermal_image
+        self.train_thermal_label = train_thermal_label
 
         self.transform = transform
+
         # Prepare index
         self.cIndex = colorIndex
         self.tIndex = thermalIndex
-
         self.modal = modal
 
     def __getitem__(self, index):
