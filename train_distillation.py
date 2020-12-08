@@ -14,8 +14,8 @@ import numpy as np
 from utils import *
 from tensorboardX import SummaryWriter
 from model import Network
-import test_single
 from evaluation import eval_regdb
+from extract_feat import *
 
 from data_augmentation import data_aug
 
@@ -291,8 +291,8 @@ def test(epoch):
     end = time.time()
     #Get all normalized distance
     if args.distilled== "VtoT" :
-        gall_feat_pool, gall_feat_fc = test_single.extract_gall_feat(gall_loader, n_gall, net = net_thermal)
-        query_feat_pool, query_feat_fc = test_single.extract_query_feat(query_loader, n_query, net = net_visible)
+        gall_feat_pool, gall_feat_fc = extract_gall_feat(gall_loader, n_gall, net = net_thermal)
+        query_feat_pool, query_feat_fc = extract_query_feat(query_loader, n_query, net = net_visible)
     print(f"Feature extraction time : {time.time() - end}")
     start = time.time()
     # compute the similarity
