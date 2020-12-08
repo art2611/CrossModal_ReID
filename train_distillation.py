@@ -296,6 +296,10 @@ def multi_process() :
         train_thermal(epoch)
         # validation
         if epoch > 0 and epoch % 2 == 0:
+            validset = None
+            valid_color_pos = None
+            valid_thermal_pos = None
+
             valid_loss = AverageMeter()
             data_time = AverageMeter()
             batch_time = AverageMeter()
