@@ -28,7 +28,7 @@ args = parser.parse_args()
 ### Tensorboard init
 today = date.today()
 d1 = today.strftime("%d")
-if args.trained == "VtoT":
+if args.trained == "VtoV":
     args.trained = "visible"
 writer = SummaryWriter(f"runs/{args.trained}_model_singleReID_{args.reid}-test_{args.dataset}_day{d1}_{time.time()}")
 
