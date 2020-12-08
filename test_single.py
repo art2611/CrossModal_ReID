@@ -218,7 +218,7 @@ def multi_process() :
         print("  ------------------------------")
         print('Data Loading Time:\t {:.3f}'.format(time.time() - end))
 
-        query_feat_pool, query_feat_fc = extract_query_feat(query_loader,nquery = nquery, net = net)
+
 
         for trial in range(10):
             # testing set
