@@ -12,8 +12,8 @@ class RegDBData(data.Dataset):
     def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, modal = "both"):
         # Load training images (path) and labels
         data_dir = '../Datasets/RegDB/'
-        train_color_list = data_dir + 'idx/train_visible_0.txt'
-        train_thermal_list = data_dir + 'idx/train_thermal_0.txt'
+        train_color_list = data_dir + 'idx/train_visible_1.txt'
+        train_thermal_list = data_dir + 'idx/train_thermal_1.txt'
         #Load color and thermal images + labels
         color_img_file, train_color_label = load_data(train_color_list)
         thermal_img_file, train_thermal_label = load_data(train_thermal_list)
