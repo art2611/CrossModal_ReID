@@ -110,6 +110,7 @@ def multi_process() :
 
     #model_path = checkpoint_path +  args.resume
     model_path = '../save_model/' + suffix + '_best.t'
+    print(model_path)
     # model_path = checkpoint_path + 'regdb_awg_p4_n8_lr_0.1_seed_0_trial_{}_best.t'.format(test_trial)
     if os.path.isfile(model_path):
 
