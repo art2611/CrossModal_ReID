@@ -21,13 +21,14 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
 parser.add_argument('--dataset', default='regdb', help='dataset name: regdb or sysu]')
-parser.add_argument('--train', default='visible', help='train visible or thermal only')
+parser.add_argument('--trained', default='visible', help='train visible or thermal only')
+parser.add_argument('--reid', default='visible', help='test this type of reid with selected trained model')
 args = parser.parse_args()
 
 ### Tensorboard init
 today = date.today()
 d1 = today.strftime("%d")
-writer = SummaryWriter(f"runs/{args.train}_singleReID_test_{args.dataset}_day{d1}_{time.time()}")
+writer = SummaryWriter(f"runs/{args.trained}_model_singleReID_{args.reid}-test_{args.dataset}_day{d1}_{time.time()}")
 
 pool_dim = 2048
 # Init variables :
@@ -48,9 +49,9 @@ if args.dataset == "regdb":
     data_path = '../Datasets/RegDB/'
     nclass = 206
 
-suffix = f'{args.dataset}_person_{args.train}_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+suffix = f'{args.dataset}_person_{args.trained}_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
-print(f'Testing {args.train} ReID')
+print(f'Testing {args.trained} ReID')
 # suffix = f'RegDB_person_Visible({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -110,7 +111,7 @@ def multi_process() :
     # model_path = checkpoint_path + 'regdb_awg_p4_n8_lr_0.1_seed_0_trial_{}_best.t'.format(test_trial)
     if os.path.isfile(model_path):
 
-        print(f'==> Loading {args.train} checkpoint on {args.dataset} dataset..')
+        print(f'==> Loading {args.trained} checkpoint on {args.dataset} dataset..')
 
         checkpoint = torch.load(model_path)
         net = Network(class_num=nclass)
@@ -123,16 +124,7 @@ def multi_process() :
     if args.dataset == "regdb" :
         for trial in range(1, 11):
 
-            query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.train, trial = trial)
-            # elif args.dataset == "sysu" :
-            #     ir_img, ir_id, vis_img, vis_id = process_test_sysu(data_path)
-            #     vis_pos, ir_pos  = GenIdx(vis_id, ir_id)
-            #     if args.train == "visible" :
-            #         query_img, query_label, gall_img, gall_label = \
-            #         process2_test_sysu(data_path, modal=args.train, vis_img=vis_img, vis_id=vis_id, vis_pos=vis_pos )
-            #     if args.train == "thermal" :
-            #         query_img, query_label, gall_img, gall_label = \
-            #         process2_test_sysu(data_path, modal=args.train, ir_img =ir_img , ir_id=ir_id, ir_pos = ir_pos)
+            query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, modal=args.reid, trial = trial)
 
             gallset = TestData(gall_img, gall_label, transform=transform_test, img_size=(img_w, img_h))
             gall_loader = torch.utils.data.DataLoader(gallset, batch_size=test_batch_size, shuffle=False, num_workers=workers)
@@ -162,10 +154,10 @@ def multi_process() :
 
             # pool5 feature
             distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
+
             if args.dataset=="regdb":
                 cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, gall_label, query_label)
-            if args.dataset=="sysu":
-                cmc_pool, mAP_pool, mINP_pool = eval_sysu(-distmat_pool, gall_label, query_label)
+
 
             # fc feature
             distmat = np.matmul(gall_feat_fc , np.transpose(query_feat_fc))
@@ -199,7 +191,7 @@ def multi_process() :
 
         # testing set
         query_img, query_label, query_cam, gall_img, gall_label, gall_cam =\
-            process_test_single_sysu(data_path, "test", trial=0, mode='all', relabel=False, reid=args.train)
+            process_test_single_sysu(data_path, "test", trial=0, mode='all', relabel=False, reid=args.reid)
 
 
         nquery = len(query_label)
@@ -221,7 +213,7 @@ def multi_process() :
         for trial in range(10):
             # testing set
             query_img, query_label, query_cam, gall_img, gall_label, gall_cam = \
-                process_test_single_sysu(data_path, "test", trial=trial, mode='all', relabel=False, reid=args.train)
+                process_test_single_sysu(data_path, "test", trial=trial, mode='all', relabel=False, reid=args.reid)
 
             trial_gallset = TestData(gall_img, gall_label, transform=transform_test, img_size=(img_w, img_h))
             trial_gall_loader = data.DataLoader(trial_gallset, batch_size=test_batch_size, shuffle=False, num_workers=4)

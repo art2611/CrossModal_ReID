@@ -29,6 +29,10 @@ def multi_process() :
     parser.add_argument('--dataset', default='regdb', help='dataset name: regdb or sysu]')
     parser.add_argument('--train', default='visible', help='train visible or thermal only')
     args = parser.parse_args()
+    if args.train == "visible" :
+        args.train = "VtoV"
+    elif args.train == "thermal" :
+        args.train = "TtoT"
     print(f"Starting train_single.py, {args.train} training on {args.dataset} dataset")
     # device = 'cpu'
     device = 'cuda' if torch.cuda.is_available() else 'cpu'

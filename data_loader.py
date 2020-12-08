@@ -417,26 +417,26 @@ def process_test_regdb(img_dir, modal='visible', trial = 1):
 
     input_visible_data_path = img_dir + f'idx/test_visible_{trial}.txt'
     input_thermal_data_path = img_dir + f'idx/test_thermal_{trial}.txt'
-    if modal == "visible" or modal == "VtoT" :
+    if modal == "VtoV" or modal == "VtoT" :
         with open(input_visible_data_path) as f:
             data_file_list = open(input_visible_data_path, 'rt').read().splitlines()
             # Get full list of image and labels
             file_image_visible = [img_dir + '/' + s.split(' ')[0] for s in data_file_list]
             file_label_visible = [int(s.split(' ')[1]) for s in data_file_list]
-    if modal == "thermal" or modal == "VtoT":
+    if modal == "TtoT" or modal == "VtoT":
         with open(input_thermal_data_path) as f:
             data_file_list = open(input_thermal_data_path, 'rt').read().splitlines()
             # Get full list of image and labels
             file_image_thermal = [img_dir + '/' + s.split(' ')[0] for s in data_file_list]
             file_label_thermal = [int(s.split(' ')[1]) for s in data_file_list]
     #If required, return half of the dataset in two slice
-    if modal == "visible" :
+    if modal == "VtoV" :
         file_image = file_image_visible
         file_label = file_label_visible
-    if modal == "thermal" :
+    if modal == "TtoT" :
         file_image = file_image_thermal
         file_label = file_label_thermal
-    if modal == "thermal" or modal == "visible" :
+    if modal == "TtoT" or modal == "VtoV" :
         first_image_slice_query = []
         first_label_slice_query = []
         sec_image_slice_gallery = []
@@ -684,10 +684,10 @@ def process_test_single_sysu(data_path, method, trial=0, mode='all', relabel=Fal
     gall_id = []
     gall_cam = []
 
-    if reid == "visible":
+    if reid == "VtoV":
         files_query = files_query_visible
         files_gallery = files_gallery_visible
-    elif reid == "thermal":
+    elif reid == "TtoT":
         files_query = files_query_thermal
         files_gallery = files_gallery_thermal
 
