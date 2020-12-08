@@ -9,7 +9,7 @@ from torchvision import transforms
 import matplotlib.pyplot as plt
 
 class RegDBData(data.Dataset):
-    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, modal = "both", split="training" ):
+    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex=None, modal = "both"):
         # Load training images (path) and labels
         data_dir = '../Datasets/RegDB/'
         train_color_list = data_dir + 'idx/train_visible_1.txt'
@@ -78,7 +78,7 @@ class RegDBData(data.Dataset):
         return len(self.train_color_label)
 
 class SYSUData(data.Dataset):
-    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex = None, split="training", modal ="visible"):
+    def __init__(self, data_dir, transform=None, colorIndex=None, thermalIndex = None, modal ="visible"):
         data_dir = '../Datasets/SYSU/'
         # Load training images (path) and labels
         # 395 ids sont loadées sur les 491
@@ -413,7 +413,7 @@ def GenIdx(train_color_label, train_thermal_label):
 
     return color_pos, thermal_pos
 
-def process_test_regdb(img_dir, modal='visible', trial = 1):
+def process_test_regdb(img_dir, modal='VtoT', trial = 1):
 
     input_visible_data_path = img_dir + f'idx/test_visible_{trial}.txt'
     input_thermal_data_path = img_dir + f'idx/test_thermal_{trial}.txt'

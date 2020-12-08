@@ -92,7 +92,7 @@ def multi_process() :
     if args.dataset == 'sysu':
         # Data info  :
         data_path = '../Datasets/SYSU/'
-        trainset = SYSUData(data_path, transform=transform_train, split ="training", modal=args.train)
+        trainset = SYSUData(data_path, transform=transform_train,  modal=args.train)
         #validset = SYSUData_split(data_path, transform=transform_train, split ="validation", modal=args.train)
         if args.train == "visible":
             print(f'Loaded images : {len(trainset.train_color_image)}')
@@ -110,7 +110,7 @@ def multi_process() :
     if args.dataset == "regdb" :
         data_path = '../Datasets/RegDB/'
         #Split args has no longer influence there
-        trainset = RegDBData(data_path, transform=transform_train, split="training", modal =args.train)
+        trainset = RegDBData(data_path, transform=transform_train, modal =args.train)
         #validset = RegDBData(data_path, transform=transform_train, split="validation", modal =args.train)
         if args.train == "visible":
             # print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')

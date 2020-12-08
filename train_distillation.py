@@ -42,23 +42,14 @@ def multi_process() :
     num_of_same_id_in_batch = 4 # Number of same identity in a batch
     workers = 4
     lr = 0.001
+    if args.distilled=="VtoT" :
+        args.trained="Visible"
 
-    if args.dataset == "sysu":
-        data_path = '../Datasets/SYSU/'
-        if args.distilled == 'VtoT':
-            suffix = f'RegDB_person_Visible_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
-        elif args.distilled == "TtoV":
-            suffix = f'RegDB_person_Thermal_only_sysu({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
-    if args.dataset == "regdb":
-        data_path = '../Datasets/RegDB/'
-        if args.distilled == 'VtoT':
-            suffix = f'RegDB_person_Visible_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
-        elif args.distilled == "TtoV":
-            suffix = f'RegDB_person_Thermal_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+    suffix = f'{args.dataset}_person_{args.trained}_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
     checkpoint_path = '../save_model/'
 
-    suffix_distilled = f'RegDB_person_Thermal_distilled({num_of_same_id_in_batch})_same_id({trainV_batch_num_identities})_lr_{lr}'
+    suffix_distilled = f'{args.dataset}_{args.distilled}_distilled({num_of_same_id_in_batch})_same_id({trainV_batch_num_identities})_lr_{lr}'
 
     #log_path = args.log_path + 'regdb_log/'
     test_mode = [2, 1]  # visible to thermal
@@ -91,7 +82,6 @@ def multi_process() :
 
     # generate the idx of each person identity for instance, identity 10 have the index 100 to 109
     # It is a list of list train_color_pos[10] = [100, ..., 109]
-    # train_color_pos, thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
 
 
     # for i in range(6):
@@ -104,52 +94,47 @@ def multi_process() :
     print('==> Loading images..')
 
     #Get Train set and test set
-    trainset = RegDBData(data_path, transform=transform_train, split="training", modal="both")
+    data_path = '../Datasets/regdb'
+
+    trainset = RegDBData(data_path, transform=transform_train, modal="both")
+
+    ######################################### TEST SET
+    query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, trial=1, modal=args.distilled)
+
+    # Gallery of thermal images - Queryset = Gallery of visible query
+    gallset = TestData(gall_img, gall_label, transform=transform_test, img_size=( img_w, img_h))
+    queryset = TestData(query_img, query_label, transform=transform_test, img_size=( img_w, img_h))
+    # Test data loader
+    gall_loader = torch.utils.data.DataLoader(gallset, batch_size= test_batch_size, shuffle=False, num_workers= workers)
+    query_loader = torch.utils.data.DataLoader(queryset, batch_size= test_batch_size, shuffle=False, num_workers= workers)
+
+    n_class = len(np.unique(trainset.train_color_label))
+    n_query = len(query_label)
+    n_gall = len(gall_label)
 
     ######################################### VALIDATION SET
-    validset = RegDBData(data_path, transform=transform_train, split="validation", modal="both")
+    #validset = RegDBData(data_path, transform=transform_train, split="validation", modal="both")
     # print(validset.valid_color_label)
+    # loaded_img = len(trainset.train_color_image) + len(validset.valid_color_label) + \
+    #         len(trainset.train_thermal_image) + len(validset.valid_thermal_image)
 
-    loaded_img = len(trainset.train_color_image) + len(validset.valid_color_label) + \
-            len(trainset.train_thermal_image) + len(validset.valid_thermal_image)
+    loaded_img = len(trainset.train_color_image) + len(trainset.train_thermal_image)
+    train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
 
     print(f'Data Loading Time:\t {time.time() - Timer1}')
     print(f'Loaded images : {loaded_img}')
     print(f'')
-    ######################################### Image GENERATION
-    # print('==> Image generation..')
-    # end = time.time()
-    # trainset.train_color_image,trainset.train_color_label,\
-    #         trainset.train_thermal_image, trainset.train_thermal_label =\
-    #                                       data_aug(visible_images = trainset.train_color_image, \
-    #                                                Visible_labels = trainset.train_color_label, \
-    #                                                Thermal_images = trainset.train_thermal_image, \
-    #                                                Thermal_labels = trainset.train_thermal_label\
-    #                                                )
-    # validset.valid_color_image,validset.valid_color_label,\
-    #         validset.valid_thermal_image, validset.valid_thermal_label =\
-    #                                       data_aug(visible_images = validset.valid_color_image, \
-    #                                                Visible_labels = validset.valid_color_label, \
-    #                                                Thermal_images = validset.valid_thermal_image, \
-    #                                                Thermal_labels = validset.valid_thermal_label\
-    #                                                )
-    # loaded_img = len(trainset.train_color_image) + len(validset.valid_color_image) + \
-    #              len(trainset.train_thermal_image) + len(validset.valid_thermal_image)
-    # print(f'Data generation time:\t {time.time() - end:.3f}')
-    # print(f'New image number : {loaded_img}')
-
     # Get position list
-    train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
-    valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
-
+    # valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
     print(' ')
     print('Generated dataset statistics:')
     print('   set     |  Nb ids |  Nb img    ')
     print('  ------------------------------')
-    print(f'  train_Visible  | {len(np.unique(trainset.train_color_label)):5d} | {len(trainset.train_color_label):8d}')
-    print(f'  train_Thermal  | {len(np.unique(trainset.train_thermal_label)):5d} | {len(trainset.train_thermal_label):8d}')
-    print(f'  valid_Visible  | {len(np.unique(validset.valid_color_label)):5d} | {len(validset.valid_color_label):8d}')
-    print(f'  valid_Thermal  | {len(np.unique(validset.valid_thermal_label)):5d} | {len(validset.valid_thermal_label):8d}')
+    print(f'  Visible  | {len(np.unique(trainset.train_color_label)):5d} | {len(trainset.train_color_label):8d}')
+    print(f'  Thermal  | {len(np.unique(trainset.train_thermal_label)):5d} | {len(trainset.train_thermal_label):8d}')
+    print('  ------------------------------')
+    print(f'  query    | {len(np.unique(query_label)):5d} | {n_query:8d}')
+    print(f'  gallery  | {len(np.unique(gall_label)):5d} | {n_gall:8d}')
     print('  ------------------------------')
     print(' ')
     print('==> Building model..')

@@ -22,12 +22,14 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')
 parser.add_argument('--dataset', default='regdb', help='dataset name: regdb or sysu]')
 parser.add_argument('--trained', default='visible', help='train visible or thermal only')
-parser.add_argument('--reid', default='visible', help='test this type of reid with selected trained model')
+parser.add_argument('--reid', default='VtoV', help='test this type of reid with selected trained model')
 args = parser.parse_args()
 
 ### Tensorboard init
 today = date.today()
 d1 = today.strftime("%d")
+if args.trained == "VtoT":
+    args.trained = "Visible"
 writer = SummaryWriter(f"runs/{args.trained}_model_singleReID_{args.reid}-test_{args.dataset}_day{d1}_{time.time()}")
 
 pool_dim = 2048
