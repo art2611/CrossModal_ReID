@@ -20,8 +20,10 @@ from extract_feat import *
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
+# device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 device = 'cpu'
-# device2 = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 
 
 parser = argparse.ArgumentParser(description='PyTorch Cross-Modality Training')

@@ -16,8 +16,9 @@ def extract_gall_feat(gall_loader, ngall, net, distillation = False):
         for batch_idx, (input, label) in enumerate(gall_loader):
             batch_num = input.size(0)
             # input = Variable(input)
-            input = Variable(input.cuda())
-            if distillation :
+            if distillation == False:
+                input = Variable(input.cuda())
+            else :
                 input = Variable(input)
             feat_pool, feat_fc = net(input)
             gall_feat_pool[ptr:ptr + batch_num, :] = feat_pool.detach().cpu().numpy()
@@ -37,8 +38,9 @@ def extract_query_feat(query_loader, nquery, net, distillation = False):
     with torch.no_grad():
         for batch_idx, (input, label) in enumerate(query_loader):
             batch_num = input.size(0)
-            input = Variable(input.cuda())
-            if distillation :
+            if distillation == False:
+                input = Variable(input.cuda())
+            else :
                 input = Variable(input)
             # input = Variable(input)
             feat_pool, feat_fc = net(input)
