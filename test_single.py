@@ -160,26 +160,17 @@ def multi_process() :
             query_feat_pool, query_feat_fc = extract_query_feat(query_loader, nquery = nquery, net = net)
             gall_feat_pool,  gall_feat_fc = extract_gall_feat(gall_loader, ngall = ngall, net = net)
 
-            # if True = thermal to visible, else, the reverse
-            if True :
-                # pool5 feature
-                distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
-                if args.dataset=="regdb":
-                    cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, gall_label, query_label)
-                if args.dataset=="sysu":
-                    cmc_pool, mAP_pool, mINP_pool = eval_sysu(-distmat_pool, gall_label, query_label)
+            # pool5 feature
+            distmat_pool = np.matmul(gall_feat_pool, np.transpose(query_feat_pool))
+            if args.dataset=="regdb":
+                cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, gall_label, query_label)
+            if args.dataset=="sysu":
+                cmc_pool, mAP_pool, mINP_pool = eval_sysu(-distmat_pool, gall_label, query_label)
 
-                # fc feature
-                distmat = np.matmul(gall_feat_fc , np.transpose(query_feat_fc))
-                cmc, mAP, mINP = eval_regdb(-distmat,gall_label,  query_label )
-            else:
-                # pool5 feature
-                distmat_pool = np.matmul(query_feat_pool, np.transpose(gall_feat_pool))
-                cmc_pool, mAP_pool, mINP_pool = eval_regdb(-distmat_pool, query_label, gall_label)
+            # fc feature
+            distmat = np.matmul(gall_feat_fc , np.transpose(query_feat_fc))
+            cmc, mAP, mINP = eval_regdb(-distmat,gall_label,  query_label )
 
-                # fc feature
-                distmat = np.matmul(query_feat_fc, np.transpose(gall_feat_fc))
-                cmc, mAP, mINP = eval_regdb(-distmat, query_label, gall_label)
 
             if trial == 1 :
                 all_cmc = cmc
@@ -205,19 +196,6 @@ def multi_process() :
                     cmc_pool[0], cmc_pool[4], cmc_pool[9], cmc_pool[19], mAP_pool, mINP_pool))
 
     if args.dataset == 'sysu':
-
-        print('==> Resuming from checkpoint..')
-        model_path = checkpoint_path + suffix + '_best.t'
-        # model_path = checkpoint_path + 'regdb_awg_p4_n8_lr_0.1_seed_0_trial_{}_best.t'.format(test_trial)
-        if os.path.isfile(model_path):
-            print('==> loading checkpoint')
-            checkpoint = torch.load(model_path)
-            net = Network(class_num=nclass)
-            net = net.to(device)
-            net.load_state_dict(checkpoint['net'])
-        else :
-            print("Saved model not loaded, care")
-            net = Network(class_num = nclass).to(device)
 
         # testing set
         query_img, query_label, query_cam, gall_img, gall_label, gall_cam =\
