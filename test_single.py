@@ -29,7 +29,7 @@ args = parser.parse_args()
 today = date.today()
 d1 = today.strftime("%d")
 if args.trained == "VtoV":
-    args.trained = "visible"
+    args.trained = "Visible"
 elif args.trained == "TtoT" :
     args.trained = "thermal"
 writer = SummaryWriter(f"runs/{args.trained}_model_singleReID_{args.reid}-test_{args.dataset}_day{d1}_{time.time()}")
