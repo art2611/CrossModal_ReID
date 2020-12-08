@@ -17,6 +17,7 @@ from multiprocessing import freeze_support
 import os
 from evaluation import eval_regdb
 import sys
+from test_single import extract_gall_feat, extract_query_feat
 from data_augmentation import data_aug
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
@@ -286,6 +287,34 @@ def multi_process() :
         writer.add_scalar('Training accuracy ', 100. * correct / total, epoch)
 
 
+    def test(epoch):
+
+        end = time.time()
+        #Get all normalized distance
+        if args.distilled== "VtoT" :
+            gall_feat_pool, gall_feat_fc = extract_gall_feat(gall_loader, n_gall, net = net_thermal)
+            query_feat_pool, query_feat_fc = extract_query_feat(query_loader, n_query, net = net_visible)
+        print(f"Feature extraction time : {time.time() - end}")
+        start = time.time()
+        # compute the similarity
+        distmat_pool = np.matmul(query_feat_pool, np.transpose(gall_feat_pool))
+        distmat_fc = np.matmul(query_feat_fc, np.transpose(gall_feat_fc))
+
+        # evaluation
+        if args.dataset == 'regdb':
+            cmc, mAP, mINP      = eval_regdb(-distmat_pool, query_label, gall_label)
+            cmc_att, mAP_att, mINP_att  = eval_regdb(-distmat_fc, query_label, gall_label)
+        #
+        # elif args.dataset == 'sysu':
+        #
+        #     cmc, mAP, mINP = eval_sysu(-distmat_pool, query_label, gall_label, query_cam, gall_cam)
+        #     cmc_att, mAP_att, mINP_att = eval_sysu(-distmat_fc, query_label, gall_label, query_cam, gall_cam)
+
+        print('Evaluation Time:\t {:.3f}'.format(time.time() - start))
+        writer.add_scalar('Accuracy validation', mAP, epoch)
+
+        return cmc, mAP, mINP, cmc_att, mAP_att, mINP_att
+
     # Training part
     # start_epoch = 0
     loader_batch = batch_num_identities * num_of_same_id_in_batch
@@ -309,11 +338,43 @@ def multi_process() :
 
         # training
         train_thermal(epoch)
-        # validation
-        if epoch > 0 and epoch % 2 == 0:
-            validset = None
-            valid_color_pos = None
-            valid_thermal_pos = None
+        # validation :
+        if epoch > 0 and epoch % 2 == 0  :
+            print(f'Test Epoch: {epoch}')
+
+            # testing
+            cmc, mAP, mINP, cmc_att, mAP_att, mINP_att = test(epoch)
+            # save model
+            if cmc_att[0] > best_acc:  # not the real best for sysu-mm01
+                best_acc = cmc_att[0]
+                best_epoch = epoch
+                state = {
+                    'net': net_thermal.state_dict(),
+                    'cmc': cmc_att,
+                    'mAP': mAP_att,
+                    'mINP': mINP_att,
+                    'epoch': epoch,
+                }
+                torch.save(state, checkpoint_path + suffix_distilled + '_best.t')
+
+            # save model
+            if epoch > 10 and epoch % 20 == 0:
+                state = {
+                    'net': net_thermal.state_dict(),
+                    'cmc': cmc,
+                    'mAP': mAP,
+                    'epoch': epoch,
+                }
+                torch.save(state, checkpoint_path + suffix_distilled + '_best.t')
+            print(
+                'POOL:   Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
+                    cmc[0], cmc[4], cmc[9], cmc[19], mAP, mINP))
+            print(
+                'FC:   Rank-1: {:.2%} | Rank-5: {:.2%} | Rank-10: {:.2%}| Rank-20: {:.2%}| mAP: {:.2%}| mINP: {:.2%}'.format(
+                    cmc_att[0], cmc_att[4], cmc_att[9], cmc_att[19], mAP_att, mINP_att))
+            print('Best Epoch [{}]'.format(best_epoch))
+        # if epoch > 0 and epoch % 2 == 0 and False:
+        if False :
 
             valid_loss = AverageMeter()
             data_time = AverageMeter()
