@@ -100,7 +100,7 @@ def multi_process() :
     #Get Train set and test set
     data_path = '../Datasets/RegDB'
 
-    trainset = RegDBData(data_path, transform=transform_train, modal="both")
+    trainset = RegDBData(data_path, transform=transform_train, modal=args.distilled)
 
     ######################################### TEST SET
     query_img, query_label, gall_img, gall_label = process_test_regdb(data_path, trial=1, modal=args.distilled)
