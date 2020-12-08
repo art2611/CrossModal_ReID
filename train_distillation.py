@@ -17,7 +17,6 @@ from model import Network
 from evaluation import eval_regdb
 from extract_feat import *
 
-from data_augmentation import data_aug
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
@@ -338,7 +337,7 @@ for epoch in range(81):
     # training
     train_thermal(epoch)
     # validation :
-    if epoch > 0 and epoch % 2 == 0  :
+    if epoch > 0 and epoch % 1 == 0  :
         print(f'Test Epoch: {epoch}')
 
         # testing
