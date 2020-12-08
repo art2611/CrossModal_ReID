@@ -328,7 +328,7 @@ def multi_process() :
         print('==> Preparing Data Loader...')
         # identity sampler - Give iteratively index from a randomized list of color index and thermal index
         if args.train == "VtoV":
-            Print("SAMPLE VtoV")
+            print("SAMPLE VtoV")
             sampler_train  = UniModalIdentitySampler(trainset.train_color_label, \
                                 train_color_pos, \
                                 num_of_same_id_in_batch, batch_num_identities)
