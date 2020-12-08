@@ -5,7 +5,7 @@ from torch.autograd import Variable
 
 pool_dim = 2048
 
-def extract_gall_feat(gall_loader, ngall, net, visible_train = False):
+def extract_gall_feat(gall_loader, ngall, net, distillation = False):
     net.eval()
     print('Extracting Gallery Feature...')
     start = time.time()
@@ -17,7 +17,8 @@ def extract_gall_feat(gall_loader, ngall, net, visible_train = False):
             batch_num = input.size(0)
             # input = Variable(input)
             input = Variable(input.cuda())
-
+            if distillation :
+                input = Variable(input)
             feat_pool, feat_fc = net(input)
             gall_feat_pool[ptr:ptr + batch_num, :] = feat_pool.detach().cpu().numpy()
             gall_feat_fc[ptr:ptr + batch_num, :] = feat_fc.detach().cpu().numpy()
@@ -26,7 +27,7 @@ def extract_gall_feat(gall_loader, ngall, net, visible_train = False):
     return gall_feat_pool, gall_feat_fc
 
 
-def extract_query_feat(query_loader, nquery, net):
+def extract_query_feat(query_loader, nquery, net, distillation = False):
     net.eval()
     print('Extracting Query Feature...')
     start = time.time()
@@ -37,6 +38,8 @@ def extract_query_feat(query_loader, nquery, net):
         for batch_idx, (input, label) in enumerate(query_loader):
             batch_num = input.size(0)
             input = Variable(input.cuda())
+            if distillation :
+                input = Variable(input)
             # input = Variable(input)
             feat_pool, feat_fc = net(input)
             query_feat_pool[ptr:ptr + batch_num, :] = feat_pool.detach().cpu().numpy()
