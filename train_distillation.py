@@ -14,7 +14,7 @@ import numpy as np
 from utils import *
 from tensorboardX import SummaryWriter
 from model import Network
-from test_single import *
+# from test_single import *
 from evaluation import eval_regdb
 
 from data_augmentation import data_aug
