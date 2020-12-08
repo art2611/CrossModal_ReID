@@ -339,7 +339,7 @@ for epoch in range(81):
     # training
     train_thermal(epoch)
     # validation :
-    if epoch > 0 and epoch % 1 == 0  :
+    if epoch > 0 and epoch % 2 == 0  :
         print(f'Test Epoch: {epoch}')
 
         # testing
