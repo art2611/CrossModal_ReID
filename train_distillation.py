@@ -98,7 +98,7 @@ def multi_process() :
     print('==> Loading images..')
 
     #Get Train set and test set
-    data_path = '../Datasets/regdb'
+    data_path = '../Datasets/RegDB'
 
     trainset = RegDBData(data_path, transform=transform_train, modal="both")
 
