@@ -45,7 +45,9 @@ def multi_process() :
     workers = 4
     lr = 0.001
     if args.distilled=="VtoT" :
-        args.trained="Visible"
+        args.trained="VtoV"
+    elif args.distilled=="TtoV":
+        args.trained="TtoT"
 
     suffix = f'{args.dataset}_person_{args.trained}_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
