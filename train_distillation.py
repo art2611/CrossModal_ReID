@@ -17,7 +17,7 @@ from multiprocessing import freeze_support
 import os
 from evaluation import eval_regdb
 import sys
-from test_single import extract_gall_feat, extract_query_feat
+# from test_single import extract_gall_feat, extract_query_feat
 from data_augmentation import data_aug
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
