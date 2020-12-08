@@ -170,7 +170,7 @@ def multi_process() :
 
     n_query = len(query_label)
     n_gall = len(gall_label)
-    if args.train == "visible":
+    if args.train == "VtoV":
 
         print(f'Identities number : {len(train_color_pos)}')
         print(' ')
@@ -185,7 +185,7 @@ def multi_process() :
         print('  ------------------------------')
         class_number = len(np.unique(trainset.train_color_label))
 
-    elif args.train == "thermal":
+    elif args.train == "TtoT":
 
         print(f'Identities number : {len(train_thermal_pos)}')
         print(' ')
