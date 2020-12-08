@@ -53,24 +53,24 @@ class RegDBData(data.Dataset):
 
     def __getitem__(self, index):
         #Dataset[i] return images from both modal and the corresponding label
-        if self.modal == "both" or self.modal == "visible" :
+        if self.modal in ["VtoT", "TtoV", "VtoV"] :
             img1, target1 = self.train_color_image[self.cIndex[index]], self.train_color_label[self.cIndex[index]]
-        if self.modal == "both" or self.modal == "thermal":
+        if self.modal in ["VtoT", "TtoV", "TtoT"] :
             img2, target2 = self.train_thermal_image[self.tIndex[index]], self.train_thermal_label[self.tIndex[index]]
 
-        if self.modal == "both" :
+        if self.modal in ["VtoT", "TtoV"] :
             img1 = self.transform(img1)
             img2 = self.transform(img2)
             return img1, img2, target1, target2
-        elif self.modal == "visible" :
+        elif self.modal == "VtoV" :
             img1 = self.transform(img1)
             return img1, target1
-        elif self.modal == "thermal" :
+        elif self.modal == "TtoT" :
             img2 = self.transform(img2)
             return img2, target2
 
     def __len__(self):
-        if self.modal == "thermal" :
+        if self.modal == "TtoT" :
             return len(self.train_thermal_label)
         return len(self.train_color_label)
 
