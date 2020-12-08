@@ -412,8 +412,8 @@ def GenIdx(train_color_label, train_thermal_label):
 
 def process_test_regdb(img_dir, modal='visible', trial = 1):
 
-    input_visible_data_path = img_dir + f'idx/test_visible_{trial}.txt'
-    input_thermal_data_path = img_dir + f'idx/test_thermal_{trial}.txt'
+    input_visible_data_path = img_dir + f'/idx/test_visible_{trial}.txt'
+    input_thermal_data_path = img_dir + f'/idx/test_thermal_{trial}.txt'
 
     with open(input_visible_data_path) as f:
         data_file_list = open(input_visible_data_path, 'rt').read().splitlines()
