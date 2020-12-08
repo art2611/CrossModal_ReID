@@ -94,9 +94,7 @@ class UniModalIdentitySampler(Sampler):
         for j in range(int(N / (batchSize * num_pos) + 1)):
             batch_idx = np.random.choice(uni_label, batchSize, replace=False)
             for i in range(batchSize):
-                #On choisit un nombre num pos au hasard de même personne d'identité batchidx[i]
-                #print(f'chosen id : {batch_idx[i] - train_color_label[0]}')
-                sample_color = np.random.choice(_pos[batch_idx[i] - train_label[0]], num_pos)
+                sample_color = np.random.choice(_pos[batch_idx[i]], num_pos)
                 if j == 0 and i == 0:
                     index1 = sample_color
                 else:
