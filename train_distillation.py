@@ -30,6 +30,8 @@ def multi_process() :
     # parser.add_argument('--trained', default='visible', help='train visible or thermal only')
     parser.add_argument('--board', default='default', help='tensorboard name')
     parser.add_argument('--distilled', default='VtoT', help='tensorboard name')
+    parser.add_argument('--mode', default='cp&freeze', help='tensorboard name')
+
     args = parser.parse_args()
 
     writer = SummaryWriter(f"runs/{args.board}")
@@ -150,26 +152,37 @@ def multi_process() :
         # No weight init for thermal
         net_thermal = Network(class_num=nclass)
         net_thermal.to(device)
-        net_thermal.load_state_dict(checkpoint['net'])
+
         net_visible = Network(class_num=nclass)
         net_visible.to(device)
-        net_visible.load_state_dict(checkpoint['net'])
+        if args.mode in ["cp&freeze", "copy"] :
+            net_thermal.load_state_dict(checkpoint['net'])
+            net_visible.load_state_dict(checkpoint['net'])
+        elif args.distilled == "VtoT" :
+            net_visible.load_state_dict(checkpoint['net'])
+        elif args.distilled == "TtoV" :
+            net_thermal.load_state_dict(checkpoint['net'])
     else:
         print("Saved model not loaded, care")
         sys.exit()
-    #Je pense qu'on peut prendre le vecteur en sortir du FC car ça signifie que l'activation des neurones au préalable est bonne.
+
     net_visible.train()
     net_thermal.train()
     # Freeze some in thermal model
 
-    if args.distilled == "VtoT" :
-        net_thermal.Resnet_module.res.layer2.requires_grad = False
-        net_thermal.Resnet_module.res.layer3.requires_grad = False
-        net_thermal.Resnet_module.res.layer4.requires_grad = False
-    elif args.distilled == "TtoV" :
-        net_visible.Resnet_module.res.layer2.requires_grad = False
-        net_visible.Resnet_module.res.layer3.requires_grad = False
-        net_visible.Resnet_module.res.layer4.requires_grad = False
+    if args.mode == "cp&freeze" :
+
+        if args.distilled == "VtoT" :
+            net_thermal.Resnet_module.res.layer2.requires_grad = False
+            net_thermal.Resnet_module.res.layer3.requires_grad = False
+            net_thermal.Resnet_module.res.layer4.requires_grad = False
+            print("Several layers frozen")
+        elif args.distilled == "TtoV" :
+            net_visible.Resnet_module.res.layer2.requires_grad = False
+            net_visible.Resnet_module.res.layer3.requires_grad = False
+            net_visible.Resnet_module.res.layer4.requires_grad = False
+            print("Several layers frozen")
+
 
     ######################################### TRAINING
     print('==> Start Training...')
