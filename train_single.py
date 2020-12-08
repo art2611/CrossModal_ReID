@@ -91,11 +91,11 @@ def multi_process() :
         data_path = '../Datasets/SYSU/'
         trainset = SYSUData(data_path, transform=transform_train,  modal=args.train)
         #validset = SYSUData_split(data_path, transform=transform_train, split ="validation", modal=args.train)
-        if args.train == "visible":
+        if args.train == "VtoV":
             print(f'Loaded images : {len(trainset.train_color_image)}')
             train_color_pos, train_thermal_pos = GenIdx(trainset.train_color_label, trainset.train_thermal_label)
             # valid_color_pos, valid_thermal_pos = GenIdx(validset.valid_color_label, validset.valid_thermal_label)
-        elif args.train == "thermal" :
+        elif args.train == "TtoT" :
             print(f'Loaded images : {len(trainset.train_thermal_image)}')
             train_thermal_pos, _ = GenIdx(trainset.train_thermal_label, trainset.train_thermal_label)
             # print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
@@ -109,12 +109,12 @@ def multi_process() :
         #Split args has no longer influence there
         trainset = RegDBData(data_path, transform=transform_train, modal =args.train)
         #validset = RegDBData(data_path, transform=transform_train, split="validation", modal =args.train)
-        if args.train == "visible":
+        if args.train == "VtoV":
             # print(f'Loaded images : {len(trainset.train_color_image) + len(validset.valid_color_label)}')
             print(f'Loaded images : {len(trainset.train_color_image)}')
             train_color_pos, _ = GenIdx(trainset.train_color_label, trainset.train_color_label)
             # valid_color_pos, _ = GenIdx(validset.valid_color_label, validset.valid_color_label)
-        elif args.train == "thermal" :
+        elif args.train == "TtoT" :
            # print(f'Loaded images : {len(trainset.train_thermal_image) + len(validset.valid_thermal_label)}')
             print(f'Loaded images : {len(trainset.train_thermal_image)}')
             train_thermal_pos, _ = GenIdx(trainset.train_thermal_label, trainset.train_thermal_label)
@@ -327,12 +327,12 @@ def multi_process() :
 
         print('==> Preparing Data Loader...')
         # identity sampler - Give iteratively index from a randomized list of color index and thermal index
-        if args.train == "visible":
+        if args.train == "VtoV":
             sampler_train  = UniModalIdentitySampler(trainset.train_color_label, \
                                 train_color_pos, \
                                 num_of_same_id_in_batch, batch_num_identities)
             trainset.cIndex = sampler_train.index1  # color index
-        elif args.train == "thermal":
+        elif args.train == "TtoT":
             sampler_train = UniModalIdentitySampler(trainset.train_thermal_label, \
                                                     train_thermal_pos, \
                                                     num_of_same_id_in_batch, batch_num_identities)
