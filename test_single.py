@@ -30,7 +30,7 @@ args = parser.parse_args()
 batch_num_identities = 16  # 16 different identities in a batch
 num_of_same_id_in_batch = 4  # Number of same identity in a batch
 lr = 0.001
-suffix = f'{args.dataset}_person_{args.train}_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+suffix = f'{args.dataset}_person_{args.trained}_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
 #If reid TtoT sur modèle de distillation entraîné
 suffix_thermal = f'regdb_VtoT_distilled({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
