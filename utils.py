@@ -60,8 +60,8 @@ class IdentitySampler_paired(Sampler):
                 #On choisit un nombre num pos au hasard de même personne d'identité batchidx[i]
                 sample_color = np.random.choice(color_pos[batch_idx[i]], num_pos)
                 # sample_thermal = np.random.choice(thermal_pos[batch_idx[i]], num_pos)
-                sample_thermal = sample_color
-                # We need paired images for distillation
+                sample_thermal =  np.random.choice(color_pos[batch_idx[i]], num_pos)
+                # We trial with strict pairs or not, seems a bit better when not strict
                 #sample_thermal = sample_color
                 if j == 0 and i == 0:
                     index1 = sample_color
