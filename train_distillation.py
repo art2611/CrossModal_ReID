@@ -254,9 +254,11 @@ def train_thermal(epoch):
         loss_MSE = criterion_MSE(out1, out2)
 
         if args.distilled == "VtoT" :
-            _, predicted = out2.max(1)
-            print(f"predicted : {predicted}")
-            correct += (predicted.eq(thermal_label).sum().item())
+            _, predicted1 = out1.max(1)
+            _, predicted2 = out2.max(1)
+            print(f"predicted 1 : {predicted1}")
+            print(f"predicted 2 : {predicted2}")
+            correct += (predicted2.eq(thermal_label).sum().item())
             # correct += (predicted.eq(labels).sum().item())
 
             optimizer_thermal.zero_grad()
