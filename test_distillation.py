@@ -19,7 +19,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # device = 'cpu'
 nclass = 206
 # net = Network(class_num=nclass).to(device)
-writer = SummaryWriter(f"runs/test_distillation_strict")
+writer = SummaryWriter(f"runs/Distillation_freeze_and_copy_test_strict")
 pool_dim = 2048
 # Init variables :
 img_w = 144
