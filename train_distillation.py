@@ -195,18 +195,18 @@ ignored_params = list(map(id, net_thermal.bottleneck.parameters())) \
                  + list(map(id, net_thermal.fc.parameters()))
 
 base_params = filter(lambda p: id(p) not in ignored_params, net_thermal.parameters())
-base_params_v = filter(lambda p: id(p) not in ignored_params, net_visible.parameters())
 
 optimizer_thermal = optim.SGD([
     {'params': base_params, 'lr': 0.1 * lr},
     {'params': net_thermal.bottleneck.parameters(), 'lr': lr},
     {'params': net_thermal.fc.parameters(), 'lr': lr}],
     weight_decay=5e-4, momentum=0.9, nesterov=True)
+
 #Train function
 ignored_params = list(map(id, net_visible.bottleneck.parameters())) \
                  + list(map(id, net_visible.fc.parameters()))
 
-base_params = filter(lambda p: id(p) not in ignored_params, net_visible.parameters())
+base_params_v = filter(lambda p: id(p) not in ignored_params, net_visible.parameters())
 
 optimizer_visible = optim.SGD([
     {'params': base_params_v, 'lr': 0.1 * lr},
@@ -227,7 +227,8 @@ def train_thermal(epoch):
     batch_time = AverageMeter()
     correct = 0
     total = 0
-
+    net_thermal.train()
+    net_visible.train()
     end = time.time()
     for batch_idx, (visible_input, thermal_input, visible_label, thermal_label) in enumerate(trainloader):
         # visible_input = Variable(visible_input.cuda())
