@@ -42,7 +42,8 @@ if args.trained == "VtoV":
     args.trained = "Visible"
 elif args.trained == "TtoT" :
     args.trained = "thermal"
-writer = SummaryWriter(f"runs/{args.trained}_model_singleReID_{args.reid}-test_{args.dataset}_day{d1}_{time.time()}")
+# writer = SummaryWriter(f"runs/{args.trained}_model_singleReID_{args.reid}-test_{args.dataset}_day{d1}_{time.time()}")
+writer = SummaryWriter(f"runs/TEST_TtoT_distilledMODEL")
 
 pool_dim = 2048
 # Init variables :
