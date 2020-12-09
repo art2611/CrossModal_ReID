@@ -241,10 +241,8 @@ def train_thermal(epoch):
         thermal_input = Variable(thermal_input)
         visible_label = Variable(visible_label)
         thermal_label = Variable(thermal_label)
-        print(f"Label 1 : {visible_label}")
-        print(f"Label 2 : {thermal_label}")
-        # labels = torch.cat((visible_label, thermal_label), 0)
-        # print(f"Label 3 : {labels}")
+        # print(f"Label 1 : {visible_label}")
+        # print(f"Label 2 : {thermal_label}")
 
         # labels = Variable(labels)
         data_time.update(time.time() - end)
@@ -257,8 +255,8 @@ def train_thermal(epoch):
         if args.distilled == "VtoT" :
             _, predicted1 = out1.max(1)
             _, predicted2 = out2.max(1)
-            print(f"predicted 1 : {predicted1}")
-            print(f"predicted 2 : {predicted2}")
+            # print(f"predicted 1 : {predicted1}")
+            # print(f"predicted 2 : {predicted2}")
             correct += (predicted2.eq(predicted1).sum().item())
             # correct += (predicted.eq(labels).sum().item())
 

@@ -54,7 +54,7 @@ if args.dataset == "regdb":
     data_path = '../Datasets/RegDB/'
     nclass = 206
 
-suffix = f'{args.dataset}_person_{args.trained}_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+suffix = f'{args.dataset}_person_VtoV_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
 print(f'Testing {args.trained} ReID')
 # suffix = f'RegDB_person_Visible({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
