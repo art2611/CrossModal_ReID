@@ -26,6 +26,15 @@ parser.add_argument('--trained', default='VtoV', help='train visible or thermal 
 parser.add_argument('--reid', default='VtoV', help='test this type of reid with selected trained model')
 args = parser.parse_args()
 
+
+batch_num_identities = 16  # 16 different identities in a batch
+num_of_same_id_in_batch = 4  # Number of same identity in a batch
+lr = 0.001
+suffix = f'{args.dataset}_person_{args.train}_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+
+#If reid TtoT sur modèle de distillation entraîné
+suffix_thermal = f'regdb_VtoT_distilled({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+
 ### Tensorboard init
 today = date.today()
 d1 = today.strftime("%d")
@@ -40,10 +49,8 @@ pool_dim = 2048
 img_w = 144
 img_h = 288
 test_batch_size = 64
-batch_num_identities = 16  # 16 different identities in a batch
-num_of_same_id_in_batch = 4  # Number of same identity in a batch
 workers = 4
-lr = 0.001
+
 checkpoint_path = '../save_model/'
 
 if args.dataset == "sysu":
@@ -54,7 +61,6 @@ if args.dataset == "regdb":
     data_path = '../Datasets/RegDB/'
     nclass = 206
 
-suffix = f'{args.dataset}_person_VtoV_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
 print(f'Testing {args.trained} ReID')
 # suffix = f'RegDB_person_Visible({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
