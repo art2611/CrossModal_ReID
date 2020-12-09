@@ -240,9 +240,14 @@ def train_thermal(epoch):
         thermal_input = Variable(thermal_input)
         visible_label = Variable(visible_label)
         thermal_label = Variable(thermal_label)
+        print(f"Label 1 : {visible_label}")
+        print(f"Label 2 : {thermal_label}")
+        labels = torch.cat((visible_label, thermal_label), 0)
+        print(f"Label 3 : {labels}")
+
         # labels = Variable(labels)
         data_time.update(time.time() - end)
-
+        labels = Variable(labels.cuda())
         feat1, out1, = net_visible(visible_input)  # Call the visible trained net
         feat2, out2, = net_thermal(thermal_input)  # Call the  net thermal to train net
 
