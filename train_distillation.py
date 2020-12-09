@@ -247,7 +247,7 @@ def train_thermal(epoch):
 
         # labels = Variable(labels)
         data_time.update(time.time() - end)
-        labels = Variable(labels.cuda())
+
         feat1, out1, = net_visible(visible_input)  # Call the visible trained net
         feat2, out2, = net_thermal(thermal_input)  # Call the  net thermal to train net
 
