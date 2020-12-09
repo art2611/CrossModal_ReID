@@ -32,8 +32,10 @@ lr = 0.001
 checkpoint_path = '../save_model/'
 data_path = '../Datasets/RegDB/'
 
-suffix_visible = f'RegDB_person_Visible_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
-suffix_thermal = f'RegDB_person_Thermal_distilled({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+# suffix_visible = f'RegDB_person_Visible_only_regdb({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+# suffix_thermal = f'RegDB_person_Thermal_distilled({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+suffix_visible = f'regdb_person_VtoV_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+suffix_thermal = f'regdb_VtoT_distilled({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
 #
 test_mode = [2, 1]  # visible to thermal
