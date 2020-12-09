@@ -255,6 +255,7 @@ def train_thermal(epoch):
 
         if args.distilled == "VtoT" :
             _, predicted = out2.max(1)
+            print(f"predicted : {predicted}")
             correct += (predicted.eq(thermal_label).sum().item())
             # correct += (predicted.eq(labels).sum().item())
 
