@@ -30,10 +30,10 @@ args = parser.parse_args()
 batch_num_identities = 16  # 16 different identities in a batch
 num_of_same_id_in_batch = 4  # Number of same identity in a batch
 lr = 0.001
-suffix = f'{args.dataset}_person_{args.trained}_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+# suffix = f'{args.dataset}_person_{args.trained}_only_({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
-#If reid TtoT sur modèle de distillation entraîné
-# suffix = f'regdb_VtoT_distilled({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
+# If reid TtoT sur modèle de distillation entraîné
+suffix = f'regdb_VtoT_distilled({num_of_same_id_in_batch})_same_id({batch_num_identities})_lr_{lr}'
 
 ### Tensorboard init
 today = date.today()
@@ -42,8 +42,8 @@ if args.trained == "VtoV":
     args.trained = "Visible"
 elif args.trained == "TtoT" :
     args.trained = "thermal"
-writer = SummaryWriter(f"runs/{args.trained}_model_singleReID_{args.reid}-test_{args.dataset}_day{d1}_{time.time()}")
-# writer = SummaryWriter(f"runs/TEST_TtoT_distilledMODEL")
+# writer = SummaryWriter(f"runs/{args.trained}_model_singleReID_{args.reid}-test_{args.dataset}_day{d1}_{time.time()}")
+writer = SummaryWriter(f"runs/TEST_TtoT_distilledMODEL")
 
 pool_dim = 2048
 # Init variables :
